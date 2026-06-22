@@ -1,0 +1,267 @@
+/**
+ * Report HTML templates for PDF generation.
+ * Each returns an HTML string that can be passed to generatePDF().
+ */
+
+interface PurchaseOrderData {
+  poNumber: string;
+  vendorName: string;
+  vendorEmail: string | null;
+  locationName: string;
+  expectedDate: string | null;
+  status: string;
+  notes: string | null;
+  lineItems: Array<{
+    sku: string;
+    title: string;
+    quantity: number;
+    unitCost: number;
+  }>;
+  shippingCost: number;
+  customsDuties: number;
+  otherCosts: number;
+}
+
+export function generatePurchaseOrderHTML(po: PurchaseOrderData): string {
+  const subtotal = po.lineItems.reduce(
+    (sum, item) => sum + item.quantity * item.unitCost,
+    0
+  );
+  const totalCost = subtotal + po.shippingCost + po.customsDuties + po.otherCosts;
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 30px; color: #333; }
+    .header { display: flex; justify-content: space-between; margin-bottom: 30px; }
+    .header h1 { color: #0066cc; margin: 0; }
+    .header .po-number { text-align: right; }
+    .header .po-number h2 { margin: 0; color: #333; }
+    .meta { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px; }
+    .meta-block h3 { font-size: 11px; text-transform: uppercase; color: #666; margin: 0 0 4px; }
+    .meta-block p { margin: 0; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+    th { background: #f4f6f8; text-align: left; padding: 10px; border-bottom: 2px solid #ddd; font-size: 11px; text-transform: uppercase; }
+    td { padding: 10px; border-bottom: 1px solid #eee; font-size: 13px; }
+    .text-right { text-align: right; }
+    .totals { margin-top: 20px; text-align: right; }
+    .totals .row { display: flex; justify-content: flex-end; gap: 40px; padding: 4px 0; font-size: 13px; }
+    .totals .row.total { font-size: 16px; font-weight: bold; border-top: 2px solid #333; padding-top: 8px; margin-top: 8px; }
+    .status { display: inline-block; padding: 4px 12px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+    .status-sent { background: #fff3e0; color: #e65100; }
+    .status-received { background: #e8f5e9; color: #2e7d32; }
+    .footer { margin-top: 40px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 11px; color: #666; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>PURCHASE ORDER</h1>
+      <p style="color:#666;margin:4px 0 0;">StockFlows Inventory Management</p>
+    </div>
+    <div class="po-number">
+      <h2>${escapeHtml(po.poNumber)}</h2>
+      <p style="color:#666;margin:4px 0 0;">
+        Status: <span class="status status-${po.status.toLowerCase()}">${po.status}</span>
+      </p>
+    </div>
+  </div>
+
+  <div class="meta">
+    <div class="meta-block">
+      <h3>Vendor</h3>
+      <p><strong>${escapeHtml(po.vendorName)}</strong></p>
+      ${po.vendorEmail ? `<p>${escapeHtml(po.vendorEmail)}</p>` : ""}
+    </div>
+    <div class="meta-block">
+      <h3>Ship To</h3>
+      <p><strong>${escapeHtml(po.locationName)}</strong></p>
+    </div>
+    <div class="meta-block">
+      <h3>Expected Delivery</h3>
+      <p>${po.expectedDate || "Not specified"}</p>
+    </div>
+    <div class="meta-block">
+      <h3>Date Issued</h3>
+      <p>${new Date().toLocaleDateString()}</p>
+    </div>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Product</th>
+        <th class="text-right">Qty</th>
+        <th class="text-right">Unit Cost</th>
+        <th class="text-right">Total</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${po.lineItems
+        .map(
+          (item) => `
+        <tr>
+          <td>${escapeHtml(item.sku || "—")}</td>
+          <td>${escapeHtml(item.title)}</td>
+          <td class="text-right">${item.quantity}</td>
+          <td class="text-right">$${item.unitCost.toFixed(2)}</td>
+          <td class="text-right">$${(item.quantity * item.unitCost).toFixed(2)}</td>
+        </tr>
+      `
+        )
+        .join("")}
+    </tbody>
+  </table>
+
+  <div class="totals">
+    <div class="row"><span>Subtotal:</span><span>$${subtotal.toFixed(2)}</span></div>
+    ${po.shippingCost > 0 ? `<div class="row"><span>Shipping:</span><span>$${po.shippingCost.toFixed(2)}</span></div>` : ""}
+    ${po.customsDuties > 0 ? `<div class="row"><span>Customs/Duties:</span><span>$${po.customsDuties.toFixed(2)}</span></div>` : ""}
+    ${po.otherCosts > 0 ? `<div class="row"><span>Other:</span><span>$${po.otherCosts.toFixed(2)}</span></div>` : ""}
+    <div class="row total"><span>Total:</span><span>$${totalCost.toFixed(2)}</span></div>
+  </div>
+
+  ${po.notes ? `<div style="margin-top:30px;padding:12px;background:#f4f6f8;border-radius:4px;"><h3 style="margin:0 0 8px;font-size:12px;text-transform:uppercase;color:#666;">Notes</h3><p style="margin:0;font-size:13px;">${escapeHtml(po.notes)}</p></div>` : ""}
+
+  <div class="footer">
+    <p>This purchase order was generated by StockFlows — ${new Date().toLocaleDateString()}</p>
+  </div>
+</body>
+</html>`;
+}
+
+export function generateInventoryValuationHTML(
+  items: Array<{
+    sku: string;
+    title: string;
+    location: string;
+    quantity: number;
+    unitCost: number | null;
+  }>,
+  locationName?: string
+): string {
+  const totalValue = items.reduce(
+    (sum, i) => sum + i.quantity * (i.unitCost ?? 0),
+    0
+  );
+  const totalUnits = items.reduce((sum, i) => sum + i.quantity, 0);
+
+  // Group by location
+  const byLocation = new Map<string, typeof items>();
+  for (const item of items) {
+    const loc = item.location;
+    if (!byLocation.has(loc)) byLocation.set(loc, []);
+    byLocation.get(loc)!.push(item);
+  }
+
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 30px; color: #333; }
+    h1 { color: #0066cc; border-bottom: 2px solid #0066cc; padding-bottom: 8px; }
+    .summary { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0; }
+    .stat { background: #f4f6f8; padding: 16px; border-radius: 4px; text-align: center; }
+    .stat .value { font-size: 24px; font-weight: bold; color: #0066cc; }
+    .stat .label { font-size: 11px; text-transform: uppercase; color: #666; }
+    .location-header { font-size: 14px; font-weight: bold; color: #333; margin: 24px 0 12px; padding-bottom: 4px; border-bottom: 1px solid #ddd; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f4f6f8; text-align: left; padding: 8px; font-size: 11px; text-transform: uppercase; }
+    td { padding: 8px; border-bottom: 1px solid #eee; font-size: 12px; }
+    .text-right { text-align: right; }
+    .location-total { font-weight: bold; background: #f9fafb; }
+    .grand-total { font-size: 16px; font-weight: bold; margin-top: 20px; text-align: right; padding-top: 12px; border-top: 2px solid #333; }
+  </style>
+</head>
+<body>
+  <h1>Inventory Valuation Report</h1>
+  <p style="color:#666;font-size:12px;">Generated: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}${locationName ? ` • Location: ${escapeHtml(locationName)}` : ""}</p>
+
+  <div class="summary">
+    <div class="stat"><div class="value">${totalUnits.toLocaleString()}</div><div class="label">Total Units</div></div>
+    <div class="stat"><div class="value">${items.length}</div><div class="label">SKUs</div></div>
+    <div class="stat"><div class="value">$${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div><div class="label">Total Value</div></div>
+  </div>
+
+  ${Array.from(byLocation.entries())
+    .map(([loc, locItems]) => {
+      const locTotal = locItems.reduce((s, i) => s + i.quantity * (i.unitCost ?? 0), 0);
+      return `
+    <div class="location-header">${escapeHtml(loc)} — $${locTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+    <table>
+      <thead><tr><th>SKU</th><th>Product</th><th class="text-right">Qty</th><th class="text-right">Unit Cost</th><th class="text-right">Total Value</th></tr></thead>
+      <tbody>
+        ${locItems.map(i => `
+          <tr>
+            <td>${escapeHtml(i.sku || "—")}</td>
+            <td>${escapeHtml(i.title)}</td>
+            <td class="text-right">${i.quantity}</td>
+            <td class="text-right">${i.unitCost != null ? `$${i.unitCost.toFixed(2)}` : "—"}</td>
+            <td class="text-right">${i.unitCost != null ? `$${(i.quantity * i.unitCost).toFixed(2)}` : "—"}</td>
+          </tr>
+        `).join("")}
+        <tr class="location-total"><td colspan="4">Location Total</td><td class="text-right">$${locTotal.toLocaleString(undefined, { minimumFractionDigits: 2 })}</td></tr>
+      </tbody>
+    </table>`;
+    })
+    .join("")}
+
+  <div class="grand-total">Grand Total: $${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2 })}</div>
+</body>
+</html>`;
+}
+
+export function generateCycleCountSheetHTML(
+  items: Array<{ sku: string; title: string; location: string; currentQty: number }>,
+  locationName: string
+): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; color: #333; }
+    h1 { font-size: 18px; color: #0066cc; }
+    .meta { font-size: 12px; color: #666; margin-bottom: 16px; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background: #f4f6f8; text-align: left; padding: 10px; font-size: 11px; text-transform: uppercase; }
+    td { padding: 10px; border-bottom: 1px solid #ddd; font-size: 12px; }
+    .count-box { width: 80px; height: 30px; border: 1px solid #ccc; border-radius: 4px; }
+    .notes-box { width: 100%; height: 24px; border: 1px solid #ccc; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <h1>Cycle Count Sheet</h1>
+  <div class="meta">Location: <strong>${escapeHtml(locationName)}</strong> • Date: ${new Date().toLocaleDateString()} • Total Items: ${items.length}</div>
+  <table>
+    <thead>
+      <tr><th>SKU</th><th>Product</th><th>System Qty</th><th>Counted Qty</th><th>Variance</th><th>Notes</th></tr>
+    </thead>
+    <tbody>
+      ${items.map(i => `
+        <tr>
+          <td>${escapeHtml(i.sku)}</td>
+          <td>${escapeHtml(i.title)}</td>
+          <td>${i.currentQty}</td>
+          <td><div class="count-box"></div></td>
+          <td></td>
+          <td><div class="notes-box"></div></td>
+        </tr>
+      `).join("")}
+    </tbody>
+  </table>
+</body>
+</html>`;
+}
+
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}

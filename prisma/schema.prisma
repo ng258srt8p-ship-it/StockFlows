@@ -1,0 +1,419 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ── Core ──────────────────────────────────────────────────
+
+model Shop {
+  id              String   @id @default(uuid())
+  shopifyDomain   String   @unique
+  accessToken     String
+  plan            ShopPlan @default(FREE)
+  installedAt     DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  locations       Location[]
+  vendors         Vendor[]
+  purchaseOrders  PurchaseOrder[]
+  alerts          ReorderAlert[]
+  settings        ShopSetting?
+  users           User[]
+  sessions        Session[]
+  auditLogs       AuditLog[]
+  processedWebhooks ProcessedWebhook[]
+
+  @@map("shops")
+}
+
+enum ShopPlan {
+  FREE
+  STARTER
+  PRO
+  ENTERPRISE
+}
+
+// ── Auth ──────────────────────────────────────────────────
+
+model Session {
+  id              String   @id @default(uuid())
+  shopId          String
+  shopifyDomain   String
+  accessToken     String
+  expires         DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@index([shopifyDomain])
+  @@map("sessions")
+}
+
+// ── Users ─────────────────────────────────────────────────
+
+model User {
+  id              String   @id @default(uuid())
+  shopId          String
+  shopifyUserId   String
+  email           String
+  role            UserRole @default(STAFF)
+  permissions     Json?
+  createdAt       DateTime @default(now())
+
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, shopifyUserId])
+  @@map("users")
+}
+
+enum UserRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+// ── Inventory ─────────────────────────────────────────────
+
+model Location {
+  id               String       @id @default(uuid())
+  shopId           String
+  shopifyLocationId String      @unique
+  name             String
+  address          Json?
+  type             LocationType @default(WAREHOUSE)
+  isActive         Boolean      @default(true)
+
+  shop             Shop         @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  inventoryItems   InventoryItem[]
+  transfersFrom    StockTransfer[] @relation("TransferFrom")
+  transfersTo      StockTransfer[] @relation("TransferTo")
+  purchaseOrders   PurchaseOrder[]
+  forecasts        ForecastResult[]
+  alerts           ReorderAlert[]
+
+  @@index([shopId])
+  @@map("locations")
+}
+
+enum LocationType {
+  WAREHOUSE
+  RETAIL_STORE
+  DROP_SHIP
+  THIRD_PARTY_LOGISTICS
+}
+
+model InventoryItem {
+  id              String   @id @default(uuid())
+  shopId          String
+  locationId      String
+  shopifyProductId String
+  shopifyVariantId String
+  sku             String?
+  barcode         String?
+  title           String
+  quantity        Int
+  reserved        Int      @default(0)
+  available       Int      @default(0)
+  costPerUnit     Decimal? @db.Decimal(10, 2)
+  reorderPoint    Int      @default(0)
+  reorderQuantity Int      @default(0)
+  lastCountedAt   DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  location        Location @relation(fields: [locationId], references: [id], onDelete: Cascade)
+  movements       StockMovement[]
+  poLineItems     POLineItem[]
+  forecasts       ForecastResult[]
+  alerts          ReorderAlert[]
+
+  @@unique([shopifyVariantId, locationId])
+  @@index([shopId])
+  @@index([shopId, locationId])
+  @@index([barcode])
+  @@map("inventory_items")
+}
+
+model StockMovement {
+  id              String       @id @default(uuid())
+  inventoryItemId String
+  locationId      String
+  type            MovementType
+  quantityChange  Int
+  reference       String?
+  notes           String?
+  createdBy       String?
+  createdAt       DateTime     @default(now())
+
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+
+  @@index([inventoryItemId])
+  @@index([locationId, createdAt])
+  @@index([createdAt])
+  @@map("stock_movements")
+}
+
+enum MovementType {
+  SALE
+  RETURN
+  ADJUSTMENT
+  TRANSFER_IN
+  TRANSFER_OUT
+  RECEIVING
+  CYCLE_COUNT
+  DAMAGE
+}
+
+model StockTransfer {
+  id              String         @id @default(uuid())
+  shopId          String
+  fromLocationId  String
+  toLocationId    String
+  status          TransferStatus @default(PENDING)
+  lineItems       Json
+  notes           String?
+  requestedBy     String
+  approvedBy      String?
+  shippedAt       DateTime?
+  receivedAt      DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  fromLocation    Location @relation("TransferFrom", fields: [fromLocationId], references: [id])
+  toLocation      Location @relation("TransferTo", fields: [toLocationId], references: [id])
+
+  @@index([shopId])
+  @@map("stock_transfers")
+}
+
+enum TransferStatus {
+  PENDING
+  APPROVED
+  SHIPPED
+  PARTIALLY_RECEIVED
+  COMPLETED
+  CANCELLED
+}
+
+// ── Purchasing ────────────────────────────────────────────
+
+model Vendor {
+  id              String   @id @default(uuid())
+  shopId          String
+  name            String
+  email           String?
+  phone           String?
+  contactPerson   String?
+  leadTimeDays    Int      @default(7)
+  reliabilityScore Float   @default(1.0)
+  paymentTerms    String?
+  defaultCurrency String   @default("USD")
+  notes           String?
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  purchaseOrders  PurchaseOrder[]
+
+  @@unique([shopId, name])
+  @@index([shopId])
+  @@map("vendors")
+}
+
+model PurchaseOrder {
+  id              String   @id @default(uuid())
+  shopId          String
+  vendorId        String
+  locationId      String
+  poNumber        String
+  status          POStatus @default(DRAFT)
+  expectedDate    DateTime?
+  receivedDate    DateTime?
+  shippingCost    Decimal? @db.Decimal(10, 2)
+  customsDuties   Decimal? @db.Decimal(10, 2)
+  otherCosts      Decimal? @db.Decimal(10, 2)
+  notes           String?
+  createdBy       String
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  shop            Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  vendor          Vendor   @relation(fields: [vendorId], references: [id])
+  location        Location @relation(fields: [locationId], references: [id])
+  lineItems       POLineItem[]
+  receivingEvents ReceivingEvent[]
+
+  @@unique([shopId, poNumber])
+  @@index([shopId])
+  @@index([shopId, status])
+  @@map("purchase_orders")
+}
+
+enum POStatus {
+  DRAFT
+  SENT
+  PARTIALLY_RECEIVED
+  RECEIVED
+  CLOSED
+  CANCELLED
+}
+
+model POLineItem {
+  id              String   @id @default(uuid())
+  poId            String
+  inventoryItemId String
+  quantity        Int
+  receivedQty     Int      @default(0)
+  unitCost        Decimal  @db.Decimal(10, 2)
+  landedCost      Decimal? @db.Decimal(10, 2)
+  notes           String?
+
+  purchaseOrder   PurchaseOrder @relation(fields: [poId], references: [id], onDelete: Cascade)
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
+
+  @@index([poId])
+  @@map("po_line_items")
+}
+
+model ReceivingEvent {
+  id          String   @id @default(uuid())
+  poId        String
+  lineItems   Json
+  receivedBy  String
+  notes       String?
+  createdAt   DateTime @default(now())
+
+  purchaseOrder PurchaseOrder @relation(fields: [poId], references: [id])
+
+  @@index([poId])
+  @@map("receiving_events")
+}
+
+// ── Forecasting ───────────────────────────────────────────
+
+model ForecastResult {
+  id              String   @id @default(uuid())
+  inventoryItemId String
+  locationId      String
+  forecastDate    DateTime
+  horizonDays     Int      @default(30)
+  predictedDaily  Json
+  totalPredicted  Int
+  confidence      Float
+  modelUsed       String
+  modelVersion    String
+  factors         Json?
+  createdAt       DateTime @default(now())
+
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
+  location        Location      @relation(fields: [locationId], references: [id])
+
+  @@unique([inventoryItemId, locationId, forecastDate])
+  @@index([inventoryItemId])
+  @@map("forecast_results")
+}
+
+// ── Alerts ────────────────────────────────────────────────
+
+model ReorderAlert {
+  id              String       @id @default(uuid())
+  shopId          String
+  inventoryItemId String
+  locationId      String
+  currentStock    Int
+  reorderPoint    Int
+  recommendedQty  Int
+  urgency         AlertUrgency
+  status          AlertStatus  @default(PENDING)
+  poId            String?
+  notes           String?
+  createdAt       DateTime     @default(now())
+  actedAt         DateTime?
+
+  shop            Shop          @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id])
+  location        Location      @relation(fields: [locationId], references: [id])
+
+  @@index([shopId, status])
+  @@index([shopId, urgency])
+  @@map("reorder_alerts")
+}
+
+enum AlertUrgency {
+  CRITICAL
+  WARNING
+  INFO
+}
+
+enum AlertStatus {
+  PENDING
+  ACKNOWLEDGED
+  PO_CREATED
+  DISMISSED
+}
+
+// ── Settings ──────────────────────────────────────────────
+
+model ShopSetting {
+  id                     String  @id @default(uuid())
+  shopId                 String  @unique
+  defaultLocationId      String?
+  lowStockThreshold      Int     @default(10)
+  criticalStockThreshold Int     @default(3)
+  enableAutoReorder      Boolean @default(false)
+  forecastHorizonDays    Int     @default(30)
+  emailAlerts            Boolean @default(true)
+  slackWebhookUrl        String?
+  smsPhoneNumbers        Json?
+  currency               String  @default("USD")
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  shop                   Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@map("shop_settings")
+}
+
+// ── Audit & Webhook Tracking ──────────────────────────────
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  shopId      String
+  userId      String?
+  action      String
+  entityType  String
+  entityId    String
+  oldValue    Json?
+  newValue    Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId, createdAt(sort: Desc)])
+  @@index([entityType, entityId])
+  @@map("audit_logs")
+}
+
+model ProcessedWebhook {
+  id          String   @id @default(uuid())
+  eventId     String   @unique
+  shopId      String
+  topic       String
+  processedAt DateTime @default(now())
+
+  shop        Shop     @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@index([processedAt])
+  @@map("processed_webhooks")
+}

@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* StockFlows custom theme */
+@theme {
+  --color-brand: #0066cc;
+  --color-brand-hover: #0052a3;
+  --color-critical: #d72c0d;
+  --color-warning: #f49342;
+  --color-success: #008060;
+  --color-info: #5bcdd3;
+}

@@ -1,0 +1,77 @@
+name = "StockFlows"
+client_id = "abc123def456"
+application_url = "https://stockflows.app"
+embedded = true
+handle = "stockflows"
+
+[access_scopes]
+scopes = """
+  read_inventory,
+  write_inventory,
+  read_products,
+  write_products,
+  read_locations,
+  read_orders,
+  read_customers,
+  read_companies,
+  read_report_analytics,
+  write_content
+"""
+optional_scopes = [
+  "read_product_listings",
+  "read_shipping"
+]
+use_legacy_install_flow = false
+
+[access.admin]
+direct_api_mode = "online"
+embedded_app_direct_api_access = true
+
+[auth]
+redirect_urls = [
+  "https://stockflows.app/auth/callback",
+  "https://stockflows.app/auth/shopify/callback"
+]
+
+[webhooks]
+api_version = "2026-04"
+
+[[webhooks.subscriptions]]
+topics = [
+  "inventory_levels/update",
+  "inventory_levels/connect",
+  "inventory_levels/disconnect",
+  "inventory_items/create",
+  "inventory_items/update",
+  "inventory_items/delete",
+  "variants/in_stock",
+  "variants/out_of_stock",
+  "locations/create",
+  "locations/update",
+  "locations/delete",
+  "orders/create",
+  "orders/updated",
+  "products/create",
+  "products/update",
+  "app/uninstalled"
+]
+compliance_topics = [
+  "customers/redact",
+  "customers/data_request",
+  "shop/redact"
+]
+uri = "https://stockflows.app/webhooks"
+
+[app_proxy]
+url = "https://stockflows.app/proxy"
+subpath = "stockflows"
+prefix = "apps"
+
+[pos]
+embedded = true
+
+[app_preferences]
+url = "https://stockflows.app/app/settings"
+
+[build]
+automatically_update_urls_on_dev = false
