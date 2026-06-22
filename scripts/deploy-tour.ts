@@ -78,13 +78,28 @@ async function createGitHubRepo() {
   const description = "AI-powered inventory management and demand forecasting for Shopify merchants";
 
   try {
-    // Check if repo already exists
+    // Check auth first
+    exec("gh auth status 2>&1");
+  } catch {
+    log("GitHub CLI not authenticated.");
+    log("Run: gh auth login");
+    log("Then re-run this script.");
+    log("Manual steps:");
+    log("  1. Go to https://github.com/new");
+    log("  2. Repository name: stockflows");
+    log("  3. Create repository");
+    log("  4. git remote add origin git@github.com:YOUR_USER/stockflows.git");
+    log("  5. git push -u origin main");
+    return;
+  }
+
+  try {
     exec(`gh repo view ${repoName} 2>/dev/null`);
     log(`Repository ${repoName} already exists on GitHub`);
   } catch {
     log(`Creating repository ${repoName}...`);
     exec(`gh repo create ${repoName} --public --description "${description}" --source=. --remote=origin --push`);
-    log(`Repository created and pushed: https://github.com/$(gh api user -q .login)/${repoName}`);
+    log(`Repository created and pushed`);
   }
 }
 
