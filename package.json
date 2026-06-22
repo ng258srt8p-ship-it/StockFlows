@@ -1,14 +1,22 @@
 {
   "name": "stockflows",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Inventory management and demand forecasting for Shopify merchants",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite dev",
+    "build": "vite build",
+    "start": "remix-serve ./build/server/index.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "lint": "eslint app/",
+    "seed": "tsx scripts/seed.ts",
+    "deploy:tour": "wrangler pages deploy public --project-name=stockflows-tour --branch=main"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["shopify", "inventory", "forecasting", "ecommerce"],
+  "author": "StockFlows",
+  "license": "MIT",
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "@react-email/components": "^1.0.12",
