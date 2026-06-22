@@ -6,6 +6,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const TOUR_PATH = path.join(__dirname, '..', 'public', 'tour.html');
 const SCREENSHOTS_DIR = path.join(__dirname, '..', 'screenshots');
 
+const TARGET_W = 1270;
+const TARGET_H = 760;
+
 const pages = [
   { id: 'dashboard', waitFor: '#page-dashboard.active' },
   { id: 'inventory', click: '[data-page="inventory"]', waitFor: '#page-inventory.active' },
@@ -17,9 +20,11 @@ const pages = [
 async function main() {
   console.log('Launching browser...');
   const browser = await chromium.launch({ headless: true });
+
+  // Use 1x DPR so output is exactly 1270x760 pixels
   const context = await browser.newContext({
-    viewport: { width: 1270, height: 760 },
-    deviceScaleFactor: 2,
+    viewport: { width: TARGET_W, height: TARGET_H },
+    deviceScaleFactor: 1,
   });
   const page = await context.newPage();
 
@@ -32,13 +37,11 @@ async function main() {
   await page.click('.btn');
   await page.waitForTimeout(1500);
 
-  // Force scroll to top of content
+  // Force scroll content to top
   await page.evaluate(() => {
-    const content = document.querySelector('.content');
-    if (content) content.scrollTop = 0;
-    window.scrollTo(0, 0);
+    document.querySelector('.content')?.scrollTo(0, 0);
   });
-  await page.waitForTimeout(500);
+  await page.waitForTimeout(400);
 
   for (const p of pages) {
     if (p.click) {
@@ -48,28 +51,24 @@ async function main() {
 
       // Force scroll to top
       await page.evaluate(() => {
-        const content = document.querySelector('.content');
-        if (content) content.scrollTop = 0;
+        document.querySelector('.content')?.scrollTo(0, 0);
       });
       await page.waitForTimeout(400);
     }
 
     const screenshotPath = path.join(SCREENSHOTS_DIR, `${p.id}.png`);
-    console.log(`Capturing ${p.id}...`);
+    console.log(`Capturing ${p.id} at ${TARGET_W}x${TARGET_H}...`);
 
-    // Take a full-page screenshot of just the content area
-    const contentEl = await page.$('.content');
-    if (contentEl) {
-      await contentEl.screenshot({ path: screenshotPath });
-    } else {
-      // Fallback to full page
-      await page.screenshot({ path: screenshotPath, clip: { x: 220, y: 0, width: 1050, height: 760 } });
-    }
+    // Capture exactly the viewport — no clip, no element screenshot
+    await page.screenshot({
+      path: screenshotPath,
+      clip: { x: 0, y: 0, width: TARGET_W, height: TARGET_H },
+    });
     console.log(`Saved: ${screenshotPath}`);
   }
 
   await browser.close();
-  console.log('Done! All screenshots captured.');
+  console.log('Done! All screenshots captured at 1270x760.');
 }
 
 main().catch((e) => {
