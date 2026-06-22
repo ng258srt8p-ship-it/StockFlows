@@ -49,6 +49,11 @@ topics = [
   "products/update",
   "app/uninstalled"
 ]
+compliance_topics = [
+  "customers/data_request",
+  "customers/redact",
+  "shop/redact",
+]
 uri = "https://stockflows.app/webhooks"
 
 [app_proxy]
