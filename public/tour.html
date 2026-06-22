@@ -14,6 +14,7 @@
 <div class="landing" id="landing">
 <div class="eyebrow">Interactive Sandbox</div>
 <h1>StockFlows</h1>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;opacity:.7"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122 34" width="90" fill="white"><path d="M29.76 10.58c-.18-.57-.76-.76-1.24-.76H22.3l-.88-3.38c-.08-.29-.24-.43-.44-.43h-3.1c-.5 0-.92.33-.99.8l-.88 3.38H9.86c-.42 0-.63.33-.82.65-.18.33-.27.76-.17 1.19l1.47 6.27-1.33 6.03c-.08.33.07.65.37.76l8.06 2.93c.17.06.35.06.52 0l8.06-2.93c.3-.11.46-.43.37-.76l-1.33-6.03 1.47-6.27c.1-.43.01-.86-.17-1.19zM12.1 17.56l1.48-5.7c.08-.29.24-.36.37-.36h5.57c.13 0 .29.07.37.36l1.48 5.7-3.93 1.45c-.3.11-.65.11-.95 0l-3.93-1.45z"/><path d="M38.96 14.89c0-3.24-2.13-5.54-4.83-5.54s-4.83 2.3-4.83 5.54c0 3.23 2.13 5.54 4.83 5.54s4.83-2.31 4.83-5.54zm-6.7 0c0-1.42.9-2.6 2.1-2.6s2.1 1.18 2.1 2.6c0 1.42-.9 2.6-2.1 2.6s-2.1-1.18-2.1-2.6zM51.19 14.89c0-3.24-2.13-5.54-4.83-5.54s-4.83 2.3-4.83 5.54c0 3.23 2.13 5.54 4.83 5.54s4.83-2.31 4.83-5.54zm-6.7 0c0-1.42.9-2.6 2.1-2.6s2.1 1.18 2.1 2.6c0 1.42-.9 2.6-2.1 2.6s-2.1-1.18-2.1-2.6z"/></svg><span style="font-size:.75rem">Built for Shopify</span></div>
 <p class="sub">Inventory management and demand forecasting for Shopify merchants. Explore every feature, no setup required.</p>
 <div class="stats">
 <div class="stat"><div class="n">10</div><div class="l">Products</div></div>
@@ -259,7 +260,9 @@
 
 <!-- Footer -->
 <div style="background:#111;color:#fff;padding:40px 24px;text-align:center;border-top:1px solid #333">
-<div style="font-size:.7rem;color:#666;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">StockFlows / Inventory Management for Shopify / Always working, even when you are not</div>
+<div style="margin-bottom:16px"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 122 34" width="60" fill="#666"><path d="M29.76 10.58c-.18-.57-.76-.76-1.24-.76H22.3l-.88-3.38c-.08-.29-.24-.43-.44-.43h-3.1c-.5 0-.92.33-.99.8l-.88 3.38H9.86c-.42 0-.63.33-.82.65-.18.33-.27.76-.17 1.19l1.47 6.27-1.33 6.03c-.08.33.07.65.37.76l8.06 2.93c.17.06.35.06.52 0l8.06-2.93c.3-.11.46-.43.37-.76l-1.33-6.03 1.47-6.27c.1-.43.01-.86-.17-1.19zM12.1 17.56l1.48-5.7c.08-.29.24-.36.37-.36h5.57c.13 0 .29.07.37.36l1.48 5.7-3.93 1.45c-.3.11-.65.11-.95 0l-3.93-1.45z"/></svg></div>
+<div style="font-size:.65rem;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">StockFlows / Inventory Management for Shopify</div>
+<div style="font-size:.6rem;color:#444;margin-bottom:8px">Always working, even when you are not</div>
 <div><a href="privacy.html" style="font-size:.65rem;color:#555;text-decoration:none">Privacy Policy</a></div>
 </div>
 <!-- ════════════════════ APP ════════════════════ -->
@@ -936,7 +939,7 @@ const tourSteps=[
 {page:'inventory',title:'Inventory Table',text:'All products with search, location filter, and status tabs. Click any row to adjust stock.',target:'#page-inventory table tbody tr:first-child'},
 {page:'purchasing',title:'Purchase Orders',text:'Track POs from vendors. View status, line items, and receiving progress.',target:'#page-purchasing table tbody tr:first-child'},
 {page:'forecasting',title:'Demand Forecasting',text:'Statistical 30-day predictions for every product. Click a row to see the full forecast sparkline chart.',target:'#page-forecasting table tbody tr:first-child'},
-{page:'reports',title:'Reports and Export',text:'Inventory valuation, stock status pie chart, and one-click CSV/PDF export.',target:'#page-reports .card:first-child'},
+{page:'reports',title:'Reports and Export',text:'Inventory valuation, stock status pie chart, and one-click CSV/PDF export.',target:'#page-reports table:first-of-type'},
 ];
 function startTour(){
 if(!document.getElementById('app').classList.contains('active'))enterApp();
