@@ -1,5 +1,5 @@
 name = "StockFlows"
-client_id = "abc123def456"
+client_id = "9563680320c6d9dd9fbf24b206166eec"
 application_url = "https://stockflows.app"
 embedded = true
 handle = "stockflows"
