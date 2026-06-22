@@ -931,13 +931,12 @@ document.getElementById('page-settings').innerHTML=`
 let tourStep=0;
 const tourSteps=[
 {page:'dashboard',title:'Welcome to StockFlows',text:'Your inventory management dashboard. Key metrics at a glance: products, alerts, value at risk, and forecast accuracy.',target:null},
-{page:'dashboard',title:'Inventory Chart',text:'Bar chart showing stock levels across all 10 products. Color-coded: black = in stock, amber = low, red = out of stock.',target:'svg'},
-{page:'dashboard',title:'Active Alerts',text:'Products below their reorder point. Click Create PO to start a purchase order for any alert.',target:'.btn-brand'},
-{page:'inventory',title:'Inventory Table',text:'All products with search, location filter, and status tabs. Click any row to adjust stock.',target:'table'},
-{page:'inventory',title:'Stock Status Badges',text:'Quick visual indicators: Out of Stock, Low Stock, In Stock. Filter by status using the tabs above.',target:'.badge-success'},
-{page:'purchasing',title:'Purchase Orders',text:'Track POs from vendors. View status, line items, and receiving progress.',target:'table'},
-{page:'forecasting',title:'Demand Forecasting',text:'Statistical 30-day predictions for every product. Click a row to see the full forecast sparkline chart.',target:'table'},
-{page:'reports',title:'Reports and Export',text:'Inventory valuation, stock status pie chart, and one-click CSV/PDF export.',target:'svg'},
+{page:'dashboard',title:'Inventory Chart',text:'Bar chart showing stock levels across all 10 products. Color-coded: black = in stock, amber = low, red = out of stock.',target:'.bar-fill'},
+{page:'dashboard',title:'Active Alerts',text:'Products below their reorder point. Click Create PO to start a purchase order for any alert.',target:'#page-dashboard tbody tr:first-child'},
+{page:'inventory',title:'Inventory Table',text:'All products with search, location filter, and status tabs. Click any row to adjust stock.',target:'#page-inventory table tbody tr:first-child'},
+{page:'purchasing',title:'Purchase Orders',text:'Track POs from vendors. View status, line items, and receiving progress.',target:'#page-purchasing table tbody tr:first-child'},
+{page:'forecasting',title:'Demand Forecasting',text:'Statistical 30-day predictions for every product. Click a row to see the full forecast sparkline chart.',target:'#page-forecasting table tbody tr:first-child'},
+{page:'reports',title:'Reports and Export',text:'Inventory valuation, stock status pie chart, and one-click CSV/PDF export.',target:'#page-reports .card:first-child'},
 ];
 function startTour(){
 if(!document.getElementById('app').classList.contains('active'))enterApp();
@@ -948,33 +947,28 @@ if(tourStep>=tourSteps.length){endTour();return}
 const s=tourSteps[tourStep];
 document.querySelectorAll('.tour-highlight').forEach(el=>el.classList.remove('tour-highlight'));
 go(s.page);
-setTimeout(()=>{
+setTimeout(()=>{document.body.offsetHeight;
 document.getElementById('tour-overlay').classList.add('active');
 const tooltip=document.getElementById('tour-tooltip');
 const prog=document.getElementById('tour-progress');
 tooltip.style.display='block';
 prog.style.display='flex';
-tooltip.innerHTML='<h4>'+s.title+'</h4><p>'+s.text+'</p><div class="actions"><span style="font-size:.8rem;color:var(--text-dimmer)">'+(tourStep+1)+' / '+tourSteps.length+'</span><div style="display:flex;gap:8px"><button class="btn-sm btn-ghost" onclick="endTour()">Skip</button><button class="btn-sm btn-brand" onclick="nextTour()">Next</button></div></div>';
+tooltip.innerHTML='<h4>'+s.title+'</h4><p>'+s.text+'</p><div class="actions"><span style="font-size:.8rem;color:#666">'+(tourStep+1)+' / '+tourSteps.length+'</span><div style="display:flex;gap:8px"><button class="btn-sm btn-ghost" onclick="endTour()">Skip</button><button class="btn-sm btn-brand" onclick="nextTour()">Next</button></div></div>';
 prog.innerHTML=tourSteps.map((_,i)=>'<div class="tour-dot '+(i===tourStep?'active':'')+'" onclick="tourStep='+i+';renderTour()"></div>').join('');
 const tooltipW=Math.min(380,window.innerWidth-32);
 tooltip.style.width=tooltipW+'px';
 tooltip.style.transform='none';
 const target=s.target?document.querySelector(s.target):null;
 if(target){
+target.scrollIntoView({block:'center',behavior:'auto'});
 target.classList.add('tour-highlight');
-const content=document.querySelector('.content');
-if(content&&target.closest('.content')){
-const scrollTarget=target.offsetTop-content.offsetTop-100;
-content.scrollTo({top:Math.max(0,scrollTarget),behavior:'smooth'});
 }
-tooltip.style.top=Math.max(16,window.innerHeight-260)+'px';
-tooltip.style.left=Math.max(16,(window.innerWidth-tooltipW)/2)+'px';
-}else{
+// Position tooltip: right side of screen, vertically centered
 tooltip.style.top='50%';
-tooltip.style.left='50%';
-tooltip.style.transform='translate(-50%,-50%)';
-}
-},200);
+tooltip.style.left='auto';
+tooltip.style.right='24px';
+tooltip.style.transform='translateY(-50%)';
+},400);
 }
 
 function nextTour(){tourStep++;renderTour()}
