@@ -381,7 +381,7 @@ export default function ReceiveShipment() {
                   const remaining = getRemaining(li);
                   const fullyReceived = li.receivedQty >= li.quantity;
                   const qty = quantities[li.id] || 0;
-                  const hasError = actionData?.errors?.[`qty_${li.id}`];
+                  const hasError = (actionData as any)?.errors?.[`qty_${li.id}`];
 
                   return (
                     <div

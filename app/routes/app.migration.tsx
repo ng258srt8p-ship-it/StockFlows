@@ -239,7 +239,7 @@ export default function Migration() {
             <IndexTable.Row key={row.id} id={row.id} position={idx}>
               {preview.headers.map((h) => (
                 <IndexTable.Cell key={h}>
-                  <Text variant="bodySm" as="p">{row[h]}</Text>
+                  <Text variant="bodySm" as="p">{(row as any)[h]}</Text>
                 </IndexTable.Cell>
               ))}
             </IndexTable.Row>

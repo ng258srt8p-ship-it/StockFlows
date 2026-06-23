@@ -195,12 +195,12 @@ export default function InventoryDetail() {
               </Text>
               <Suspense fallback={<TableSkeleton rows={5} />}>
                 <Await resolve={movements}>
-                  {(data) =>
-                    data.length === 0 ? (
+                  {(data: any) =>
+                    (data ?? []).length === 0 ? (
                       <p className="text-gray-500 mt-2">No movements recorded yet.</p>
                     ) : (
                       <div className="mt-2 space-y-2">
-                        {data.map((m: any) => (
+                        {(data ?? []).map((m: any) => (
                           <div
                             key={m.id}
                             className="flex items-center justify-between py-2 border-b"
