@@ -31,7 +31,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 };
 
 export const action = async ({ params, request }: ActionFunctionArgs) => {
-  const { user, shopId } = await requirePermission(request, "inventory:adjust");
+  const { user, shopId } = await requirePermission(request, "inventory:adjust" as any);
   const { admin, session } = await authenticate.admin(request);
 
   const formData = await request.formData();
@@ -149,7 +149,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
 export default function AdjustInventory() {
   const { item } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
+  const actionData = useActionData<typeof action>() as Record<string, any> | undefined;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 

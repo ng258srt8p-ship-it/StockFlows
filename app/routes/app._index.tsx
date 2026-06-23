@@ -123,10 +123,10 @@ const MOVEMENT_TONES: Record<string, "success" | "critical" | "attention" | "inf
 
 export default function Dashboard() {
   const loaderData = useLoaderData<typeof loader>();
-  const stats = loaderData.stats as NonNullable<typeof loaderData.stats>;
-  const alerts = loaderData.alerts as any[];
-  const recentActivity = loaderData.recentActivity as any[];
-  const forecastAccuracy = loaderData.forecastAccuracy as number;
+  const stats = (loaderData as any).stats;
+  const alerts = (loaderData as any).alerts ?? [];
+  const recentActivity = (loaderData as any).recentActivity ?? [];
+  const forecastAccuracy = (loaderData as any).forecastAccuracy ?? 0;
 
   return (
     <Page title="StockFlows Dashboard" subtitle="Inventory overview">

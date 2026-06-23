@@ -54,7 +54,6 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
         include: { vendor: true },
       },
     },
-    orderBy: { createdAt: "desc" },
     take: 10,
   });
 
@@ -92,9 +91,16 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
 };
 
 export default function InventoryDetail() {
-  const { item, movements, forecast, poLineItems, alerts } =
-    useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+
+  const item = loaderData.item as any;
+  const movements = loaderData.movements;
+
+  // Cast deferred data to bypass Jsonify type stripping
+  const poLineItems = (loaderData as any).poLineItems ?? [];
+  const alerts = (loaderData as any).alerts ?? [];
+  const forecastData = (loaderData as any).forecast;
 
   const stockStatus =
     item.quantity === 0
@@ -309,7 +315,7 @@ export default function InventoryDetail() {
                 Demand Forecast
               </Text>
               <Suspense fallback={<TableSkeleton rows={3} />}>
-                <Await resolve={forecast}>
+                <Await resolve={forecastData}>
                   {(data) =>
                     !data ? (
                       <Text variant="bodySm" as="p" tone="subdued" className="mt-2">
