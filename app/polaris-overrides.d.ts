@@ -72,16 +72,5 @@ declare module "@shopify/polaris" {
     required?: boolean;
   }
 
-  // TextField — name, type, helpText are valid runtime props not in types
-  interface TextFieldProps {
-    name?: string;
-    type?: string;
-    helpText?: string;
-    multiline?: number | boolean;
-    min?: number;
-    max?: number;
-    required?: boolean;
-  }
-
   // Banner — tone is correct
 }
