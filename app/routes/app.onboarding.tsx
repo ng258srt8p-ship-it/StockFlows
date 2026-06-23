@@ -325,8 +325,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 // ---------------------------------------------------------------------------
 
 export default function Onboarding() {
-  const { shopName, locations, staffMembers, defaultRoles } =
-    useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
+  const shopName = loaderData.shopName as string;
+  const locations = (loaderData.locations ?? []) as { id: string; name: string }[];
+  const staffMembers = (loaderData.staffMembers ?? []) as StaffMember[];
+  const defaultRoles = (loaderData as any).defaultRoles ?? {};
 
   const [state, dispatch] = useReducer(stepReducer, {
     ...initialState,
@@ -350,7 +353,7 @@ export default function Onboarding() {
   // Navigate to dashboard after onboarding is complete
   useEffect(() => {
     if (
-      fetcher.data?.success &&
+      (fetcher.data as any)?.success &&
       state.step === TOTAL_STEPS
     ) {
       // Brief delay so the user can see the success state
@@ -499,10 +502,10 @@ export default function Onboarding() {
           <Card>
             <div className="p-4">
               <div className="flex items-center justify-between mb-2">
-                <Text variant="bodyMd" fontWeight="semibold">
+                <Text variant="bodyMd" as="p" fontWeight="semibold">
                   Setup progress
                 </Text>
-                <Text variant="bodySm" tone="subdued">
+                <Text variant="bodySm" as="p" tone="subdued">
                   {progressPercentage}% complete
                 </Text>
               </div>
@@ -711,18 +714,20 @@ function ReorderDefaultsStep({
       </Text>
 
       <TextField
+        name="reorderPoint"
         label="Default reorder point"
         type="number"
         value={reorderPoint}
-        onChange={onReorderPointChange}
+        onChange={(val) => onReorderPointChange(val)}
         helpText="When stock drops below this level, StockFlows will alert you to reorder."
       />
 
       <TextField
+        name="safetyStockMultiplier"
         label="Safety stock multiplier"
         type="number"
         value={safetyStockMultiplier}
-        onChange={onSafetyStockMultiplierChange}
+        onChange={(val) => onSafetyStockMultiplierChange(val)}
         helpText="Multiplied by your average daily sales to calculate how much extra stock to keep on hand."
       />
 
@@ -777,7 +782,7 @@ function TeamSetupStep({
               className="flex items-center justify-between p-3 border rounded-lg"
             >
               <div>
-                <Text variant="bodyMd" fontWeight="semibold">
+                <Text variant="bodyMd" as="p" fontWeight="semibold">
                   {member.email}
                 </Text>
               </div>
@@ -833,9 +838,10 @@ function NotificationStep({
       />
 
       <TextField
+        name="slackWebhookUrl"
         label="Slack webhook URL"
         value={slackWebhookUrl}
-        onChange={onSlackWebhookUrlChange}
+        onChange={(val) => onSlackWebhookUrlChange(val)}
         placeholder="https://hooks.slack.com/services/..."
         helpText="Optionally send alerts to a Slack channel. Leave empty to disable."
       />

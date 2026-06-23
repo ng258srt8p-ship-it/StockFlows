@@ -203,6 +203,7 @@ export default function NewPurchaseOrder() {
   const isSubmitting = navigation.state === "submitting";
 
   const [selectedLocationId, setSelectedLocationId] = useState("");
+  const [notes, setNotes] = useState("");
   const [lineItems, setLineItems] = useState<LineItemDraft[]>([
     { inventoryItemId: "", quantity: "1", unitCost: "0.00" },
   ]);
@@ -265,6 +266,7 @@ export default function NewPurchaseOrder() {
                   <div className="flex gap-4">
                     <div className="flex-1">
                       <TextField
+                        name="poNumber"
                         label="PO Number"
                         value={nextPoNumber}
                         readOnly
@@ -312,6 +314,8 @@ export default function NewPurchaseOrder() {
                         name="expectedDate"
                         label="Expected Date"
                         type="date"
+                        value=""
+                        onChange={() => {}}
                         error={actionData?.errors?.expectedDate?.[0]}
                       />
                     </div>
@@ -320,6 +324,8 @@ export default function NewPurchaseOrder() {
                   <TextField
                     name="notes"
                     label="Notes"
+                    value={notes}
+                    onChange={(val) => setNotes(val)}
                     multiline={3}
                     placeholder="Optional notes about this purchase order"
                     error={actionData?.errors?.notes?.[0]}
@@ -405,30 +411,27 @@ export default function NewPurchaseOrder() {
                         </IndexTable.Cell>
                         <IndexTable.Cell>
                           <TextField
+                            name={`quantity-${index}`}
                             value={lineItem.quantity}
                             onChange={(value) =>
                               updateLineItem(index, "quantity", value)
                             }
                             type="number"
-                            min={1}
-                            connectedLeft
                           />
                         </IndexTable.Cell>
                         <IndexTable.Cell>
                           <TextField
+                            name={`unitCost-${index}`}
                             value={lineItem.unitCost}
                             onChange={(value) =>
                               updateLineItem(index, "unitCost", value)
                             }
                             type="number"
-                            min={0}
-                            prefix="$"
-                            connectedLeft
                           />
                         </IndexTable.Cell>
                         <IndexTable.Cell>
                           <Button
-                            size="slim"
+                            variant="slim"
                             destructive
                             onClick={() => removeLineItem(index)}
                             disabled={lineItems.length === 1}
