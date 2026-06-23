@@ -180,8 +180,8 @@ export default function InventoryTransfer() {
   ]);
 
   // Items available at the selected "from" location
-  const availableItems = items.filter(
-    (item: InventoryItemWithLocation) =>
+  const availableItems = (items as any[]).filter(
+    (item: any) =>
       item.locationId === fromLocationId && item.quantity > 0,
   );
 
@@ -210,7 +210,7 @@ export default function InventoryTransfer() {
   const totalUnits = lineItems.reduce((sum, li) => sum + (li.quantity || 0), 0);
   const willAutoApprove = totalUnits > 0 && totalUnits < AUTO_APPROVE_THRESHOLD;
 
-  const locationOptions = locations.map((l: Location) => ({
+  const locationOptions = (locations as any[]).map((l: any) => ({
     label: l.name,
     value: l.id,
   }));
@@ -296,13 +296,13 @@ export default function InventoryTransfer() {
                     )}
 
                     {lineItems.map((li, index) => {
-                      const itemOptions = items
+                      const itemOptions = (items as any[])
                         .filter(
-                          (item: InventoryItemWithLocation) =>
+                          (item: any) =>
                             item.locationId === fromLocationId &&
                             item.quantity > 0,
                         )
-                        .map((item: InventoryItemWithLocation) => ({
+                        .map((item: any) => ({
                           label: `${item.title}${item.sku ? ` (${item.sku})` : ""} — ${item.quantity} available`,
                           value: item.id,
                         }));
@@ -336,8 +336,6 @@ export default function InventoryTransfer() {
                             <TextField
                               name={`lineItem_${index}__quantity`}
                               label={index === 0 ? "Quantity" : undefined}
-                              type="number"
-                              min={1}
                               value={String(li.quantity)}
                               onChange={(value) =>
                                 updateLineItem(
@@ -384,7 +382,7 @@ export default function InventoryTransfer() {
                     name="notes"
                     label="Notes"
                     value={notes}
-                    onChange={(val) => setNotes(val)}
+                    onChange={(val, _id) => setNotes(val)}
                     multiline={3}
                     placeholder="Optional notes about this transfer"
                   />

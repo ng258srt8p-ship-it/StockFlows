@@ -101,7 +101,7 @@ export default function Settings() {
                   label="Low stock alert threshold"
                   type="number"
                   value={lowStock}
-                  onChange={(val) => setLowStock(val)}
+                  onChange={(val, _id) => setLowStock(val)}
                   helpText="Alert when stock drops below this level"
                 />
                 <TextField
@@ -109,7 +109,7 @@ export default function Settings() {
                   label="Critical stock threshold"
                   type="number"
                   value={criticalStock}
-                  onChange={(val) => setCriticalStock(val)}
+                  onChange={(val, _id) => setCriticalStock(val)}
                   helpText="Critical alert when stock drops below this level"
                 />
               </div>
@@ -123,7 +123,7 @@ export default function Settings() {
                     label="Forecast horizon (days)"
                     type="number"
                     value={forecastHorizon}
-                    onChange={(val) => setForecastHorizon(val)}
+                    onChange={(val, _id) => setForecastHorizon(val)}
                     helpText="How many days ahead to forecast"
                   />
                 </div>
@@ -142,7 +142,7 @@ export default function Settings() {
                     name="slackWebhookUrl"
                     label="Slack Webhook URL"
                     value={slackUrl}
-                    onChange={(val) => setSlackUrl(val)}
+                    onChange={(val, _id) => setSlackUrl(val)}
                     placeholder="https://hooks.slack.com/services/..."
                     helpText="Leave empty to disable Slack notifications"
                   />
@@ -150,7 +150,7 @@ export default function Settings() {
                     name="smsPhoneNumbers"
                     label="SMS Alert Phone Numbers"
                     value={smsPhones}
-                    onChange={(val) => setSmsPhones(val)}
+                    onChange={(val, _id) => setSmsPhones(val)}
                     placeholder="+15551234567, +15559876543"
                     helpText="Comma-separated list of phone numbers for critical stock alerts. Leave empty to disable SMS."
                   />
