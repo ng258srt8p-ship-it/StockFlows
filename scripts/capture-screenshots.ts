@@ -15,50 +15,50 @@ const pages = [
 ];
 
 async function main() {
-  console.log('Launching browser...');
   const browser = await chromium.launch({ headless: true });
-  const context = await browser.newContext({
-    viewport: { width: 1600, height: 900 },
-    deviceScaleFactor: 1,
-  });
+  const context = await browser.newContext({ viewport: { width: 1840, height: 900 } });
   const page = await context.newPage();
 
-  console.log(`Opening tour page: ${TOUR_PATH}`);
   await page.goto(`file://${TOUR_PATH}`);
   await page.waitForTimeout(1500);
 
   // Click "Explore" to enter the app
-  console.log('Clicking Explore button...');
   await page.click('.btn');
   await page.waitForTimeout(1500);
 
+  // First, force scroll the document body and content to top
+  await page.evaluate(() => {
+    window.scrollTo(0, 0);
+    const content = document.querySelector('.content');
+    if (content) content.scrollTop = 0;
+  });
+  await page.waitForTimeout(500);
+
   for (const p of pages) {
     if (p.click) {
-      console.log(`Navigating to ${p.id}...`);
       await page.click(p.click);
-      await page.waitForTimeout(1200);
+      await page.waitForTimeout(1000);
     }
 
-    // Scroll content to top
+    // Scroll both document body and content to top
     await page.evaluate(() => {
+      window.scrollTo(0, 0);
       const content = document.querySelector('.content');
       if (content) content.scrollTop = 0;
     });
-    await page.waitForTimeout(400);
+    await page.waitForTimeout(300);
 
     const screenshotPath = path.join(SCREENSHOTS_DIR, `${p.id}.png`);
-    console.log(`Capturing ${p.id}...`);
 
-    // Take a full browser screenshot at 1600x900
-    await page.screenshot({ path: screenshotPath });
+    // Use Playwright's element-level screenshot — captures ONLY the element
+    // regardless of its position on the page
+    const contentEl = page.locator('.content');
+    await contentEl.screenshot({ path: screenshotPath });
+
     console.log(`Saved: ${screenshotPath}`);
   }
 
   await browser.close();
-  console.log('Done! All screenshots captured.');
 }
 
-main().catch((e) => {
-  console.error('Error:', e);
-  process.exit(1);
-});
+main().catch(console.error);
