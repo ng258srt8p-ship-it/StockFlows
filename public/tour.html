@@ -14,7 +14,7 @@
 <div class="landing" id="landing">
 <div class="eyebrow">Interactive Sandbox</div>
 <h1>StockFlows</h1>
-<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px"><img src="glyph-white.png" alt="Shopify" width="20" height="20" style="object-fit:contain"> Built for Shopify</div>
+<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px"><img src="glyph-white.png" alt="Shopify" width="20" height="20" style="object-fit:contain"> Built with Shopify APIs</div>
 <p class="sub">Inventory management and demand forecasting for Shopify merchants. Explore every feature, no setup required.</p>
 <div class="stats">
 <div class="stat"><div class="n">10</div><div class="l">Products</div></div>
@@ -41,7 +41,7 @@
 <div>
 <div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">02 / Forecasting</div>
 <div style="font-family:var(--serif);font-size:1.3rem;font-style:italic;margin-bottom:8px">Demand forecasting</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">30-day demand forecasts using Exponential Smoothing. Auto-selects the best model per product. AI-powered insights explain trends and recommend reorder strategies.</p>
+<p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">30-day demand forecasts using Exponential Smoothing with confidence intervals. Reorder recommendations with quantity suggestions based on forecast data.</p>
 </div>
 <div>
 <div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">03 / Purchasing</div>
@@ -122,14 +122,13 @@
 <div style="background:#111;color:#fff;padding:80px 24px">
 <div style="max-width:960px;margin:0 auto">
 <div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Why switch</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:16px">Stocky is being discontinued.</div>
+<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:16px">Stocky is reportedly being discontinued.</div>
 <div id="countdown" style="display:flex;gap:24px;margin-bottom:40px;flex-wrap:wrap">
 <div style="text-align:center"><div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;font-weight:400;line-height:1" id="cd-days">--</div><div style="font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px">Days Left</div></div>
 <div style="text-align:center"><div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;font-weight:400;line-height:1" id="cd-hours">--</div><div style="font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px">Hours</div></div>
 <div style="text-align:center"><div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;font-weight:400;line-height:1" id="cd-mins">--</div><div style="font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px">Minutes</div></div>
 </div>
-<p style="font-size:.85rem;color:#888;max-width:520px;line-height:1.7;margin-bottom:40px">Shopify's own inventory app has a 2.8 rating on the App Store. Forecasting is broken. Purchase orders don't work. Merchants are switching to Google Sheets. StockFlows replaces everything Stocky does, and adds statistical forecasting on top.</p>
-<div style="font-size:.85rem;color:#888;max-width:520px;line-height:1.7;margin-bottom:40px">Shopify's own inventory app has a 2.8 rating on the App Store. Forecasting is broken. Purchase orders don't work. Merchants are switching to Google Sheets. StockFlows replaces everything Stocky does, and adds statistical forecasting on top.</div>
+<div style="font-size:.85rem;color:#888;max-width:520px;line-height:1.7;margin-bottom:40px">Shopify's built-in inventory app (Stocky) has consistently low ratings and is reportedly being discontinued. StockFlows replaces everything Stocky does, and adds working statistical forecasting on top.</div>
 <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid #333">
 <div style="padding:20px;border-right:1px solid #333">
 <div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Feature</div>
@@ -142,7 +141,7 @@
 <div style="font-size:.8rem;padding:10px 0">Reorder suggestions</div>
 </div>
 <div style="padding:20px;border-right:1px solid #333">
-<div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Stocky (2.8 stars)</div>
+<div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Stocky (Shopify's built-in)</div>
 <div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#888">Basic</div>
 <div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#dc2626">Broken</div>
 <div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#dc2626">Broken</div>
@@ -264,7 +263,7 @@
 <div style="margin-bottom:16px"><img src="glyph-black.png" alt="Shopify" width="24" height="28" style="object-fit:contain;filter:grayscale(1);opacity:.6"></div>
 <div style="font-size:.65rem;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">StockFlows / Inventory Management for Shopify</div>
 <div style="font-size:.6rem;color:#444;margin-bottom:8px">Always working, even when you are not</div>
-<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px"><img src="glyph-black.png" alt="Shopify" width="12" height="14" style="object-fit:contain;filter:grayscale(1)"> <span style="font-size:.6rem;color:#555">Built for Shopify</span></div>
+<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px"><img src="glyph-black.png" alt="Shopify" width="12" height="14" style="object-fit:contain;filter:grayscale(1)"> <span style="font-size:.6rem;color:#555">Built with Shopify APIs</span></div>
 <div><a href="demo.html" style="font-size:.65rem;color:#555;text-decoration:none">Demo Video</a> &nbsp;·&nbsp; <a href="privacy.html" style="font-size:.65rem;color:#555;text-decoration:none">Privacy Policy</a></div>
 </div>
 <!-- ════════════════════ APP ════════════════════ -->
@@ -944,6 +943,7 @@ const tourSteps=[
 {page:'purchasing',title:'Purchase Orders',text:'Track POs from vendors. View status, line items, and receiving progress.',target:'#page-purchasing table tbody tr:first-child'},
 {page:'forecasting',title:'Demand Forecasting',text:'Statistical 30-day predictions for every product. Click a row to see the full forecast sparkline chart.',target:'#page-forecasting table tbody tr:first-child'},
 {page:'reports',title:'Reports and Export',text:'Inventory valuation, stock status pie chart, and one-click CSV/PDF export.',target:'#page-reports table:first-of-type'},
+{page:'settings',title:'Settings & Configuration',text:'Set stock thresholds, configure email/Slack/SMS notifications, manage AI features, and import data from Stocky.',target:'#page-settings'},
 ];
 function startTour(){
 if(!document.getElementById('app').classList.contains('active'))enterApp();
