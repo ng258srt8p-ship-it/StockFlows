@@ -118,9 +118,9 @@ export default function PurchasingList() {
         {fetcher.data && (
           <Layout.Section>
             <Banner
-              tone={fetcher.data.success ? "success" : "warning"}
+              tone={((fetcher.data as Record<string, unknown>).success ? "success" : "warning") as "success" | "warning"}
             >
-              <p>{fetcher.data.message}</p>
+              <p>{String((fetcher.data as Record<string, unknown>).message ?? "")}</p>
             </Banner>
           </Layout.Section>
         )}

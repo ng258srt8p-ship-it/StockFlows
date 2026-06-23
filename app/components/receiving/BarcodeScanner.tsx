@@ -157,7 +157,7 @@ export function BarcodeScanner({ onScan, isActive, format }: BarcodeScannerProps
             Barcode Scanner
           </Text>
           <Badge tone={scanCount > 0 ? "success" : "info"}>
-            {String(scanCount)} scans
+            {`${scanCount} scans`}
           </Badge>
         </div>
 

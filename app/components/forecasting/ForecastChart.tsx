@@ -66,10 +66,10 @@ export function ForecastChart({
           />
           <YAxis />
           <Tooltip
-            labelFormatter={(v) => new Date(v).toLocaleDateString()}
-            formatter={(value: number, name: string) => [
-              Math.round(value),
-              name,
+            labelFormatter={(v) => new Date(String(v)).toLocaleDateString()}
+            formatter={(value: unknown, name: unknown) => [
+              Math.round(Number(value)),
+              String(name),
             ]}
           />
           <Legend />

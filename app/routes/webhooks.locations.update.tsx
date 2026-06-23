@@ -12,10 +12,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const log = logger.child({
     shopDomain: shop,
     topic: "locations/update",
-    locationId: payload.id,
   });
 
-  log.info("Location updated", {
+  log.info({
+    msg: "Location updated",
     locationId: payload.id,
     name: payload.name,
   });

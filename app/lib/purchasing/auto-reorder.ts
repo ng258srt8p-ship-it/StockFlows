@@ -134,7 +134,7 @@ export async function generateAutoReorderPOs(
       title: item.title,
       sku: item.sku,
       recommendedQty: alert.recommendedQty,
-      costPerUnit: item.costPerUnit,
+      costPerUnit: item.costPerUnit ? Number(item.costPerUnit) : null,
     });
   }
 

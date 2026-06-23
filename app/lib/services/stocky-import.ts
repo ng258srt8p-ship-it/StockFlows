@@ -177,13 +177,13 @@ export async function importStockyVendors(
         data: {
           shopId,
           name,
-          email: row.Email?.trim() || null,
-          phone: row.Phone?.trim() || null,
+          email: row.Email?.trim() || undefined,
+          phone: row.Phone?.trim() || undefined,
           leadTimeDays: row["Lead time (days)"]
             ? parseInt(row["Lead time (days)"], 10)
-            : null,
-          paymentTerms: row["Payment terms"]?.trim() || null,
-          reliabilityScore: null,
+            : 7,
+          paymentTerms: row["Payment terms"]?.trim() || undefined,
+          reliabilityScore: 1.0,
           isActive: true,
         },
       });
@@ -260,11 +260,8 @@ export async function importStockyPurchaseOrders(
             data: {
               shopId,
               name: vendorName,
-              email: rows[0]["Vendor Email"]?.trim() || null,
+              email: rows[0]["Vendor Email"]?.trim() || undefined,
               isActive: true,
-              reliabilityScore: null,
-              leadTimeDays: null,
-              paymentTerms: null,
             },
           });
           vendorId = newVendor.id;
@@ -295,27 +292,46 @@ export async function importStockyPurchaseOrders(
         0,
       );
 
-      await prisma.purchaseOrder.create({
+      // Need a valid locationId and at least one inventoryItemId to create POs
+      if (!primaryLocation) {
+        log.warn({ shopId, poNumber }, "No active location found — skipping PO import");
+        skipped++;
+        continue;
+      }
+
+      // Create PO without line items first (we'll resolve inventory items by SKU)
+      const po = await prisma.purchaseOrder.create({
         data: {
           shopId,
-          vendorId,
-          locationId: primaryLocation?.id ?? null,
+          vendorId: vendorId!,
+          locationId: primaryLocation.id,
           poNumber,
           status: "DRAFT",
           expectedDate: isNaN(expectedDate?.getTime() ?? NaN) ? null : expectedDate,
           shippingCost: 0,
           customsDuties: 0,
-          lineItems: {
-            create: lineItems.map((li) => ({
-              inventoryItemId: null, // Will be linked later if SKU matches
-              quantity: li.quantity,
-              receivedQty: 0,
-              unitCost: li.unitCost ?? 0,
-              landedCost: 0,
-            })),
-          },
+          createdBy: "system",
         },
       });
+
+      // Resolve inventory items by SKU and create line items
+      for (const li of lineItems) {
+        const invItem = await prisma.inventoryItem.findFirst({
+          where: { shopId, sku: li.sku },
+        });
+        if (!invItem) continue;
+
+        await prisma.pOLineItem.create({
+          data: {
+            poId: po.id,
+            inventoryItemId: invItem.id,
+            quantity: li.quantity,
+            receivedQty: 0,
+            unitCost: li.unitCost ?? 0,
+            landedCost: 0,
+          },
+        });
+      }
 
       imported++;
     } catch (error) {

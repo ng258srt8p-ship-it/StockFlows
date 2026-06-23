@@ -325,7 +325,7 @@ export default function Forecasting() {
                                 : "critical"
                           }
                         >
-                          {String(Math.round(f.confidence * 100))}%
+                          {`${Math.round(f.confidence * 100)}%`}
                         </Badge>
                       </IndexTable.Cell>
                       <IndexTable.Cell>
@@ -339,7 +339,7 @@ export default function Forecasting() {
                               : "success"
                           }
                         >
-                          {String(f.inventoryItem.quantity)} in stock
+                          {`${f.inventoryItem.quantity} in stock`}
                         </Badge>
                       </IndexTable.Cell>
                       <IndexTable.Cell>
