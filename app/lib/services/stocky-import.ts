@@ -85,6 +85,13 @@ export async function importStockyProducts(
   const records = parseCsv<ProductRow>(csvContent);
   log.info({ shopId, totalRows: records.length }, "Starting product import");
 
+  // Resolve the shop's first active location for imported items
+  const defaultLocation = await prisma.location.findFirst({
+    where: { shopId, isActive: true },
+    orderBy: { createdAt: "asc" },
+  });
+  const locationId = defaultLocation?.id ?? "";
+
   let imported = 0;
   let skipped = 0;
 
@@ -121,7 +128,7 @@ export async function importStockyProducts(
           // with the SKU as a unique marker
           shopifyProductId: `imported-product-${sku}`,
           shopifyVariantId: `imported-variant-${sku}`,
-          locationId: "", // Will be assigned during sync
+          locationId,
         },
       });
 

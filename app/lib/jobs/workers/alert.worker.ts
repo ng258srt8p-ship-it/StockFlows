@@ -4,6 +4,8 @@ import { prisma } from "~/lib/db/client";
 import { logger } from "~/lib/logger";
 import { sendLowStockEmail } from "~/lib/notifications/email";
 import { sendSlackAlert } from "~/lib/notifications/slack";
+import { sendStockAlertSMS } from "~/lib/notifications/sms";
+import { broadcastSSE } from "~/lib/sse/manager.server";
 
 const connection = {
   host: process.env.REDIS_HOST ?? "localhost",
@@ -82,6 +84,30 @@ export const alertWorker = new Worker(
         log.error({ err: error, alertId }, "Failed to send Slack alert");
       }
     }
+
+    // SMS notifications for CRITICAL alerts
+    if (settings.smsPhoneNumbers && urgency === "CRITICAL") {
+      const phones = Array.isArray(settings.smsPhoneNumbers) ? settings.smsPhoneNumbers as string[] : [];
+      for (const phone of phones) {
+        try {
+          await sendStockAlertSMS(phone, productName, stock, locationName, urgency as "CRITICAL" | "WARNING" | "INFO");
+          log.info({ alertId, channel: "sms", phone }, "SMS alert sent");
+        } catch (error) {
+          log.error({ err: error, alertId, phone }, "Failed to send SMS alert");
+        }
+      }
+    }
+
+    // Broadcast SSE event so the dashboard updates in real-time
+    broadcastSSE(alert.shop.shopifyDomain, "reorder-alert", {
+      id: alert.id,
+      productName,
+      locationName,
+      currentStock: stock,
+      reorderPoint: reorderPt,
+      urgency,
+      recommendedQty: alert.recommendedQty,
+    });
 
     log.info({ alertId, urgency, productName }, "Alert processed");
   },

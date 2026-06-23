@@ -7,6 +7,9 @@ import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import * as Sentry from "@sentry/remix";
 
+// Start background job workers and scheduler on server startup
+import "~/lib/jobs/index.server";
+
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
   tracesSampleRate: 1.0,
