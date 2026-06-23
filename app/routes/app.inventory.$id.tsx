@@ -200,7 +200,7 @@ export default function InventoryDetail() {
                       <p className="text-gray-500 mt-2">No movements recorded yet.</p>
                     ) : (
                       <div className="mt-2 space-y-2">
-                        {data.map((m) => (
+                        {data.map((m: any) => (
                           <div
                             key={m.id}
                             className="flex items-center justify-between py-2 border-b"
@@ -244,7 +244,7 @@ export default function InventoryDetail() {
                   Active Alerts
                 </Text>
                 <div className="mt-2 space-y-2">
-                  {alerts.map((a) => (
+                  {alerts.map((a: any) => (
                     <Banner
                       key={a.id}
                       tone={a.urgency === "CRITICAL" ? "critical" : "warning"}
@@ -270,7 +270,7 @@ export default function InventoryDetail() {
                   Purchase Orders
                 </Text>
                 <div className="mt-2 space-y-2">
-                  {poLineItems.map((pli) => (
+                  {poLineItems.map((pli: any) => (
                     <div
                       key={pli.id}
                       className="flex items-center justify-between py-2 border-b last:border-0"

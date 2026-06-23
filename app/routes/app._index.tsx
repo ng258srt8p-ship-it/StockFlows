@@ -186,7 +186,7 @@ export default function Dashboard() {
                 </Text>
               ) : (
                 <div className="space-y-2">
-                  {recentActivity.map((m) => (
+                  {recentActivity.map((m: any) => (
                     <div
                       key={m.id}
                       className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"

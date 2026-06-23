@@ -89,7 +89,7 @@ export default function InventoryList() {
     [searchParams, setSearchParams]
   );
 
-  const getStatus = (item: InventoryWithLocation) => {
+  const getStatus = (item: any) => {
     if (item.quantity === 0) return { label: "Out of Stock", status: "critical" as const };
     if (item.quantity <= item.reorderPoint) return { label: "Low Stock", status: "warning" as const };
     return { label: "In Stock", status: "success" as const };

@@ -86,9 +86,10 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
   const receivedItems: { lineItemId: string; quantity: number }[] = [];
   let hasErrors = false;
   const errors: Record<string, string> = {};
+  const parsedFormData = await request.clone().formData();
 
   for (const li of po.lineItems) {
-    const rawQty = formData_get(request, `qty_${li.id}`);
+    const rawQty = parsedFormData.get(`qty_${li.id}`) as string | null;
     const qty = parseInt(rawQty ?? "0", 10);
 
     if (isNaN(qty) || qty < 0) {
@@ -274,6 +275,11 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
 async function formData_get(request: Request, key: string): Promise<string | null> {
   const formData = await request.clone().formData();
+  return formData.get(key) as string | null;
+}
+
+// Synchronous wrapper for use in loops where the formData is already parsed
+function getFormValue(formData: FormData, key: string): string | null {
   return formData.get(key) as string | null;
 }
 
