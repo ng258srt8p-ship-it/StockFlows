@@ -159,7 +159,9 @@ export async function getCurrentPlan(
   const logCtx = log.child({ shop });
 
   // 1. Check for an active subscription in the database
-  const subscription = await prisma.subscription?.findFirst({
+  // Note: Subscription model will be added when billing is activated.
+  // Currently the app is free during development.
+  const subscription = await (prisma as any).subscription?.findFirst({
     where: {
       shop: { shopifyDomain: shop },
       status: "active",
@@ -300,7 +302,7 @@ export async function requestPlanUpgrade(
   logCtx.info("Billing session created — redirecting to confirmation URL");
 
   // Persist the pending upgrade so we can activate on callback
-  await prisma.subscription?.upsert({
+  await (prisma as any).subscription?.upsert({
     where: {
       // Use a unique constraint if available; otherwise fall back to createMany logic
       id: `pending-${shop}`,
@@ -318,7 +320,7 @@ export async function requestPlanUpgrade(
       priceAmount: plan.priceAmount,
       currencyCode: plan.currencyCode,
     },
-  }).catch((err) => {
+  }).catch((err: any) => {
     logCtx.warn({ err }, "Could not persist pending subscription (table may not exist)");
   });
 

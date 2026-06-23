@@ -57,7 +57,7 @@ interface PurchaseOrderRow {
 
 const log = logger.child({ module: "stocky-import" });
 
-function parseCsv<T extends Record<string, unknown>>(
+function parseCsv<T>(
   csvContent: string,
 ): T[] {
   return parse(csvContent, {
