@@ -1,8 +1,10 @@
-import type { LoaderFunctionArgs } from "@remix-run/node";
+import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate } from "@remix-run/react";
+import { useLoaderData, useNavigate, useFetcher } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
+import { requirePermission } from "~/lib/auth/middleware";
+import { generateAutoReorderPOs } from "~/lib/purchasing/auto-reorder";
 import {
   Page,
   Layout,
@@ -10,6 +12,8 @@ import {
   IndexTable,
   Badge,
   Button,
+  Banner,
+  Text,
 } from "@shopify/polaris";
 
 const statusBadge: Record<string, "info" | "success" | "warning" | "critical"> = {
@@ -27,21 +31,70 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const shop = await prisma.shop.findUnique({
     where: { shopifyDomain: session.shop },
   });
-  if (!shop) return json({ purchaseOrders: [] });
+  if (!shop) return json({ purchaseOrders: [], pendingAlertCount: 0 });
 
-  const purchaseOrders = await prisma.purchaseOrder.findMany({
-    where: { shopId: shop.id },
-    include: { vendor: true, location: true, lineItems: true },
-    orderBy: { createdAt: "desc" },
-    take: 50,
-  });
+  const [purchaseOrders, pendingAlertCount] = await Promise.all([
+    prisma.purchaseOrder.findMany({
+      where: { shopId: shop.id },
+      include: { vendor: true, location: true, lineItems: true },
+      orderBy: { createdAt: "desc" },
+      take: 50,
+    }),
+    prisma.reorderAlert.count({
+      where: { shopId: shop.id, status: "PENDING" },
+    }),
+  ]);
 
-  return json({ purchaseOrders });
+  return json({ purchaseOrders, pendingAlertCount });
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const { shopId } = await requirePermission(request, "purchasing:write");
+  const { session } = await authenticate.admin(request);
+  const formData = await request.formData();
+  const intent = formData.get("intent");
+
+  if (intent === "auto-reorder") {
+    try {
+      // Find the user ID from the session
+      const user = await prisma.user.findFirst({
+        where: { shopId },
+      });
+      const userId = user?.id || "system";
+
+      const results = await generateAutoReorderPOs(shopId, userId);
+
+      if (results.length === 0) {
+        return json({
+          success: false,
+          message: "No POs created. Make sure vendors are assigned to your inventory items.",
+        });
+      }
+
+      const summary = results
+        .map((r) => `${r.poNumber} (${r.vendorName}: ${r.totalUnits} units)`)
+        .join(", ");
+
+      return json({
+        success: true,
+        message: `Created ${results.length} PO: ${summary}`,
+      });
+    } catch (error) {
+      return json({
+        success: false,
+        message: "Failed to generate POs. Please try again.",
+      });
+    }
+  }
+
+  return json({ success: false, message: "Unknown action" }, { status: 400 });
 };
 
 export default function PurchasingList() {
-  const { purchaseOrders } = useLoaderData<typeof loader>();
+  const { purchaseOrders, pendingAlertCount } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const fetcher = useFetcher();
+  const isGenerating = fetcher.state !== "idle";
 
   return (
     <Page
@@ -50,8 +103,50 @@ export default function PurchasingList() {
         content: "Create PO",
         onAction: () => navigate("/app/purchasing/new"),
       }}
+      secondaryActions={[
+        {
+          content: "Auto-generate POs",
+          onAction: () =>
+            fetcher.submit({ intent: "auto-reorder" }, { method: "post" }),
+          loading: isGenerating,
+          disabled: isGenerating || pendingAlertCount === 0,
+        },
+      ]}
     >
       <Layout>
+        {/* Auto-reorder result banner */}
+        {fetcher.data && (
+          <Layout.Section>
+            <Banner
+              tone={fetcher.data.success ? "success" : "warning"}
+            >
+              <p>{fetcher.data.message}</p>
+            </Banner>
+          </Layout.Section>
+        )}
+
+        {/* Pending alerts banner */}
+        {pendingAlertCount > 0 && !fetcher.data && (
+          <Layout.Section>
+            <Banner tone="warning">
+              <p>
+                <strong>{pendingAlertCount} items</strong> need reordering.
+                {" "}
+                <button
+                  type="button"
+                  className="underline font-medium"
+                  onClick={() =>
+                    fetcher.submit({ intent: "auto-reorder" }, { method: "post" })
+                  }
+                >
+                  Generate POs automatically
+                </button>
+                {" "}or create them manually.
+              </p>
+            </Banner>
+          </Layout.Section>
+        )}
+
         <Layout.Section>
           <Card>
             <IndexTable

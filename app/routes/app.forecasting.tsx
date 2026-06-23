@@ -130,20 +130,23 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function Forecasting() {
-  const { forecasts, accuracy, reorderAlerts } = useLoaderData<typeof loader>();
+  const { forecasts, accuracy, reorderAlerts, abcSummary } = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
+  // Cast to non-null arrays — Remix Jsonify adds null union but our data is clean
+  const forecastList = forecasts as NonNullable<typeof forecasts>;
+  const alertList = reorderAlerts as NonNullable<typeof reorderAlerts>;
 
   const selectedId = searchParams.get("forecast");
-  const selectedForecast = forecasts.find((f) => f.id === selectedId) ?? null;
+  const selectedForecast = forecastList.find((f) => f.id === selectedId) ?? null;
 
   // Summary stats
-  const totalPredicted = forecasts.reduce((sum, f) => sum + (f.totalPredicted || 0), 0);
-  const highConfidence = forecasts.filter((f) => f.confidence >= 0.8).length;
+  const totalPredicted = forecastList.reduce((sum, f) => sum + (f.totalPredicted || 0), 0);
+  const highConfidence = forecastList.filter((f) => f.confidence >= 0.8).length;
 
   return (
     <Page
       title="Forecasting"
-      subtitle={`Average accuracy: ${accuracy}% — ${forecasts.length} forecasts generated`}
+      subtitle={`Average accuracy: ${accuracy}% — ${forecastList.length} forecasts generated`}
     >
       <Layout>
         {/* Summary cards */}
@@ -175,7 +178,7 @@ export default function Forecasting() {
                   Reorder Needed
                 </Text>
                 <Text variant="headingLg" as="p" className={reorderAlerts.length > 0 ? "text-red-600" : ""}>
-                  {reorderAlerts.length} items
+                  {alertList.length} items
                 </Text>
               </div>
             </Card>
@@ -265,7 +268,7 @@ export default function Forecasting() {
               <Text variant="bodySm" tone="subdued" as="p">
                 Click a row to view the forecast chart and reorder recommendation.
               </Text>
-              {forecasts.length === 0 ? (
+              {forecastList.length === 0 ? (
                 <EmptyState
                   heading="No forecasts yet"
                   action={{ content: "Run forecast", url: "/app/settings" }}
@@ -280,7 +283,7 @@ export default function Forecasting() {
               ) : (
                 <IndexTable
                   resourceName={{ singular: "forecast", plural: "forecasts" }}
-                  itemCount={forecasts.length}
+                  itemCount={forecastList.length}
                   selectable={false}
                   onRowClick={(id) => setSearchParams({ forecast: id })}
                   headings={[
@@ -293,7 +296,7 @@ export default function Forecasting() {
                     { title: "Generated" },
                   ]}
                 >
-                  {forecasts.map((f, index) => (
+                  {forecastList.map((f, index) => (
                     <IndexTable.Row
                       key={f.id}
                       id={f.id}
