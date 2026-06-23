@@ -155,6 +155,7 @@ model StockMovement {
   inventoryItem   InventoryItem @relation(fields: [inventoryItemId], references: [id], onDelete: Cascade)
 
   @@index([inventoryItemId])
+  @@index([inventoryItemId, type, createdAt])
   @@index([locationId, createdAt])
   @@index([createdAt])
   @@map("stock_movements")

@@ -14,6 +14,8 @@ import {
 } from "@shopify/polaris";
 import { ForecastChart } from "~/components/forecasting/ForecastChart";
 import { ReorderRecommendation } from "~/components/forecasting/ReorderRecommendation";
+import { classifyABC, getReorderPolicy } from "~/lib/forecasting/abc-analysis";
+import type { ABCItem } from "~/lib/forecasting/abc-analysis";
 
 interface ForecastItem {
   id: string;
@@ -61,6 +63,40 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     take: 10,
   });
 
+  // ABC Analysis — compute revenue from sales movements (last 90 days)
+  const ninetyDaysAgo = new Date();
+  ninetyDaysAgo.setDate(ninetyDaysAgo.getDate() - 90);
+
+  const inventoryItems = await prisma.inventoryItem.findMany({
+    where: { shopId: shop.id },
+    select: { id: true, title: true, sku: true, quantity: true, costPerUnit: true },
+  });
+
+  const salesByItem = await prisma.stockMovement.groupBy({
+    by: ["inventoryItemId"],
+    where: {
+      inventoryItem: { shopId: shop.id },
+      type: "SALE",
+      createdAt: { gte: ninetyDaysAgo },
+    },
+    _sum: { quantityChange: true },
+  });
+
+  const salesMap = new Map(
+    salesByItem.map((s) => [s.inventoryItemId, Math.abs(s._sum.quantityChange ?? 0)])
+  );
+
+  const abcItems: ABCItem[] = inventoryItems.map((item) => ({
+    id: item.id,
+    title: item.title,
+    sku: item.sku,
+    quantity: item.quantity,
+    costPerUnit: item.costPerUnit ? Number(item.costPerUnit) : null,
+    revenue: (salesMap.get(item.id) ?? 0) * (item.costPerUnit ? Number(item.costPerUnit) : 0),
+  }));
+
+  const abcSummary = classifyABC(abcItems);
+
   return json({
     forecasts: forecasts.map((f) => ({
       id: f.id,
@@ -89,6 +125,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       inventoryItem: { title: a.inventoryItem.title, sku: a.inventoryItem.sku },
       location: { name: a.location.name },
     })),
+    abcSummary,
   });
 };
 
@@ -307,6 +344,106 @@ export default function Forecasting() {
                       </IndexTable.Cell>
                     </IndexTable.Row>
                   ))}
+                </IndexTable>
+              )}
+            </div>
+          </Card>
+        </Layout.Section>
+
+        {/* ABC Analysis */}
+        <Layout.Section>
+          <Card>
+            <div className="p-4">
+              <Text variant="headingMd" as="h2">
+                ABC Analysis
+              </Text>
+              <Text variant="bodySm" as="p" tone="subdued">
+                Inventory items classified by revenue contribution over the last 90 days.
+              </Text>
+
+              {/* Summary badges */}
+              <div className="flex gap-4 mt-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <Badge tone="success">A</Badge>
+                  <Text variant="bodySm" as="p">
+                    {abcSummary.totals.A.count} items ({abcSummary.totals.A.percentRevenue}% revenue)
+                  </Text>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge tone="warning">B</Badge>
+                  <Text variant="bodySm" as="p">
+                    {abcSummary.totals.B.count} items ({abcSummary.totals.B.percentRevenue}% revenue)
+                  </Text>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Badge tone="info">C</Badge>
+                  <Text variant="bodySm" as="p">
+                    {abcSummary.totals.C.count} items ({abcSummary.totals.C.percentRevenue}% revenue)
+                  </Text>
+                </div>
+              </div>
+
+              {abcSummary.categories.length === 0 ? (
+                <Text variant="bodySm" as="p" tone="subdued">
+                  No sales data available for ABC analysis. Items will appear once sales are recorded.
+                </Text>
+              ) : (
+                <IndexTable
+                  resourceName={{ singular: "item", plural: "items" }}
+                  itemCount={abcSummary.categories.length}
+                  selectable={false}
+                  headings={[
+                    { title: "Category" },
+                    { title: "Product" },
+                    { title: "SKU" },
+                    { title: "Revenue (90d)" },
+                    { title: "Cumulative %" },
+                    { title: "Stock" },
+                    { title: "Review Freq." },
+                  ]}
+                >
+                  {abcSummary.categories.map((item, index) => {
+                    const policy = getReorderPolicy(item.category);
+                    return (
+                      <IndexTable.Row key={item.id} id={item.id} position={index}>
+                        <IndexTable.Cell>
+                          <Badge
+                            tone={
+                              item.category === "A"
+                                ? "success"
+                                : item.category === "B"
+                                  ? "warning"
+                                  : "info"
+                            }
+                          >
+                            {item.category}
+                          </Badge>
+                        </IndexTable.Cell>
+                        <IndexTable.Cell>
+                          <Text variant="bodyMd" as="p" fontWeight="semibold">
+                            {item.title}
+                          </Text>
+                        </IndexTable.Cell>
+                        <IndexTable.Cell>
+                          <Text variant="bodySm" as="p">{item.sku ?? "—"}</Text>
+                        </IndexTable.Cell>
+                        <IndexTable.Cell>
+                          <Text variant="bodySm" as="p">
+                            ${item.revenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                          </Text>
+                        </IndexTable.Cell>
+                        <IndexTable.Cell>
+                          <Text variant="bodySm" as="p">{item.cumulativePercent}%</Text>
+                        </IndexTable.Cell>
+                        <IndexTable.Cell>
+                          <Text variant="bodySm" as="p">{item.quantity} units</Text>
+                        </IndexTable.Cell>
+                        <IndexTable.Cell>
+                          <Text variant="bodySm" as="p">{policy.reviewFrequency}</Text>
+                        </IndexTable.Cell>
+                      </IndexTable.Row>
+                    );
+                  })}
                 </IndexTable>
               )}
             </div>

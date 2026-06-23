@@ -73,6 +73,16 @@ export default function Settings() {
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
+  const [lowStock, setLowStock] = useState(String(settings?.lowStockThreshold || 10));
+  const [criticalStock, setCriticalStock] = useState(String(settings?.criticalStockThreshold || 3));
+  const [forecastHorizon, setForecastHorizon] = useState(String(settings?.forecastHorizonDays || 30));
+  const [slackUrl, setSlackUrl] = useState(settings?.slackWebhookUrl || "");
+  const [smsPhones, setSmsPhones] = useState(
+    Array.isArray(settings?.smsPhoneNumbers)
+      ? (settings.smsPhoneNumbers as string[]).join(", ")
+      : ""
+  );
+
   return (
     <Page title="Settings">
       <Layout>
@@ -90,14 +100,16 @@ export default function Settings() {
                   name="lowStockThreshold"
                   label="Low stock alert threshold"
                   type="number"
-                  value={String(settings?.lowStockThreshold || 10)}
+                  value={lowStock}
+                  onChange={(val) => setLowStock(val)}
                   helpText="Alert when stock drops below this level"
                 />
                 <TextField
                   name="criticalStockThreshold"
                   label="Critical stock threshold"
                   type="number"
-                  value={String(settings?.criticalStockThreshold || 3)}
+                  value={criticalStock}
+                  onChange={(val) => setCriticalStock(val)}
                   helpText="Critical alert when stock drops below this level"
                 />
               </div>
@@ -110,7 +122,8 @@ export default function Settings() {
                     name="forecastHorizonDays"
                     label="Forecast horizon (days)"
                     type="number"
-                    value={String(settings?.forecastHorizonDays || 30)}
+                    value={forecastHorizon}
+                    onChange={(val) => setForecastHorizon(val)}
                     helpText="How many days ahead to forecast"
                   />
                 </div>
@@ -128,18 +141,16 @@ export default function Settings() {
                   <TextField
                     name="slackWebhookUrl"
                     label="Slack Webhook URL"
-                    value={settings?.slackWebhookUrl || ""}
+                    value={slackUrl}
+                    onChange={(val) => setSlackUrl(val)}
                     placeholder="https://hooks.slack.com/services/..."
                     helpText="Leave empty to disable Slack notifications"
                   />
                   <TextField
                     name="smsPhoneNumbers"
                     label="SMS Alert Phone Numbers"
-                    value={
-                      Array.isArray(settings?.smsPhoneNumbers)
-                        ? (settings.smsPhoneNumbers as string[]).join(", ")
-                        : ""
-                    }
+                    value={smsPhones}
+                    onChange={(val) => setSmsPhones(val)}
                     placeholder="+15551234567, +15559876543"
                     helpText="Comma-separated list of phone numbers for critical stock alerts. Leave empty to disable SMS."
                   />

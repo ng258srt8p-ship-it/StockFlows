@@ -1,11 +1,16 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Outlet, useLoaderData, useLocation } from "@remix-run/react";
+import { Outlet, useLoaderData, useLocation, useRouteError, isRouteErrorResponse } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import {
   Frame,
   Navigation,
   Page,
+  Banner,
+  Card,
+  Text,
+  Button,
+  Layout,
 } from "@shopify/polaris";
 import {
   HomeIcon,
@@ -77,6 +82,57 @@ export default function AppLayout() {
   return (
     <Frame navigation={navigationMarkup}>
       <Outlet />
+    </Frame>
+  );
+}
+
+/**
+ * Error boundary for all /app/* routes. Catches loader/action errors
+ * and renders a user-friendly error page instead of crashing.
+ */
+export function ErrorBoundary() {
+  const error = useRouteError();
+
+  let title = "Something went wrong";
+  let message = "An unexpected error occurred. Please try again.";
+
+  if (isRouteErrorResponse(error)) {
+    title = `${error.status} ${error.statusText}`;
+    message =
+      error.status === 404
+        ? "The page you're looking for doesn't exist."
+        : error.status === 403
+          ? "You don't have permission to access this page."
+          : "Something went wrong while loading this page.";
+  } else if (error instanceof Error) {
+    message = error.message || message;
+  }
+
+  return (
+    <Frame>
+      <Page title="Error">
+        <Layout>
+          <Layout.Section>
+            <Card>
+              <div className="p-6">
+                <Banner tone="critical">
+                  <p>{title}</p>
+                </Banner>
+                <div className="mt-4">
+                  <Text variant="bodyMd" as="p">
+                    {message}
+                  </Text>
+                </div>
+                <div className="mt-4">
+                  <Button primary url="/app">
+                    Return to Dashboard
+                  </Button>
+                </div>
+              </div>
+            </Card>
+          </Layout.Section>
+        </Layout>
+      </Page>
     </Frame>
   );
 }
