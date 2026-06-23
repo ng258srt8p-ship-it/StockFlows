@@ -420,9 +420,11 @@ svg text{font-family:var(--font)}
   .landing{padding:60px 20px}
   .landing h1{font-size:2.8rem;letter-spacing:-1px}
   .landing .sub{font-size:.85rem;max-width:100%;padding:0 8px}
-  .landing .stats{gap:24px;flex-wrap:wrap}
-  .landing .stat .n{font-size:2rem}
+  .landing .stats{display:grid;grid-template-columns:1fr 1fr;gap:16px 24px;justify-items:center}
+  .landing .stat{text-align:center}
+  .landing .stat .n{font-size:1.8rem}
   .landing .btn-group{flex-direction:column;align-items:stretch;width:100%;max-width:300px}
+  .btn{justify-content:center}
 
   /* Screenshots section */
   .screenshots-section{padding:40px 16px}
@@ -437,7 +439,45 @@ svg text{font-family:var(--font)}
   .ss-tab-desc{display:none}
   .ss-tab-progress{display:none}
 
-  /* Tables -horizontal scroll */
+  /* Inline section padding reduction */
+  [style*="padding:80px 24px"]{padding:48px 16px !important}
+
+  /* Inline heading size reduction */
+  [style*="font-size:2.5rem"]{font-size:1.8rem !important}
+  [style*="font-size:3rem"]{font-size:2rem !important}
+
+  /* Two-column grid collapse */
+  [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr !important}
+
+  /* Countdown section */
+  #countdown{gap:12px;justify-content:center}
+  #countdown [style*="font-size:2.5rem"]{font-size:1.8rem !important}
+
+  /* Email preview card */
+  [style*="max-width:420px"]{max-width:100% !important}
+
+  /* Dashboard KPI cards */
+  [style*="font-size:4rem"]{font-size:2.5rem !important}
+
+  /* Inventory search input */
+  input[style*="min-width:200px"]{min-width:0 !important}
+
+  /* Bar chart labels */
+  [style*="width:140px"]{width:100px !important}
+
+  /* Pricing card padding */
+  .pricing-grid > div{padding:20px !important}
+
+  /* Comparison table */
+  .compare-grid{grid-template-columns:1fr !important}
+  .compare-grid > div{border-right:none !important;border-bottom:1px solid #333;padding:12px !important}
+  .compare-grid > div:last-child{border-bottom:none}
+  .compare-grid [style*="padding:10px 0"]{padding:6px 0 !important}
+
+  /* Email preview stat blocks */
+  [style*="display:flex;gap:16px"]{gap:8px !important;flex-wrap:wrap}
+
+  /* Tables - horizontal scroll */
   table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
   th,td{white-space:nowrap;padding:10px 12px;font-size:.75rem}
 
@@ -445,14 +485,6 @@ svg text{font-family:var(--font)}
   .stats-row{grid-template-columns:1fr}
   .stat-card{border-right:none;border-bottom:1px solid var(--border);padding:16px}
   .stat-card:last-child{border-bottom:none}
-
-  /* Comparison table -2 columns on mobile */
-  .compare-grid{grid-template-columns:1fr !important}
-  .compare-grid > div{border-right:none !important;border-bottom:1px solid #333}
-  .compare-grid > div:last-child{border-bottom:none}
-
-  /* Email preview */
-  .email-preview{max-width:100% !important}
 
   /* Pricing */
   .pricing-grid{grid-template-columns:1fr !important}
