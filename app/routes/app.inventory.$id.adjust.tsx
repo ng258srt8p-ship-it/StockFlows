@@ -154,6 +154,8 @@ export default function AdjustInventory() {
   const isSubmitting = navigation.state === "submitting";
 
   const [reason, setReason] = useState("correction");
+  const [quantity, setQuantity] = useState("");
+  const [notes, setNotes] = useState("");
 
   return (
     <Page
@@ -185,6 +187,8 @@ export default function AdjustInventory() {
                     name="quantityChange"
                     label="Quantity adjustment"
                     type="number"
+                    value={quantity}
+                    onChange={(val) => setQuantity(val)}
                     helpText="Positive to add stock, negative to remove"
                     error={actionData?.errors?.quantityChange?.[0]}
                     required
@@ -207,6 +211,8 @@ export default function AdjustInventory() {
                   <TextField
                     name="notes"
                     label="Notes"
+                    value={notes}
+                    onChange={(val) => setNotes(val)}
                     multiline={3}
                     placeholder="Optional notes about this adjustment"
                   />

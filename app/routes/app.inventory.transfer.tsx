@@ -174,6 +174,7 @@ export default function InventoryTransfer() {
 
   const [fromLocationId, setFromLocationId] = useState("");
   const [toLocationId, setToLocationId] = useState("");
+  const [notes, setNotes] = useState("");
   const [lineItems, setLineItems] = useState<TransferLineItem[]>([
     { inventoryItemId: "", quantity: 1 },
   ]);
@@ -382,6 +383,8 @@ export default function InventoryTransfer() {
                   <TextField
                     name="notes"
                     label="Notes"
+                    value={notes}
+                    onChange={(val) => setNotes(val)}
                     multiline={3}
                     placeholder="Optional notes about this transfer"
                   />

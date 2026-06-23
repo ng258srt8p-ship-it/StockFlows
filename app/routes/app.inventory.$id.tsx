@@ -11,9 +11,11 @@ import {
   Text,
   Badge,
   Button,
+  Banner,
   DescriptionList,
 } from "@shopify/polaris";
 import { StockLevelChart } from "~/components/inventory/StockLevelChart";
+import { ForecastChart } from "~/components/forecasting/ForecastChart";
 import { TableSkeleton } from "~/components/shared/LoadingSkeleton";
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
@@ -44,15 +46,54 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     orderBy: { createdAt: "desc" },
   });
 
+  // Linked POs (purchase orders containing this item)
+  const poLineItems = await prisma.pOLineItem.findMany({
+    where: { inventoryItemId: item.id },
+    include: {
+      purchaseOrder: {
+        include: { vendor: true },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 10,
+  });
+
+  // Active alerts for this item
+  const alerts = await prisma.reorderAlert.findMany({
+    where: {
+      inventoryItemId: item.id,
+      status: "PENDING",
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
   return defer({
     item,
     movements: movementsPromise,
     forecast: forecastPromise,
+    poLineItems: poLineItems.map((pli) => ({
+      id: pli.id,
+      quantity: pli.quantity,
+      receivedQty: pli.receivedQty,
+      unitCost: Number(pli.unitCost),
+      poNumber: pli.purchaseOrder.poNumber,
+      status: pli.purchaseOrder.status,
+      vendorName: pli.purchaseOrder.vendor.name,
+      createdAt: pli.purchaseOrder.createdAt.toISOString(),
+    })),
+    alerts: alerts.map((a) => ({
+      id: a.id,
+      urgency: a.urgency,
+      currentStock: a.currentStock,
+      reorderPoint: a.reorderPoint,
+      recommendedQty: a.recommendedQty,
+    })),
   });
 };
 
 export default function InventoryDetail() {
-  const { item, movements, forecast } = useLoaderData<typeof loader>();
+  const { item, movements, forecast, poLineItems, alerts } =
+    useLoaderData<typeof loader>();
   const navigate = useNavigate();
 
   const stockStatus =
@@ -179,6 +220,122 @@ export default function InventoryDetail() {
                             </div>
                           </div>
                         ))}
+                      </div>
+                    )
+                  }
+                </Await>
+              </Suspense>
+            </div>
+          </Card>
+        </Layout.Section>
+
+        {/* Active alerts for this item */}
+        {alerts.length > 0 && (
+          <Layout.Section>
+            <Card>
+              <div className="p-4">
+                <Text variant="headingMd" as="h2">
+                  Active Alerts
+                </Text>
+                <div className="mt-2 space-y-2">
+                  {alerts.map((a) => (
+                    <Banner
+                      key={a.id}
+                      tone={a.urgency === "CRITICAL" ? "critical" : "warning"}
+                    >
+                      <p>
+                        {a.urgency}: Stock is {a.currentStock} (reorder point: {a.reorderPoint}).
+                        Recommended order: {a.recommendedQty} units.
+                      </p>
+                    </Banner>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </Layout.Section>
+        )}
+
+        {/* Linked Purchase Orders */}
+        {poLineItems.length > 0 && (
+          <Layout.Section>
+            <Card>
+              <div className="p-4">
+                <Text variant="headingMd" as="h2">
+                  Purchase Orders
+                </Text>
+                <div className="mt-2 space-y-2">
+                  {poLineItems.map((pli) => (
+                    <div
+                      key={pli.id}
+                      className="flex items-center justify-between py-2 border-b last:border-0"
+                    >
+                      <div>
+                        <Text variant="bodyMd" as="p" fontWeight="semibold">
+                          {pli.poNumber}
+                        </Text>
+                        <Text variant="bodySm" as="p" tone="subdued">
+                          {pli.vendorName} — {new Date(pli.createdAt).toLocaleDateString()}
+                        </Text>
+                      </div>
+                      <div className="text-right flex items-center gap-2">
+                        <Badge
+                          tone={
+                            pli.status === "RECEIVED"
+                              ? "success"
+                              : pli.status === "CANCELLED"
+                                ? "critical"
+                                : "info"
+                          }
+                        >
+                          {pli.status.replace(/_/g, " ")}
+                        </Badge>
+                        <Text variant="bodySm" as="p">
+                          {pli.receivedQty}/{pli.quantity} received
+                        </Text>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </Layout.Section>
+        )}
+
+        {/* Forecast Visualization */}
+        <Layout.Section>
+          <Card>
+            <div className="p-4">
+              <Text variant="headingMd" as="h2">
+                Demand Forecast
+              </Text>
+              <Suspense fallback={<TableSkeleton rows={3} />}>
+                <Await resolve={forecast}>
+                  {(data) =>
+                    !data ? (
+                      <Text variant="bodySm" as="p" tone="subdued" className="mt-2">
+                        No forecast available yet. Forecasts are generated nightly.
+                      </Text>
+                    ) : (
+                      <div className="mt-2">
+                        <div className="flex items-center gap-4 mb-3">
+                          <Badge>{data.modelUsed}</Badge>
+                          <Text variant="bodySm" as="p" tone="subdued">
+                            Confidence: {Math.round(data.confidence * 100)}%
+                          </Text>
+                          <Text variant="bodySm" as="p" tone="subdued">
+                            30-day predicted: {data.totalPredicted} units
+                          </Text>
+                        </div>
+                        <ForecastChart
+                          forecast={(data.predictedDaily as any[]).map((p: any) => ({
+                            date: p.date,
+                            yhat: p.yhat,
+                            lower: p.lower ?? p.yhat * 0.8,
+                            upper: p.upper ?? p.yhat * 1.2,
+                          }))}
+                          height={250}
+                          title="30-Day Demand Forecast"
+                        />
                       </div>
                     )
                   }
