@@ -62,7 +62,6 @@ Secondary: Inventory and Order Management
 
 ## Support
 - Email: support@stockflows.app
-- Documentation: docs.stockflows.app
 - In-app help: Built-in tooltips and guided tour
 
 ## Privacy Policy
