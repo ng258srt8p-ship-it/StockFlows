@@ -15,7 +15,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     variantId: payload.id,
   });
 
-  log.info("Variant back in stock", {
+  log.info({
+    msg: "Variant back in stock",
     variantId: payload.id,
     title: payload.title,
     inventoryQuantity: payload.inventory_quantity,

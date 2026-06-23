@@ -15,7 +15,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     productId: payload.id,
   });
 
-  log.info("Product updated", {
+  log.info({
+    msg: "Product updated",
     productId: payload.id,
     title: payload.title,
     variantsCount: payload.variants?.length,

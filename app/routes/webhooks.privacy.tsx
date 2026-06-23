@@ -10,35 +10,28 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const log = logger.child({ shopDomain: shop, topic });
+  const log = logger.child({ shopDomain: shop, topic: String(topic) });
 
-  switch (topic) {
-    case "customers/data_request": {
-      log.info(
-        { customerId: payload.customer?.id },
-        "Customer data request received"
-      );
-      break;
-    }
+  const topicStr = String(topic);
 
-    case "customers/redact": {
-      log.info(
-        { customerId: payload.customer?.id },
-        "Customer redaction request received"
-      );
-      break;
-    }
-
-    case "shop/redact": {
-      log.info("Shop redaction request received — deleting all data");
-      try {
-        await prisma.shop.delete({
-          where: { shopifyDomain: shop },
-        });
-      } catch (error) {
-        log.error({ err: error }, "Failed to delete shop data");
-      }
-      break;
+  if (topicStr === "customers/data_request") {
+    log.info(
+      { customerId: payload.customer?.id },
+      "Customer data request received"
+    );
+  } else if (topicStr === "customers/redact") {
+    log.info(
+      { customerId: payload.customer?.id },
+      "Customer redaction request received"
+    );
+  } else if (topicStr === "shop/redact") {
+    log.info("Shop redaction request received — deleting all data");
+    try {
+      await prisma.shop.delete({
+        where: { shopifyDomain: shop },
+      });
+    } catch (error) {
+      log.error({ err: error }, "Failed to delete shop data");
     }
   }
 

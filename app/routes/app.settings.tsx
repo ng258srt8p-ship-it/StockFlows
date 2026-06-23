@@ -35,6 +35,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const formData = await request.formData();
 
+  // Parse SMS phone numbers from comma-separated string
+  const smsRaw = (formData.get("smsPhoneNumbers") as string || "").trim();
+  const smsPhoneNumbers = smsRaw
+    ? smsRaw.split(",").map((n: string) => n.trim()).filter(Boolean)
+    : null;
+
   await prisma.shopSetting.upsert({
     where: { shopId },
     create: {
@@ -44,6 +50,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       forecastHorizonDays: Number(formData.get("forecastHorizonDays")) || 30,
       emailAlerts: formData.get("emailAlerts") === "on",
       slackWebhookUrl: formData.get("slackWebhookUrl") as string || null,
+      smsPhoneNumbers: smsPhoneNumbers as any,
       currency: formData.get("currency") as string || "USD",
     },
     update: {
@@ -52,6 +59,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       forecastHorizonDays: Number(formData.get("forecastHorizonDays")) || 30,
       emailAlerts: formData.get("emailAlerts") === "on",
       slackWebhookUrl: formData.get("slackWebhookUrl") as string || null,
+      smsPhoneNumbers: smsPhoneNumbers as any,
       currency: formData.get("currency") as string || "USD",
     },
   });
@@ -123,6 +131,17 @@ export default function Settings() {
                     value={settings?.slackWebhookUrl || ""}
                     placeholder="https://hooks.slack.com/services/..."
                     helpText="Leave empty to disable Slack notifications"
+                  />
+                  <TextField
+                    name="smsPhoneNumbers"
+                    label="SMS Alert Phone Numbers"
+                    value={
+                      Array.isArray(settings?.smsPhoneNumbers)
+                        ? (settings.smsPhoneNumbers as string[]).join(", ")
+                        : ""
+                    }
+                    placeholder="+15551234567, +15559876543"
+                    helpText="Comma-separated list of phone numbers for critical stock alerts. Leave empty to disable SMS."
                   />
                 </div>
               </Card>
