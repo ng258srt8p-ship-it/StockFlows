@@ -1,0 +1,2 @@
+name = "stockflows-tour"
+pages_build_output_dir = "./public"
