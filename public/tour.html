@@ -30,7 +30,7 @@
 </div>
 
 <!-- Features -->
-<div style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
+<div class="fade-in" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
 <div style="max-width:960px;margin:0 auto">
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px">
 <div>
@@ -67,6 +67,77 @@
 </div>
 </div>
 
+<!-- Screenshots -->
+<div class="screenshots-section">
+<div class="section-inner">
+<div class="eyebrow">Screenshots</div>
+<h2>See every screen.</h2>
+<p class="subtitle">From dashboard to forecasting — click Explore to try every feature yourself.</p>
+
+<div class="ss-carousel">
+<div class="ss-track" id="ss-track">
+<div class="ss-card">
+  <div class="ss-img"><img src="dashboard.png" alt="Dashboard" loading="lazy"></div>
+  <div class="ss-label">
+    <div class="ss-num">01</div>
+    <div>
+      <div class="ss-text">Dashboard</div>
+      <div class="ss-desc">Stock levels, alerts, and forecast accuracy at a glance.</div>
+    </div>
+  </div>
+</div>
+<div class="ss-card">
+  <div class="ss-img"><img src="inventory.png" alt="Inventory" loading="lazy"></div>
+  <div class="ss-label">
+    <div class="ss-num">02</div>
+    <div>
+      <div class="ss-text">Inventory</div>
+      <div class="ss-desc">Searchable table with status badges, filters, and one-click adjustments.</div>
+    </div>
+  </div>
+</div>
+<div class="ss-card">
+  <div class="ss-img"><img src="forecasting.png" alt="Forecasting" loading="lazy"></div>
+  <div class="ss-label">
+    <div class="ss-num">03</div>
+    <div>
+      <div class="ss-text">Forecasting</div>
+      <div class="ss-desc">30-day demand predictions with confidence intervals per product.</div>
+    </div>
+  </div>
+</div>
+<div class="ss-card">
+  <div class="ss-img"><img src="purchasing.png" alt="Purchasing" loading="lazy"></div>
+  <div class="ss-label">
+    <div class="ss-num">04</div>
+    <div>
+      <div class="ss-text">Purchasing</div>
+      <div class="ss-desc">Purchase orders with vendor tracking, status badges, and receiving.</div>
+    </div>
+  </div>
+</div>
+<div class="ss-card">
+  <div class="ss-img"><img src="reports.png" alt="Reports" loading="lazy"></div>
+  <div class="ss-label">
+    <div class="ss-num">05</div>
+    <div>
+      <div class="ss-text">Reports</div>
+      <div class="ss-desc">Inventory valuation, stock status, and one-click CSV/PDF export.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="ss-nav">
+  <button onclick="ssScroll(-1)" aria-label="Previous"><span class="material-symbols-outlined">arrow_back</span></button>
+  <button onclick="ssScroll(1)" aria-label="Next"><span class="material-symbols-outlined">arrow_forward</span></button>
+</div>
+<div class="ss-dots" id="ss-dots"></div>
+</div>
+
+</div>
+</div>
+
 <!-- How It Works -->
 <div style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
 <div style="max-width:960px;margin:0 auto">
@@ -93,7 +164,7 @@
 </div>
 
 <!-- Alert Preview -->
-<div style="background:#fff;border-top:1px solid #e0e0e0;padding:80px 24px;color:#111">
+<div class="fade-in" style="background:#fff;border-top:1px solid #e0e0e0;padding:80px 24px;color:#111">
 <div style="max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center">
 <div>
 <div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Instant alerts</div>
@@ -119,7 +190,7 @@
 </div>
 
 <!-- Competitor Comparison -->
-<div style="background:#111;color:#fff;padding:80px 24px">
+<div class="fade-in" style="background:#111;color:#fff;padding:80px 24px">
 <div style="max-width:960px;margin:0 auto">
 <div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Why switch</div>
 <div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:16px">Stocky is reportedly being discontinued.</div>
@@ -129,7 +200,7 @@
 <div style="text-align:center"><div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;font-weight:400;line-height:1" id="cd-mins">--</div><div style="font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px">Minutes</div></div>
 </div>
 <div style="font-size:.85rem;color:#888;max-width:520px;line-height:1.7;margin-bottom:40px">Shopify's built-in inventory app (Stocky) has consistently low ratings and is reportedly being discontinued. StockFlows replaces everything Stocky does, and adds working statistical forecasting on top.</div>
-<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid #333">
+<div class="compare-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid #333">
 <div style="padding:20px;border-right:1px solid #333">
 <div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Feature</div>
 <div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222">Inventory tracking</div>
@@ -165,7 +236,7 @@
 </div>
 
 <!-- Social Proof -->
-<div style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
+<div class="fade-in" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
 <div style="max-width:960px;margin:0 auto">
 <div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Why StockFlows</div>
 <div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:40px">Built for real inventory workflows.</div>
@@ -228,7 +299,7 @@
 <div style="max-width:960px;margin:0 auto">
 <div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Pricing</div>
 <div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:40px">Simple, transparent pricing.</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;border:1px solid var(--border)">
+<div class="pricing-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;border:1px solid var(--border)">
 <div style="padding:28px;border-right:1px solid var(--border)">
 <div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600">Free</div>
 <div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin:8px 0">$0</div>
@@ -1036,6 +1107,60 @@ ${roi>0?`<div style="margin-top:8px"><span class="badge badge-success">${roi}% R
 ${savings>0?`<div style="font-size:.75rem;color:#666;margin-top:8px">Pays for itself after preventing just <strong>${savings>monthlyPlan?Math.ceil(monthlyPlan/costPerOut)||'one':'one'}</strong> stockout${monthlyPlan>0?' per month':''}</div>`:''}`;
 }}
 updateROI();
+
+// ══════════════════════════════════════════════════════
+//  SCREENSHOT CAROUSEL
+// ══════════════════════════════════════════════════════
+const ssTrack=document.getElementById('ss-track');
+const ssDots=document.getElementById('ss-dots');
+const ssCards=ssTrack?ssTrack.querySelectorAll('.ss-card'):[];
+let ssCurrent=0;
+function ssInit(){
+  if(!ssDots||!ssCards.length)return;
+  ssDots.innerHTML='';
+  ssCards.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='ss-dot'+(i===0?' active':'');
+    d.onclick=()=>ssGoTo(i);
+    ssDots.appendChild(d);
+  });
+}
+function ssGoTo(i){
+  if(!ssCards[i]||!ssTrack)return;
+  ssCurrent=i;
+  ssCards[i].scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'});
+  ssDots.querySelectorAll('.ss-dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+function ssScroll(dir){
+  ssGoTo(Math.max(0,Math.min(ssCards.length-1,ssCurrent+dir)));
+}
+if(ssTrack){
+  ssTrack.addEventListener('scroll',()=>{
+    const trackLeft=ssTrack.scrollLeft;
+    const trackW=ssTrack.offsetWidth;
+    let closest=0,minDist=Infinity;
+    ssCards.forEach((c,i)=>{
+      const cardCenter=c.offsetLeft+c.offsetWidth/2-trackLeft;
+      const dist=Math.abs(cardCenter-trackW/2);
+      if(dist<minDist){minDist=dist;closest=i}
+    });
+    if(closest!==ssCurrent){ssCurrent=closest;ssDots.querySelectorAll('.ss-dot').forEach((d,j)=>d.classList.toggle('active',j===closest))}
+  },{passive:true});
+}
+ssInit();
+
+// ══════════════════════════════════════════════════════
+//  SCROLL FADE-IN ANIMATION
+// ══════════════════════════════════════════════════════
+function initFadeIn(){
+  const els=document.querySelectorAll('.fade-in');
+  if(!els.length)return;
+  const observer=new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}});
+  },{threshold:0.15,rootMargin:'0px 0px -40px 0px'});
+  els.forEach(el=>observer.observe(el));
+}
+initFadeIn();
 </script>
 </body>
 </html>
