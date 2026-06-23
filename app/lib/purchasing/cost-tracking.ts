@@ -47,14 +47,14 @@ export async function calculateLandedCost(
 
   const po = await prisma.purchaseOrder.findUnique({
     where: { id: poId },
-    include: { POLineItem: true },
+    include: { lineItems: true },
   });
 
   if (!po) {
     throw new Error(`Purchase order ${poId} not found`);
   }
 
-  const lineItems = po.POLineItem;
+  const lineItems = po.lineItems;
 
   if (lineItems.length === 0) {
     throw new Error(`Purchase order ${poId} has no line items`);
@@ -108,7 +108,7 @@ export async function calculateLandedCost(
   // Return refreshed PO
   return prisma.purchaseOrder.findUnique({
     where: { id: poId },
-    include: { POLineItem: true },
+    include: { lineItems: true },
   });
 }
 
@@ -127,7 +127,7 @@ export async function getTotalPOCost(poId: string): Promise<POCostSummary> {
   const po = await prisma.purchaseOrder.findUnique({
     where: { id: poId },
     include: {
-      POLineItem: {
+      lineItems: {
         select: { quantity: true, unitCost: true },
       },
     },
@@ -137,7 +137,7 @@ export async function getTotalPOCost(poId: string): Promise<POCostSummary> {
     throw new Error(`Purchase order ${poId} not found`);
   }
 
-  const subtotal = po.POLineItem.reduce(
+  const subtotal = po.lineItems.reduce(
     (sum, li) => sum + Number(li.unitCost) * li.quantity,
     0,
   );

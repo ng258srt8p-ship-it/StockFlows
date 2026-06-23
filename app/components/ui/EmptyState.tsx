@@ -15,7 +15,7 @@ export function EmptyState({ title, description, action, icon }: EmptyStateProps
         <Text variant="headingMd" as="h3">
           {title}
         </Text>
-        <Text variant="bodyMd" as="p" color="subdued" className="mt-2 mb-4">
+        <Text variant="bodyMd" as="p" tone="subdued">
           {description}
         </Text>
         {action && (

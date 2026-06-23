@@ -100,11 +100,11 @@ export async function getVendorWithPOs(vendorId: string) {
   const vendor = await prisma.vendor.findUnique({
     where: { id: vendorId },
     include: {
-      PurchaseOrder: {
+      purchaseOrders: {
         orderBy: { createdAt: "desc" },
         take: 10,
         include: {
-          Location: { select: { id: true, name: true } },
+          location: { select: { id: true, name: true } },
         },
       },
     },

@@ -49,7 +49,7 @@ export function ReorderRecommendation({
               {itemName}
             </Text>
             {sku && (
-              <Text variant="bodySm" as="p" color="subdued">
+              <Text variant="bodySm" as="p" tone="subdued">
                 {sku}
               </Text>
             )}
@@ -59,7 +59,7 @@ export function ReorderRecommendation({
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
           <div>
-            <Text variant="bodySm" as="p" color="subdued">
+            <Text variant="bodySm" as="p" tone="subdued">
               Current Stock
             </Text>
             <Text variant="headingMd" as="p">
@@ -67,7 +67,7 @@ export function ReorderRecommendation({
             </Text>
           </div>
           <div>
-            <Text variant="bodySm" as="p" color="subdued">
+            <Text variant="bodySm" as="p" tone="subdued">
               Daily Demand
             </Text>
             <Text variant="headingMd" as="p">
@@ -75,7 +75,7 @@ export function ReorderRecommendation({
             </Text>
           </div>
           <div>
-            <Text variant="bodySm" as="p" color="subdued">
+            <Text variant="bodySm" as="p" tone="subdued">
               Days Until Stockout
             </Text>
             <Text variant="headingMd" as="p">
@@ -83,7 +83,7 @@ export function ReorderRecommendation({
             </Text>
           </div>
           <div>
-            <Text variant="bodySm" as="p" color="subdued">
+            <Text variant="bodySm" as="p" tone="subdued">
               Recommended Order
             </Text>
             <Text variant="headingMd" as="p">
@@ -106,7 +106,7 @@ export function ReorderRecommendation({
         </div>
 
         <div className="flex items-center justify-between">
-          <Text variant="bodySm" as="p" color="subdued">
+          <Text variant="bodySm" as="p" tone="subdued">
             Forecast confidence: {Math.round(confidence * 100)}% • Lead time:{" "}
             {leadTimeDays} days • Safety stock: {safetyStock}
           </Text>

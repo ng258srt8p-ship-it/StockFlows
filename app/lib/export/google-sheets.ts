@@ -1,6 +1,8 @@
-import { google, type sheets_v4 } from "googleapis";
 import { stringify } from "csv-stringify/sync";
 import { logger } from "~/lib/logger";
+
+// Lazy-loaded googleapis types — avoids hard dependency at bundle time
+type SheetsClient = any; // Will be inferred from google.sheets() at runtime
 
 // ---------------------------------------------------------------------------
 // Types
@@ -32,9 +34,9 @@ export interface StockMovementExportRow {
 // When GOOGLE_SERVICE_ACCOUNT is unset the module operates in stub mode.
 // ---------------------------------------------------------------------------
 
-let sheetsClient: sheets_v4.Sheets | null = null;
+let sheetsClient: SheetsClient | null = null;
 
-function getSheetsClient(): sheets_v4.Sheets | null {
+async function getSheetsClient(): Promise<SheetsClient | null> {
   if (sheetsClient) return sheetsClient;
 
   const serviceAccountJson = process.env.GOOGLE_SERVICE_ACCOUNT;
@@ -43,6 +45,7 @@ function getSheetsClient(): sheets_v4.Sheets | null {
   }
 
   try {
+    const { google } = await import("googleapis");
     const credentials = JSON.parse(serviceAccountJson) as {
       client_email: string;
       private_key: string;
@@ -165,7 +168,7 @@ export async function exportInventoryToSheets(
   spreadsheetId: string,
   items: InventoryExportRow[],
 ): Promise<{ message: string; updatedCells?: number }> {
-  const sheets = getSheetsClient();
+  const sheets = await getSheetsClient();
   if (!sheets) {
     const csv = generateCSV(items);
     logger.info("Google Sheets credentials not set — returning CSV stub");
@@ -206,7 +209,7 @@ export async function exportStockMovements(
   spreadsheetId: string,
   movements: StockMovementExportRow[],
 ): Promise<{ message: string; updatedCells?: number }> {
-  const sheets = getSheetsClient();
+  const sheets = await getSheetsClient();
   if (!sheets) {
     logger.info(
       "Google Sheets credentials not set — returning stub for stock movements",

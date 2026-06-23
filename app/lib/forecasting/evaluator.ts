@@ -1,4 +1,4 @@
-import type { ForecastOutput } from "./engine";
+import type { ForecastOutput, DailySales } from "./engine";
 
 /**
  * Model evaluation, selection and ensemble blending.
@@ -6,11 +6,6 @@ import type { ForecastOutput } from "./engine";
  * Provides time-series cross-validation with configurable train/test splits,
  * standard error metrics (MAPE, MAE, RMSE, bias), and model selection.
  */
-
-interface DailySales {
-  date: string;
-  qty: number;
-}
 
 type ModelFn = (data: DailySales[], horizon: number) => ForecastOutput;
 

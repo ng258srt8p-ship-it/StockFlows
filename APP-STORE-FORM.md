@@ -50,7 +50,7 @@ Track inventory across locations, forecast demand, and automate purchase orders.
 
 ### App details (max 500 chars)
 ```
-StockFlows gives you real-time visibility into inventory across all locations. Predict demand with statistical models, automate purchase orders with vendors, and get alerts before stockouts happen. Track stock levels, scan barcodes during receiving, run cycle counts, and export reports. StockFlows replaces Shopify's discontinued Stocky app with modern forecasting and multi-channel alerts.
+StockFlows gives you real-time visibility into inventory across all locations. Predict demand with statistical models, automate purchase orders with vendors, and get alerts before stockouts happen. Track stock levels, scan barcodes during receiving, run cycle counts, and export reports. Includes email, Slack, and SMS notifications with one-click CSV and PDF exports.
 ```
 
 ### Features (3-5 features, each max 80 chars)
@@ -76,7 +76,7 @@ Leave blank.
 ### Feature media
 Select **Image**. Upload one of these screenshots:
 ```
-/Users/georgetozer/Development/Shopify Apps/stockflows/screenshots/dashboard.png
+/Users/georgetozer/Development/Shopify Apps/stockflows/screenshots/forecasting.png
 ```
 
 ### Screenshots (minimum 3)
@@ -199,7 +199,7 @@ https://stockflows.app
 
 ### App card subtitle (max 62 chars)
 ```
-Demand forecasting and inventory management for Shopify
+Smart inventory management with demand forecasting
 ```
 
 ### App store search terms (1-5 terms, max 20 chars each)

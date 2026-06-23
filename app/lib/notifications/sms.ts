@@ -1,8 +1,7 @@
-import twilio from "twilio";
 import { logger } from "~/lib/logger";
 
 // ---------------------------------------------------------------------------
-// Twilio client — initialised only when credentials are present.
+// Twilio client — lazily initialised only when credentials are present.
 // When TWILIO_ACCOUNT_SID is unset the module operates in stub mode and logs
 // messages to the console instead of sending real SMS.
 // ---------------------------------------------------------------------------
@@ -11,7 +10,20 @@ const accountSid = process.env.TWILIO_ACCOUNT_SID;
 const authToken = process.env.TWILIO_AUTH_TOKEN;
 const fromNumber = process.env.TWILIO_PHONE_NUMBER;
 
-const client = accountSid && authToken ? twilio(accountSid, authToken) : null;
+let client: any = null;
+
+async function getClient(): Promise<any> {
+  if (client) return client;
+  if (!accountSid || !authToken) return null;
+  try {
+    const twilio = (await import("twilio")).default;
+    client = twilio(accountSid, authToken);
+    return client;
+  } catch (error) {
+    logger.warn({ err: error }, "Twilio package not installed — SMS disabled");
+    return null;
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Types
@@ -31,7 +43,8 @@ export async function sendSMSAlert(
   to: string,
   message: string,
 ): Promise<void> {
-  if (!client) {
+  const twilioClient = await getClient();
+  if (!twilioClient) {
     console.log("[SMS STUB] To:", to, "Message:", message);
     return;
   }
@@ -42,7 +55,7 @@ export async function sendSMSAlert(
   }
 
   try {
-    await client.messages.create({
+    await twilioClient.messages.create({
       body: message,
       from: fromNumber,
       to,

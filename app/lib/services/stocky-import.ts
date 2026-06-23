@@ -57,7 +57,7 @@ interface PurchaseOrderRow {
 
 const log = logger.child({ module: "stocky-import" });
 
-function parseCsv<T extends Record<string, string>>(
+function parseCsv<T extends Record<string, unknown>>(
   csvContent: string,
 ): T[] {
   return parse(csvContent, {
@@ -111,11 +111,17 @@ export async function importStockyProducts(
           sku,
           title: row.Name?.trim() || sku,
           costPerUnit: row.Cost ? parseFloat(row.Cost) : null,
+          barcode: row.Barcode?.trim() || null,
           quantity: 0,
           reserved: 0,
           available: 0,
           reorderPoint: 0,
           reorderQuantity: 0,
+          // Imported items don't have Shopify IDs — use placeholder values
+          // with the SKU as a unique marker
+          shopifyProductId: `imported-product-${sku}`,
+          shopifyVariantId: `imported-variant-${sku}`,
+          locationId: "", // Will be assigned during sync
         },
       });
 
@@ -172,6 +178,7 @@ export async function importStockyVendors(
           shopId,
           name,
           email: row.Email?.trim() || null,
+          phone: row.Phone?.trim() || null,
           leadTimeDays: row["Lead time (days)"]
             ? parseInt(row["Lead time (days)"], 10)
             : null,

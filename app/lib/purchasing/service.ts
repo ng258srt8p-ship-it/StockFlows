@@ -113,7 +113,7 @@ export async function createPO({
   // Return PO with line items
   return prisma.purchaseOrder.findUnique({
     where: { id: po.id },
-    include: { POLineItem: true },
+    include: { lineItems: true },
   });
 }
 
@@ -162,11 +162,11 @@ export async function getPOWithDetails(poId: string) {
   const po = await prisma.purchaseOrder.findUnique({
     where: { id: poId },
     include: {
-      Vendor: true,
-      Location: true,
-      POLineItem: {
+      vendor: true,
+      location: true,
+      lineItems: {
         include: {
-          InventoryItem: {
+          inventoryItem: {
             select: {
               id: true,
               title: true,
@@ -177,7 +177,7 @@ export async function getPOWithDetails(poId: string) {
           },
         },
       },
-      ReceivingEvent: {
+      receivingEvents: {
         orderBy: { createdAt: "desc" },
       },
     },

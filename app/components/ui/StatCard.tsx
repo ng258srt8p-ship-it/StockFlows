@@ -21,12 +21,12 @@ export function StatCard({ title, value, subtitle, trend, icon }: StatCardProps)
       <div className="p-4">
         <div className="flex items-start justify-between">
           <div>
-            <Text variant="headingSm" as="h3" color="subdued">
+            <Text variant="headingSm" as="h3" tone="subdued">
               {title}
             </Text>
             <div className={`mt-1 text-2xl font-bold ${valueColor}`}>{value}</div>
             {subtitle && (
-              <Text variant="bodySm" as="p" color="subdued" className="mt-1">
+              <Text variant="bodySm" as="p" tone="subdued">
                 {subtitle}
               </Text>
             )}

@@ -1,12 +1,22 @@
 import * as ss from "simple-statistics";
 
-interface DailySales {
+// ── Shared types ──────────────────────────────────────────────────────────────
+
+export interface DailySales {
   date: string;
   qty: number;
 }
 
-interface ForecastResult {
+/** Output returned by each individual forecasting model. */
+export interface ForecastOutput {
   predictions: Array<{ date: string; yhat: number; lower: number; upper: number }>;
+  confidence: number;
+  model: string;
+}
+
+/** Full result returned by the top-level runForecast() orchestrator. */
+export interface ForecastResult {
+  predictions: ForecastOutput["predictions"];
   totalPredicted: number;
   confidence: number;
   modelUsed: string;

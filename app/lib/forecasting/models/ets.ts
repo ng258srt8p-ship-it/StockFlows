@@ -1,4 +1,4 @@
-import type { ForecastOutput } from "../engine";
+import type { ForecastOutput, DailySales } from "../engine";
 
 /**
  * Holt's Linear Exponential Smoothing (Double Exponential Smoothing)
@@ -10,11 +10,6 @@ import type { ForecastOutput } from "../engine";
  * Alpha and beta are auto-selected via grid search minimising the in-sample
  * one-step-ahead MAE.
  */
-
-interface DailySales {
-  date: string;
-  qty: number;
-}
 
 // ---------------------------------------------------------------------------
 // Public API

@@ -172,15 +172,15 @@ export async function getItemWithLocation(itemId: string) {
     where: { id: itemId },
     include: {
       location: true,
-      StockMovement: {
+      movements: {
         orderBy: { createdAt: "desc" },
         take: 50,
       },
-      ReorderAlert: {
+      alerts: {
         where: { status: "PENDING" },
         orderBy: { createdAt: "desc" },
       },
-      ForecastResult: {
+      forecasts: {
         orderBy: { createdAt: "desc" },
         take: 5,
       },

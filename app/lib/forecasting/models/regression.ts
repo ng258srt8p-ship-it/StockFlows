@@ -1,5 +1,5 @@
 import * as ss from "simple-statistics";
-import type { ForecastOutput } from "../engine";
+import type { ForecastOutput, DailySales } from "../engine";
 
 /**
  * Linear and polynomial regression forecasting.
@@ -9,11 +9,6 @@ import type { ForecastOutput } from "../engine";
  *
  * Handles edge cases: constant data, single point, insufficient data.
  */
-
-interface DailySales {
-  date: string;
-  qty: number;
-}
 
 // ---------------------------------------------------------------------------
 // Public API

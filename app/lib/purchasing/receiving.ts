@@ -51,7 +51,7 @@ export async function receiveLineItems(
 
   const po = await prisma.purchaseOrder.findUnique({
     where: { id: poId },
-    include: { POLineItem: true },
+    include: { lineItems: true },
   });
 
   if (!po) {
@@ -60,7 +60,7 @@ export async function receiveLineItems(
 
   await prisma.$transaction(async (tx) => {
     for (const received of receivedItems) {
-      const lineItem = po.POLineItem.find(
+      const lineItem = po.lineItems.find(
         (li) => li.id === received.poLineItemId,
       );
 
@@ -154,7 +154,7 @@ export async function receiveLineItems(
 
   return prisma.purchaseOrder.findUnique({
     where: { id: poId },
-    include: { POLineItem: true },
+    include: { lineItems: true },
   });
 }
 

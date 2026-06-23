@@ -1,4 +1,4 @@
-import type { ForecastOutput } from "../engine";
+import type { ForecastOutput, DailySales } from "../engine";
 
 /**
  * Weighted Moving Average forecasting.
@@ -9,11 +9,6 @@ import type { ForecastOutput } from "../engine";
  *
  * Best suited for products with stable, non-trending demand.
  */
-
-interface DailySales {
-  date: string;
-  qty: number;
-}
 
 // ---------------------------------------------------------------------------
 // Public API
