@@ -375,21 +375,21 @@ svg text{font-family:var(--font)}
 .screenshots-section .subtitle{font-size:.85rem;color:#666;max-width:500px;line-height:1.7;margin-bottom:48px}
 
 /* Screenshot carousel */
-.ss-carousel{position:relative}
+.ss-carousel{position:relative;max-width:760px;margin:0 auto}
 .ss-track{display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:8px 0 16px}
 .ss-track::-webkit-scrollbar{display:none}
 
-.ss-card{flex:0 0 85%;max-width:700px;scroll-snap-align:center;position:relative;cursor:pointer;transition:transform .3s ease}
-.ss-card:hover{transform:scale(1.02)}
+.ss-card{flex:0 0 100%;max-width:700px;scroll-snap-align:center;position:relative;cursor:pointer;transition:transform .3s ease}
+.ss-card:hover{transform:scale(1.01)}
 
-.ss-card .ss-img{width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08)}
+.ss-card .ss-img{width:100%;border:1px solid var(--border);border-radius:4px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);background:#fafafa}
 .ss-card .ss-img img{width:100%;display:block;transition:transform .4s ease}
-.ss-card:hover .ss-img img{transform:scale(1.03)}
+.ss-card:hover .ss-img img{transform:scale(1.02)}
 
-.ss-card .ss-label{margin-top:16px;display:flex;align-items:center;gap:12px}
-.ss-card .ss-label .ss-num{font-family:var(--serif);font-size:2rem;font-style:italic;color:var(--border);line-height:1}
+.ss-card .ss-label{margin-top:16px;display:flex;align-items:flex-start;gap:12px}
+.ss-card .ss-label .ss-num{font-family:var(--serif);font-size:2rem;font-style:italic;color:var(--border);line-height:1;flex-shrink:0}
 .ss-card .ss-label .ss-text{font-size:.75rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text-dim)}
-.ss-card .ss-label .ss-desc{font-size:.8rem;color:var(--text-dim);line-height:1.5}
+.ss-card .ss-label .ss-desc{font-size:.8rem;color:var(--text-dim);line-height:1.5;margin-top:4px}
 
 /* Nav arrows */
 .ss-nav{display:flex;justify-content:center;gap:12px;margin-top:32px}
@@ -434,7 +434,7 @@ svg text{font-family:var(--font)}
   .screenshots-section{padding:48px 16px}
   .screenshots-section h2{font-size:1.8rem}
   .screenshots-section .subtitle{margin-bottom:32px;font-size:.8rem}
-  .ss-card{flex:0 0 90%}
+  .ss-card{flex:0 0 92%;max-width:none}
 
   /* Tables — horizontal scroll */
   table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch}
