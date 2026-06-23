@@ -130,23 +130,24 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 };
 
 export default function Forecasting() {
-  const { forecasts, accuracy, reorderAlerts, abcSummary } = useLoaderData<typeof loader>();
+  const loaderData = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
-  // Cast to non-null arrays — Remix Jsonify adds null union but our data is clean
-  const forecastList = forecasts as NonNullable<typeof forecasts>;
-  const alertList = reorderAlerts as NonNullable<typeof reorderAlerts>;
+  // Cast to bypass Remix Jsonify null-union types — our data is clean
+  const forecastList = (loaderData.forecasts ?? []) as any[];
+  const alertList = (loaderData.reorderAlerts ?? []) as any[];
+  const abcSummary = (loaderData as any).abcSummary;
 
   const selectedId = searchParams.get("forecast");
-  const selectedForecast = forecastList.find((f) => f.id === selectedId) ?? null;
+  const selectedForecast = forecastList.find((f: any) => f.id === selectedId) ?? null;
 
   // Summary stats
-  const totalPredicted = forecastList.reduce((sum, f) => sum + (f.totalPredicted || 0), 0);
-  const highConfidence = forecastList.filter((f) => f.confidence >= 0.8).length;
+  const totalPredicted = forecastList.reduce((sum: number, f: any) => sum + (f.totalPredicted || 0), 0);
+  const highConfidence = forecastList.filter((f: any) => f.confidence >= 0.8).length;
 
   return (
     <Page
       title="Forecasting"
-      subtitle={`Average accuracy: ${accuracy}% — ${forecastList.length} forecasts generated`}
+      subtitle={`Average accuracy: ${loaderData.accuracy}% — ${forecastList.length} forecasts generated`}
     >
       <Layout>
         {/* Summary cards */}
@@ -168,7 +169,7 @@ export default function Forecasting() {
                   High Confidence
                 </Text>
                 <Text variant="headingLg" as="p" className="text-green-600">
-                  {highConfidence} / {forecasts.length}
+                  {highConfidence} / {forecastList.length}
                 </Text>
               </div>
             </Card>
@@ -177,7 +178,7 @@ export default function Forecasting() {
                 <Text variant="headingSm" as="h3">
                   Reorder Needed
                 </Text>
-                <Text variant="headingLg" as="p" className={reorderAlerts.length > 0 ? "text-red-600" : ""}>
+                <Text variant="headingLg" as="p" className={alertList.length > 0 ? "text-red-600" : ""}>
                   {alertList.length} items
                 </Text>
               </div>
@@ -202,7 +203,7 @@ export default function Forecasting() {
                   <Badge>{selectedForecast.modelUsed}</Badge>
                 </div>
                 <ForecastChart
-                  forecast={selectedForecast.predictedDaily.map((p) => ({
+                  forecast={selectedForecast.predictedDaily.map((p: any) => ({
                     date: p.date,
                     yhat: p.yhat,
                     lower: p.lower ?? p.yhat * 0.8,
@@ -218,20 +219,20 @@ export default function Forecasting() {
                     currentQty={selectedForecast.inventoryItem.quantity}
                     avgDailySales={
                       selectedForecast.predictedDaily.length > 0
-                        ? selectedForecast.predictedDaily.reduce((sum, p) => sum + p.yhat, 0) /
+                        ? selectedForecast.predictedDaily.reduce((sum: number, p: any) => sum + p.yhat, 0) /
                           selectedForecast.predictedDaily.length
                         : 0
                     }
                     leadTimeDays={14}
                     safetyStock={Math.ceil(
-                      selectedForecast.predictedDaily.reduce((sum, p) => sum + p.yhat, 0) /
+                      selectedForecast.predictedDaily.reduce((sum: number, p: any) => sum + p.yhat, 0) /
                         Math.max(selectedForecast.predictedDaily.length, 1) * 1.5
                     )}
                     recommendedQty={
                       Math.max(
                         0,
                         Math.ceil(
-                          (selectedForecast.predictedDaily.reduce((sum, p) => sum + p.yhat, 0) /
+                          (selectedForecast.predictedDaily.reduce((sum: number, p: any) => sum + p.yhat, 0) /
                             Math.max(selectedForecast.predictedDaily.length, 1)) *
                             14 -
                             selectedForecast.inventoryItem.quantity
@@ -244,7 +245,7 @@ export default function Forecasting() {
                         ? Math.floor(
                             selectedForecast.inventoryItem.quantity /
                               Math.max(
-                                selectedForecast.predictedDaily.reduce((sum, p) => sum + p.yhat, 0) /
+                                selectedForecast.predictedDaily.reduce((sum: number, p: any) => sum + p.yhat, 0) /
                                   Math.max(selectedForecast.predictedDaily.length, 1),
                                 0.1
                               )
@@ -405,7 +406,7 @@ export default function Forecasting() {
                     { title: "Review Freq." },
                   ]}
                 >
-                  {abcSummary.categories.map((item, index) => {
+                  {abcSummary.categories.map((item: any, index: number) => {
                     const policy = getReorderPolicy(item.category);
                     return (
                       <IndexTable.Row key={item.id} id={item.id} position={index}>
