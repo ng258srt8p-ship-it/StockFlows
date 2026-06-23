@@ -150,12 +150,12 @@ export default function Migration() {
   const isSubmitting = fetcher.state === "submitting";
 
   // Handle fetcher response to store import results
-  const lastResult = fetcher.data;
+  const lastResult = fetcher.data as Record<string, unknown> | undefined;
   if (lastResult?.success && lastResult.type && lastResult.result) {
     const type = lastResult.type as MigrationType;
     setState((prev) => ({
       ...prev,
-      [type]: { preview: null, result: lastResult.result },
+      [type]: { preview: null, result: lastResult.result as ImportResult },
     }));
     // Clear the raw CSV after successful import
     setRawCsv((prev) => ({ ...prev, [type]: "" }));
@@ -225,7 +225,7 @@ export default function Migration() {
 
     return (
       <div className="mt-4 space-y-3">
-        <Text variant="bodySm" fontWeight="semibold" tone="subdued">
+        <Text variant="bodySm" as="p" fontWeight="semibold" tone="subdued">
           Preview ({Math.min(preview.totalRows, 5)} of {preview.totalRows} rows)
         </Text>
 
@@ -239,7 +239,7 @@ export default function Migration() {
             <IndexTable.Row key={row.id} id={row.id} position={idx}>
               {preview.headers.map((h) => (
                 <IndexTable.Cell key={h}>
-                  <Text variant="bodySm">{row[h]}</Text>
+                  <Text variant="bodySm" as="p">{row[h]}</Text>
                 </IndexTable.Cell>
               ))}
             </IndexTable.Row>
@@ -265,12 +265,14 @@ export default function Migration() {
     if (!result) return null;
 
     return (
-      <Banner tone="success" className="mt-4">
+      <div className="mt-4">
+      <Banner tone="success">
         <p>
           <strong>Import complete:</strong> {result.imported} imported,{" "}
           {result.skipped} skipped out of {result.total} total rows.
         </p>
       </Banner>
+      </div>
     );
   }
 
@@ -287,7 +289,7 @@ export default function Migration() {
             {description}
           </Text>
 
-          <Text variant="bodySm" tone="subdued">
+          <Text variant="bodySm" as="p" tone="subdued">
             Expected columns: {sampleColumns}
           </Text>
 
@@ -364,10 +366,10 @@ export default function Migration() {
         </Layout.Section>
 
         {/* Overall status */}
-        {fetcher.data?.error && (
+        {(fetcher.data as any)?.error && (
           <Layout.Section>
             <Banner tone="critical">
-              <p>{fetcher.data.error}</p>
+              <p>{String((fetcher.data as any).error)}</p>
             </Banner>
           </Layout.Section>
         )}
