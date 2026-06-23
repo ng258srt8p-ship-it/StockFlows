@@ -79,7 +79,7 @@ export default function VendorList() {
                   value={search}
                   onChange={handleSearch}
                   clearButton
-                  onClearClick={() => handleSearch("")}
+                  onClearButtonClick={() => handleSearch("")}
                 />
               </div>
 

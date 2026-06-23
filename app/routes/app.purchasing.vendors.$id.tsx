@@ -8,6 +8,7 @@ import {
 } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
+import { useState } from "react";
 import {
   Page,
   Layout,
@@ -125,9 +126,18 @@ const poStatusBadge: Record<
 
 export default function VendorDetail() {
   const { vendor, purchaseOrders } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
+  const actionData = useActionData<typeof action>() as Record<string, any> | undefined;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
+
+  const [name, setName] = useState(vendor.name);
+  const [email, setEmail] = useState(vendor.email || "");
+  const [phone, setPhone] = useState(vendor.phone || "");
+  const [contactPerson, setContactPerson] = useState(vendor.contactPerson || "");
+  const [leadTimeDays, setLeadTimeDays] = useState(String(vendor.leadTimeDays));
+  const [reliabilityScore, setReliabilityScore] = useState(String(vendor.reliabilityScore));
+  const [paymentTerms, setPaymentTerms] = useState(vendor.paymentTerms || "");
+  const [notes, setNotes] = useState(vendor.notes || "");
 
   return (
     <Page
@@ -140,8 +150,9 @@ export default function VendorDetail() {
       ]}
       primaryAction={{
         content: "Save",
-        onAction: undefined,
-        submit: true,
+        onAction: () => {
+          document.querySelector("form")?.requestSubmit();
+        },
         disabled: isSubmitting,
         loading: isSubmitting,
       }}
@@ -175,7 +186,8 @@ export default function VendorDetail() {
                     <TextField
                       label="Name"
                       name="name"
-                      value={vendor.name}
+                      value={name}
+                      onChange={(val) => setName(val)}
                       requiredIndicator
                       error={actionData?.errors?.name}
                     />
@@ -183,36 +195,42 @@ export default function VendorDetail() {
                       label="Email"
                       name="email"
                       type="email"
-                      value={vendor.email || ""}
+                      value={email}
+                      onChange={(val) => setEmail(val)}
                     />
                     <TextField
                       label="Phone"
                       name="phone"
                       type="tel"
-                      value={vendor.phone || ""}
+                      value={phone}
+                      onChange={(val) => setPhone(val)}
                     />
                     <TextField
                       label="Contact Person"
                       name="contactPerson"
-                      value={vendor.contactPerson || ""}
+                      value={contactPerson}
+                      onChange={(val) => setContactPerson(val)}
                     />
                     <TextField
                       label="Lead Time (days)"
                       name="leadTimeDays"
                       type="number"
-                      value={String(vendor.leadTimeDays)}
+                      value={leadTimeDays}
+                      onChange={(val) => setLeadTimeDays(val)}
                     />
                     <TextField
                       label="Reliability Score"
                       name="reliabilityScore"
                       type="number"
-                      value={String(vendor.reliabilityScore)}
+                      value={reliabilityScore}
+                      onChange={(val) => setReliabilityScore(val)}
                       helpText="Score from 0.0 to 1.0"
                     />
                     <TextField
                       label="Payment Terms"
                       name="paymentTerms"
-                      value={vendor.paymentTerms || ""}
+                      value={paymentTerms}
+                      onChange={(val) => setPaymentTerms(val)}
                       placeholder="e.g. Net 30"
                     />
                     <div className="flex items-end pb-2">
@@ -230,7 +248,8 @@ export default function VendorDetail() {
                   <TextField
                     label="Notes"
                     name="notes"
-                    value={vendor.notes || ""}
+                    value={notes}
+                    onChange={(val) => setNotes(val)}
                     multiline={3}
                   />
                   <div className="flex justify-end">
