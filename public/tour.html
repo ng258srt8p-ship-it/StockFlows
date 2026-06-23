@@ -30,7 +30,7 @@
 </div>
 
 <!-- Features -->
-<div class="fade-in" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
+<div class="fade-in tour-section" id="tour-features" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
 <div style="max-width:960px;margin:0 auto">
 <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px">
 <div>
@@ -68,7 +68,7 @@
 </div>
 
 <!-- Screenshots - Webflow-style autoplay tabs -->
-<div class="screenshots-section">
+<div class="screenshots-section tour-section" id="tour-screenshots">
 <div class="section-inner">
 <div class="eyebrow">Screenshots</div>
 <h2>See every screen.</h2>
@@ -118,7 +118,7 @@
 </div>
 
 <!-- How It Works -->
-<div style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
+<div class="tour-section" id="tour-how-it-works" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
 <div style="max-width:960px;margin:0 auto">
 <div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">How it works</div>
 <div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:40px">Three steps to zero stockouts.</div>
@@ -143,7 +143,7 @@
 </div>
 
 <!-- Alert Preview -->
-<div class="fade-in" style="background:#fff;border-top:1px solid #e0e0e0;padding:80px 24px;color:#111">
+<div class="fade-in tour-section" id="tour-alerts" style="background:#fff;border-top:1px solid #e0e0e0;padding:80px 24px;color:#111">
 <div style="max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center">
 <div>
 <div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Instant alerts</div>
@@ -169,7 +169,7 @@
 </div>
 
 <!-- Competitor Comparison -->
-<div class="fade-in" style="background:#111;color:#fff;padding:80px 24px">
+<div class="fade-in tour-section" id="tour-compare" style="background:#111;color:#fff;padding:80px 24px">
 <div style="max-width:960px;margin:0 auto">
 <div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Why switch</div>
 <div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:16px">Stocky is reportedly being discontinued.</div>
@@ -215,7 +215,7 @@
 </div>
 
 <!-- Social Proof -->
-<div class="fade-in" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
+<div class="fade-in tour-section" id="tour-social" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
 <div style="max-width:960px;margin:0 auto">
 <div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Why StockFlows</div>
 <div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:40px">Built for real inventory workflows.</div>
@@ -239,7 +239,7 @@
 </div>
 </div>
 <!-- ROI Calculator -->
-<div style="background:#fff;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
+<div class="tour-section" id="tour-roi" style="background:#fff;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
 <div style="max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center">
 <div>
 <div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">ROI Calculator</div>
@@ -274,7 +274,7 @@
 </div>
 
 <!-- Pricing -->
-<div style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
+<div class="tour-section" id="tour-pricing" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
 <div style="max-width:960px;margin:0 auto">
 <div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Pricing</div>
 <div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:40px">Simple, transparent pricing.</div>
@@ -991,29 +991,39 @@ document.getElementById('page-settings').innerHTML=`
 <button class="btn-sm btn-danger" onclick="if(confirm('Reset all data?')){PRODUCTS.forEach(p=>{const orig=PRODUCTS.find(x=>x.id===p.id);if(orig){/* would reset */}});toast('Data reset to defaults');render()}">Reset Demo Data</button></div>`;
 }
 // ══════════════════════════════════════════════════════
-//  GUIDED TOUR
+//  GUIDED TOUR - scrolls through landing page sections
 // ══════════════════════════════════════════════════════
 let tourStep=0;
 const tourSteps=[
-{page:'dashboard',title:'Welcome to StockFlows',text:'Your inventory management dashboard. Key metrics at a glance: products, alerts, value at risk, and forecast accuracy.',target:null},
-{page:'dashboard',title:'Inventory Chart',text:'Bar chart showing stock levels across all 10 products. Color-coded: black = in stock, amber = low, red = out of stock.',target:'.bar-fill'},
-{page:'dashboard',title:'Active Alerts',text:'Products below their reorder point. Click Create PO to start a purchase order for any alert.',target:'#page-dashboard tbody tr:first-child'},
-{page:'inventory',title:'Inventory Table',text:'All products with search, location filter, and status tabs. Click any row to adjust stock.',target:'#page-inventory table tbody tr:first-child'},
-{page:'purchasing',title:'Purchase Orders',text:'Track POs from vendors. View status, line items, and receiving progress.',target:'#page-purchasing table tbody tr:first-child'},
-{page:'forecasting',title:'Demand Forecasting',text:'Statistical 30-day predictions for every product. Click a row to see the full forecast sparkline chart.',target:'#page-forecasting table tbody tr:first-child'},
-{page:'reports',title:'Reports and Export',text:'Inventory valuation, stock status pie chart, and one-click CSV/PDF export.',target:'#page-reports table:first-of-type'},
-{page:'settings',title:'Settings & Configuration',text:'Set stock thresholds, configure email/Slack/SMS notifications, manage AI features, and import data from Stocky.',target:'#page-settings'},
+{id:'tour-features',title:'Features',text:'Six core capabilities: multi-location tracking, demand forecasting, smart purchase orders, automated alerts, one-click reports, and zero-maintenance operation.'},
+{id:'tour-screenshots',title:'Screenshots',text:'See every screen in the app. Tabs auto-advance every 6 seconds, or click to jump between Dashboard, Inventory, Forecasting, Purchasing, and Reports.'},
+{id:'tour-how-it-works',title:'How It Works',text:'Three steps to zero stockouts: install and import your data, set reorder thresholds, and let StockFlows handle the rest with nightly forecasts and auto alerts.'},
+{id:'tour-alerts',title:'Instant Alerts',text:'StockFlows monitors your inventory 24/7. When stock drops below your reorder point, you get an email with the product name, current stock, reorder point, and a one-click button to create a purchase order.'},
+{id:'tour-compare',title:'Why Switch from Stocky',text:'Stocky is reportedly being discontinued. StockFlows replaces everything Stocky did and adds working statistical forecasting on top.'},
+{id:'tour-social',title:'Built for Real Workflows',text:'Replaces Stocky with more features, real 30-day statistical forecasting per SKU, and a 5-minute migration from Stocky with a single CSV upload.'},
+{id:'tour-roi',title:'ROI Calculator',text:'Enter your monthly inventory spend and SKU count to see how much you could save. StockFlows pays for itself by preventing just one stockout per month.'},
+{id:'tour-pricing',title:'Simple Pricing',text:'Free for up to 50 SKUs. Starter at $19/mo for 500 SKUs with forecasting. Pro at $49/mo for 5,000 SKUs. Enterprise at $149/mo for unlimited.'},
 ];
 function startTour(){
-if(!document.getElementById('app').classList.contains('active'))enterApp();
-tourStep=0;renderTour();
+// Ensure we are on the landing page, not in the app
+if(document.getElementById('app').classList.contains('active')){
+document.getElementById('app').classList.remove('active');
+document.getElementById('landing').classList.remove('hidden');
+}
+tourStep=0;
+// Scroll to top first
+window.scrollTo({top:0,behavior:'smooth'});
+setTimeout(()=>renderTour(),400);
 }
 function renderTour(){
 if(tourStep>=tourSteps.length){endTour();return}
 const s=tourSteps[tourStep];
 document.querySelectorAll('.tour-highlight').forEach(el=>el.classList.remove('tour-highlight'));
-go(s.page);
-setTimeout(()=>{document.body.offsetHeight;
+const target=document.getElementById(s.id);
+if(!target){tourStep++;renderTour();return}
+target.classList.add('tour-highlight');
+target.scrollIntoView({block:'center',behavior:'smooth'});
+setTimeout(()=>{
 document.getElementById('tour-overlay').classList.add('active');
 const tooltip=document.getElementById('tour-tooltip');
 const prog=document.getElementById('tour-progress');
@@ -1024,17 +1034,11 @@ prog.innerHTML=tourSteps.map((_,i)=>'<div class="tour-dot '+(i===tourStep?'activ
 const tooltipW=Math.min(380,window.innerWidth-32);
 tooltip.style.width=tooltipW+'px';
 tooltip.style.transform='none';
-const target=s.target?document.querySelector(s.target):null;
-if(target){
-target.scrollIntoView({block:'center',behavior:'auto'});
-target.classList.add('tour-highlight');
-}
-// Position tooltip: right side of screen, vertically centered
 tooltip.style.top='50%';
 tooltip.style.left='auto';
 tooltip.style.right='24px';
 tooltip.style.transform='translateY(-50%)';
-},400);
+},500);
 }
 
 function nextTour(){tourStep++;renderTour()}
@@ -1043,7 +1047,7 @@ document.getElementById('tour-overlay').classList.remove('active');
 document.getElementById('tour-tooltip').style.display='none';
 document.getElementById('tour-progress').style.display='none';
 document.querySelectorAll('.tour-highlight').forEach(el=>el.classList.remove('tour-highlight'));
-toast('Tour complete! Explore freely.');
+toast('Tour complete! Click Explore to try the interactive demo.');
 }
 // ══════════════════════════════════════════════════════
 //  INIT
