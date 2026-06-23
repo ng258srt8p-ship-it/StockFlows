@@ -8,3 +8,6 @@ test-results/
 *.log
 .DS_Store
 .video-tmp/
+
+# App Store assets — not needed for website deploy
+screenshots/
