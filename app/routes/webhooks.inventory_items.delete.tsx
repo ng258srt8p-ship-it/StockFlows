@@ -12,10 +12,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const log = logger.child({
     shopDomain: shop,
     topic: "inventory_items/delete",
-    inventoryItemId: payload.id,
   });
 
-  log.info("Inventory item deleted", {
+  log.info({
+    msg: "Inventory item deleted",
     inventoryItemId: payload.id,
   });
 

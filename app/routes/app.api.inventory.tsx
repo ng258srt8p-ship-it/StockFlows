@@ -39,7 +39,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const limit = Math.min(Number(url.searchParams.get("limit") ?? "50"), 200);
   const offset = Math.max(Number(url.searchParams.get("offset") ?? "0"), 0);
 
-  log.debug("Listing inventory items", { search, locationId, limit, offset });
+  log.debug({ msg: "Listing inventory items", search, locationId, limit, offset });
 
   // Resolve shop
   const shop = await prisma.shop.findUnique({

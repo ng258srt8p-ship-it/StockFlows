@@ -12,10 +12,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const log = logger.child({
     shopDomain: shop,
     topic: "inventory_levels/disconnect",
-    inventoryItemId: payload.inventory_item_id,
   });
 
-  log.info("Inventory level disconnected", {
+  log.info({
+    msg: "Inventory level disconnected",
     inventoryItemId: payload.inventory_item_id,
     locationId: payload.location_id,
   });

@@ -29,7 +29,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   });
 
   const forecasts = await prisma.forecastResult.findMany({
-    where: { shopId: shop.id },
+    where: { inventoryItem: { shopId: shop.id } },
     orderBy: { createdAt: "desc" },
     take: 100,
   });

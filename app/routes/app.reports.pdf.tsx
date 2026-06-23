@@ -37,7 +37,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     `,
   });
 
-  return new Response(pdf, {
+  return new Response(pdf as any, {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename="stockflows-inventory-${new Date().toISOString().split("T")[0]}.pdf"`,

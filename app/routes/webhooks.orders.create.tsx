@@ -13,10 +13,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const log = logger.child({
     shopDomain: shop,
     topic: "orders/create",
-    orderId: payload.id,
   });
 
-  log.info("Order created", {
+  log.info({
+    msg: "Order created",
     orderId: payload.id,
     totalPrice: payload.total_price,
     lineItemsCount: payload.line_items?.length,

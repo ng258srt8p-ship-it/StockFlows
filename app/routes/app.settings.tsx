@@ -99,7 +99,6 @@ export default function Settings() {
                 <TextField
                   name="lowStockThreshold"
                   label="Low stock alert threshold"
-                  type="number"
                   value={lowStock}
                   onChange={(val, _id) => setLowStock(val)}
                   helpText="Alert when stock drops below this level"
@@ -107,7 +106,6 @@ export default function Settings() {
                 <TextField
                   name="criticalStockThreshold"
                   label="Critical stock threshold"
-                  type="number"
                   value={criticalStock}
                   onChange={(val, _id) => setCriticalStock(val)}
                   helpText="Critical alert when stock drops below this level"

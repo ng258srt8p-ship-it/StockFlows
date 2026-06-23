@@ -25,7 +25,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     endpoint: "unified-webhook",
   });
 
-  log.info("Unified webhook received", {
+  log.info({
+    msg: "Unified webhook received",
     topic,
   });
 
@@ -34,7 +35,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     if (handler) {
       await handler(shop, payload);
     } else {
-      log.warn("No handler registered for topic", { topic });
+      log.warn({ msg: "No handler registered for topic", topic });
     }
   } catch (error) {
     log.error({ err: error, topic }, "Error processing webhook");
