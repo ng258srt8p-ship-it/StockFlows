@@ -115,7 +115,7 @@ export default function PurchasingList() {
     >
       <Layout>
         {/* Auto-reorder result banner */}
-        {fetcher.data && (
+        {fetcher.data ? (
           <Layout.Section>
             <Banner
               tone={((fetcher.data as Record<string, unknown>).success ? "success" : "warning") as "success" | "warning"}
@@ -123,7 +123,7 @@ export default function PurchasingList() {
               <p>{String((fetcher.data as Record<string, unknown>).message ?? "")}</p>
             </Banner>
           </Layout.Section>
-        )}
+        ) : null}
 
         {/* Pending alerts banner */}
         {pendingAlertCount > 0 && !fetcher.data && (

@@ -216,7 +216,7 @@ export default function Migration() {
     const preview = state[type].preview;
     if (!preview || preview.rows.length === 0) return null;
 
-    const headings = preview.headers.map((h) => ({ title: h }));
+    const headings = preview.headers.map((h) => ({ title: h })) as [{ title: string }, ...{ title: string }[]];
 
     const rows = preview.rows.map((row, idx) => ({
       id: `${type}-preview-${idx}`,
@@ -252,7 +252,7 @@ export default function Migration() {
             loading={isSubmitting}
             onClick={() => handleImport(type)}
           >
-            Import {preview.totalRows} rows
+            Import {String(preview.totalRows)} rows
           </Button>
           <Button onClick={() => handleReset(type)}>Cancel</Button>
         </div>

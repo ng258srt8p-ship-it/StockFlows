@@ -48,8 +48,6 @@ topics = [
   "locations/delete",
   "products/create",
   "products/update",
-  "orders/create",
-  "orders/updated",
   "app/uninstalled"
 ]
 compliance_topics = [

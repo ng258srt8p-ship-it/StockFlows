@@ -409,9 +409,7 @@ export default function ReceiveShipment() {
                         {fullyReceived ? (
                           <Badge tone="success">Fully Received</Badge>
                         ) : li.receivedQty > 0 ? (
-                          <Badge tone="warning">
-                            Partial ({li.receivedQty}/{li.quantity})
-                          </Badge>
+                          <Badge tone="warning">{`Partial ${li.receivedQty}/${li.quantity}`}</Badge>
                         ) : (
                           <Badge tone="info">Pending</Badge>
                         )}

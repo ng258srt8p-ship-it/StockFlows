@@ -88,7 +88,7 @@ export async function importStockyProducts(
   // Resolve the shop's first active location for imported items
   const defaultLocation = await prisma.location.findFirst({
     where: { shopId, isActive: true },
-    orderBy: { createdAt: "asc" },
+    orderBy: { name: "asc" },
   });
   const locationId = defaultLocation?.id ?? "";
 

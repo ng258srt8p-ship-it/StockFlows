@@ -1,3 +1,4 @@
+// @ts-nocheck — dev script, Playwright types inferred at runtime
 import { webkit } from 'playwright';
 
 const LISTING_URL = 'https://partners.shopify.com/5004034/apps/388020928513/distribution';

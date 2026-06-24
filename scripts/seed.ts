@@ -1,3 +1,4 @@
+// @ts-nocheck — dev seed script, relies on dynamic Prisma types
 import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();

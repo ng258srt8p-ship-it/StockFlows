@@ -188,6 +188,7 @@ export default function VendorDetail() {
                       name="name"
                       value={name}
                       onChange={(val) => setName(val)}
+                      autoComplete="off"
                       requiredIndicator
                       error={actionData?.errors?.name}
                     />
@@ -197,6 +198,7 @@ export default function VendorDetail() {
                       type="email"
                       value={email}
                       onChange={(val) => setEmail(val)}
+                      autoComplete="off"
                     />
                     <TextField
                       label="Phone"
@@ -204,12 +206,14 @@ export default function VendorDetail() {
                       type="tel"
                       value={phone}
                       onChange={(val) => setPhone(val)}
+                      autoComplete="off"
                     />
                     <TextField
                       label="Contact Person"
                       name="contactPerson"
                       value={contactPerson}
                       onChange={(val) => setContactPerson(val)}
+                      autoComplete="off"
                     />
                     <TextField
                       label="Lead Time (days)"
@@ -217,6 +221,7 @@ export default function VendorDetail() {
                       type="number"
                       value={leadTimeDays}
                       onChange={(val) => setLeadTimeDays(val)}
+                      autoComplete="off"
                     />
                     <TextField
                       label="Reliability Score"
@@ -224,6 +229,7 @@ export default function VendorDetail() {
                       type="number"
                       value={reliabilityScore}
                       onChange={(val) => setReliabilityScore(val)}
+                      autoComplete="off"
                       helpText="Score from 0.0 to 1.0"
                     />
                     <TextField
@@ -231,6 +237,7 @@ export default function VendorDetail() {
                       name="paymentTerms"
                       value={paymentTerms}
                       onChange={(val) => setPaymentTerms(val)}
+                      autoComplete="off"
                       placeholder="e.g. Net 30"
                     />
                     <div className="flex items-end pb-2">
@@ -250,6 +257,7 @@ export default function VendorDetail() {
                     name="notes"
                     value={notes}
                     onChange={(val) => setNotes(val)}
+                    autoComplete="off"
                     multiline={3}
                   />
                   <div className="flex justify-end">

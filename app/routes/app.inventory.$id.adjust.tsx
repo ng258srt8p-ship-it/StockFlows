@@ -189,9 +189,9 @@ export default function AdjustInventory() {
                     type="number"
                     value={quantity}
                     onChange={(val) => setQuantity(val)}
+                    autoComplete="off"
                     helpText="Positive to add stock, negative to remove"
                     error={actionData?.errors?.quantityChange?.[0]}
-                    required
                   />
 
                   <Select
@@ -213,6 +213,7 @@ export default function AdjustInventory() {
                     label="Notes"
                     value={notes}
                     onChange={(val) => setNotes(val)}
+                    autoComplete="off"
                     multiline={3}
                     placeholder="Optional notes about this adjustment"
                   />

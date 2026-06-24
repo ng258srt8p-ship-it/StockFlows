@@ -719,6 +719,7 @@ function ReorderDefaultsStep({
         type="number"
         value={reorderPoint}
         onChange={(val) => onReorderPointChange(val)}
+        autoComplete="off"
         helpText="When stock drops below this level, StockFlows will alert you to reorder."
       />
 
@@ -728,6 +729,7 @@ function ReorderDefaultsStep({
         type="number"
         value={safetyStockMultiplier}
         onChange={(val) => onSafetyStockMultiplierChange(val)}
+        autoComplete="off"
         helpText="Multiplied by your average daily sales to calculate how much extra stock to keep on hand."
       />
 
@@ -842,6 +844,7 @@ function NotificationStep({
         label="Slack webhook URL"
         value={slackWebhookUrl}
         onChange={(val) => onSlackWebhookUrlChange(val)}
+        autoComplete="off"
         placeholder="https://hooks.slack.com/services/..."
         helpText="Optionally send alerts to a Slack channel. Leave empty to disable."
       />

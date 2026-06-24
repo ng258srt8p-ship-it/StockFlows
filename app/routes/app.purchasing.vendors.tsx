@@ -75,9 +75,12 @@ export default function VendorList() {
             <div className="p-4">
               <div className="mb-4">
                 <TextField
+                  label="Search vendors"
+                  labelHidden
                   placeholder="Search by name, email, or contact..."
                   value={search}
                   onChange={handleSearch}
+                  autoComplete="off"
                   clearButton
                   onClearButtonClick={() => handleSearch("")}
                 />

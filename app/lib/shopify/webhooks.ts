@@ -37,8 +37,6 @@ export const REGISTERED_TOPICS: string[] = [
   "locations/create",
   "locations/update",
   "locations/delete",
-  "orders/create",
-  "orders/updated",
   "products/create",
   "products/update",
   "app/uninstalled",

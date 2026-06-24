@@ -270,6 +270,7 @@ export default function NewPurchaseOrder() {
                         label="PO Number"
                         value={nextPoNumber}
                         readOnly
+                        autoComplete="off"
                         helpText="Auto-generated"
                       />
                     </div>
@@ -316,6 +317,7 @@ export default function NewPurchaseOrder() {
                         type="date"
                         value=""
                         onChange={() => {}}
+                        autoComplete="off"
                         error={actionData?.errors?.expectedDate?.[0]}
                       />
                     </div>
@@ -326,6 +328,7 @@ export default function NewPurchaseOrder() {
                     label="Notes"
                     value={notes}
                     onChange={(val) => setNotes(val)}
+                    autoComplete="off"
                     multiline={3}
                     placeholder="Optional notes about this purchase order"
                     error={actionData?.errors?.notes?.[0]}
@@ -412,27 +415,33 @@ export default function NewPurchaseOrder() {
                         <IndexTable.Cell>
                           <TextField
                             name={`quantity-${index}`}
+                            label="Qty"
+                            labelHidden
                             value={lineItem.quantity}
                             onChange={(value) =>
                               updateLineItem(index, "quantity", value)
                             }
                             type="number"
+                            autoComplete="off"
                           />
                         </IndexTable.Cell>
                         <IndexTable.Cell>
                           <TextField
                             name={`unitCost-${index}`}
+                            label="Cost"
+                            labelHidden
                             value={lineItem.unitCost}
                             onChange={(value) =>
                               updateLineItem(index, "unitCost", value)
                             }
                             type="number"
+                            autoComplete="off"
                           />
                         </IndexTable.Cell>
                         <IndexTable.Cell>
                           <Button
-                            variant="slim"
-                            destructive
+                            variant="tertiary"
+                            tone="critical"
                             onClick={() => removeLineItem(index)}
                             disabled={lineItems.length === 1}
                           >

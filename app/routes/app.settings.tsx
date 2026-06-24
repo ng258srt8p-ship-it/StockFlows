@@ -101,6 +101,7 @@ export default function Settings() {
                   label="Low stock alert threshold"
                   value={lowStock}
                   onChange={(val, _id) => setLowStock(val)}
+                  autoComplete="off"
                   helpText="Alert when stock drops below this level"
                 />
                 <TextField
@@ -108,6 +109,7 @@ export default function Settings() {
                   label="Critical stock threshold"
                   value={criticalStock}
                   onChange={(val, _id) => setCriticalStock(val)}
+                  autoComplete="off"
                   helpText="Critical alert when stock drops below this level"
                 />
               </div>
@@ -122,6 +124,7 @@ export default function Settings() {
                     type="number"
                     value={forecastHorizon}
                     onChange={(val, _id) => setForecastHorizon(val)}
+                    autoComplete="off"
                     helpText="How many days ahead to forecast"
                   />
                 </div>
@@ -141,6 +144,7 @@ export default function Settings() {
                     label="Slack Webhook URL"
                     value={slackUrl}
                     onChange={(val, _id) => setSlackUrl(val)}
+                    autoComplete="off"
                     placeholder="https://hooks.slack.com/services/..."
                     helpText="Leave empty to disable Slack notifications"
                   />
@@ -149,6 +153,7 @@ export default function Settings() {
                     label="SMS Alert Phone Numbers"
                     value={smsPhones}
                     onChange={(val, _id) => setSmsPhones(val)}
+                    autoComplete="off"
                     placeholder="+15551234567, +15559876543"
                     helpText="Comma-separated list of phone numbers for critical stock alerts. Leave empty to disable SMS."
                   />

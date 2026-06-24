@@ -111,11 +111,14 @@ export default function InventoryList() {
               <div className="flex gap-4 mb-4">
                 <div className="flex-1">
                   <TextField
+                    label="Search inventory"
+                    labelHidden
                     placeholder="Search by SKU, product, or barcode..."
                     value={search}
                     onChange={handleSearch}
+                    autoComplete="off"
                     clearButton
-                    onClearClick={() => handleSearch("")}
+                    onClearButtonClick={() => handleSearch("")}
                   />
                 </div>
                 <div className="w-48">

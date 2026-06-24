@@ -318,7 +318,7 @@ export default function Forecasting() {
                       </IndexTable.Cell>
                       <IndexTable.Cell>
                         <Badge
-                          status={
+                          tone={
                             f.confidence >= 0.8
                               ? "success"
                               : f.confidence >= 0.6
@@ -334,7 +334,7 @@ export default function Forecasting() {
                       </IndexTable.Cell>
                       <IndexTable.Cell>
                         <Badge
-                          status={
+                          tone={
                             f.inventoryItem.quantity <= f.inventoryItem.reorderPoint
                               ? "critical"
                               : "success"

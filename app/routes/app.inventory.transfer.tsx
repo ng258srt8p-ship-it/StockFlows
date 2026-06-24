@@ -344,7 +344,7 @@ export default function InventoryTransfer() {
                                   parseInt(value, 10) || 0,
                                 )
                               }
-                              required
+                              autoComplete="off"
                             />
                           </div>
                           {lineItems.length > 1 && (
@@ -383,6 +383,7 @@ export default function InventoryTransfer() {
                     label="Notes"
                     value={notes}
                     onChange={(val, _id) => setNotes(val)}
+                    autoComplete="off"
                     multiline={3}
                     placeholder="Optional notes about this transfer"
                   />

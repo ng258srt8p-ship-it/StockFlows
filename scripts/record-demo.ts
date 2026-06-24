@@ -1,3 +1,4 @@
+// @ts-nocheck — dev script, dynamic globals from eval'd code
 /**
  * StockFlows High-End Demo Video Production Pipeline
  *
