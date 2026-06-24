@@ -212,12 +212,41 @@ read_report_analytics, write_content
 |----------|----------|-------------|
 | `SHOPIFY_API_KEY` | Yes | Shopify app API key |
 | `SHOPIFY_API_SECRET` | Yes | Shopify app API secret |
+| `SHOPIFY_APP_URL` | Yes | Public URL of the app (e.g. `https://stockflows.app`) |
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `REDIS_HOST` | Yes | Redis host (default: localhost) |
-| `REDIS_PORT` | Yes | Redis port (default: 6379) |
+| `REDIS_HOST` | No* | Redis host (default: localhost). Required for background jobs. |
+| `REDIS_PORT` | No* | Redis port (default: 6379) |
 | `SENTRY_DSN` | No | Sentry error tracking DSN |
 | `RESEND_API_KEY` | No | Resend email service API key |
 | `SLACK_WEBHOOK_URL` | No | Slack incoming webhook URL |
+| `TWILIO_ACCOUNT_SID` | No | Twilio Account SID (for SMS alerts) |
+| `TWILIO_AUTH_TOKEN` | No | Twilio Auth Token |
+| `TWILIO_PHONE_NUMBER` | No | Twilio phone number for outgoing SMS |
+
+*Redis is optional — the app starts without it. Background jobs (inventory sync, alerts, forecasting) are only active when Redis is configured.
+
+## Deployment
+
+See [DEPLOY.md](DEPLOY.md) for full deployment instructions.
+
+### Quick Deploy (Railway)
+
+```bash
+# Install Railway CLI
+npm install -g @railway/cli
+
+# Login and deploy
+railway login
+railway up --service <service-name>
+
+# Set environment variables
+railway variable set "SHOPIFY_API_KEY=..." --service <service-name>
+railway variable set "SHOPIFY_API_SECRET=..." --service <service-name>
+railway variable set "DATABASE_URL=..." --service <service-name>
+railway variable set "SHOPIFY_APP_URL=https://stockflows.app" --service <service-name>
+```
+
+The Dockerfile builds the Remix app and runs it via `remix-serve`. Railway auto-detects the Dockerfile and deploys.
 
 ## License
 

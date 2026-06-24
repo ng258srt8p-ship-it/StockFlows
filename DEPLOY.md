@@ -1,104 +1,272 @@
-# Deploy StockFlows Tour to GitHub + Cloudflare Pages
+# StockFlows — Deployment Guide
 
-## Prerequisites
+## Overview
 
-1. **GitHub account** + `gh` CLI authenticated (`gh auth login`)
-2. **Cloudflare account** with Pages enabled
-3. **Domain purchased**: stockflows.app (on Cloudflare Registrar or transferred)
+StockFlows has two deployed components:
 
-## One-Command Deploy
+| Component | Host | Purpose |
+|-----------|------|---------|
+| **Remix app** (API server) | Railway | Webhooks, auth, admin UI, background jobs |
+| **Static site** (tour/landing) | Cloudflare Pages | Marketing pages, privacy policy, tour |
 
-```bash
-cd stockflows
-npx tsx scripts/deploy-tour.ts
+The Shopify app runs on Railway. Cloudflare Pages serves the static marketing site at `stockflows.app`.
+
+---
+
+## Production Architecture
+
+```
+Shopify ──POST /webhooks──► Railway (Remix app)
+                                    │
+                                    ├── PostgreSQL (Railway add-on)
+                                    ├── Redis (Railway add-on, optional)
+                                    └── BullMQ workers (in-process)
+
+Merchants ──► Cloudflare Pages (stockflows.app)
+              (tour, privacy policy, landing page)
 ```
 
-## Manual Steps (if automation fails)
+### Webhook HMAC Verification
 
-### Step 1: Create GitHub Repo
+Shopify requires that webhook endpoints validate the HMAC digest of each request and return HTTP 401 when rejecting a request with an invalid digest.
 
-```bash
-# Authenticate
-gh auth login
+Per [Shopify's documentation](https://shopify.dev/docs/apps/build/webhooks/verify-deliveries#hmac-verification):
+- Algorithm: **HMAC-SHA256**
+- Header: `X-Shopify-Hmac-SHA256`
+- Encoding: **base64**
+- Verification: Use `authenticate.webhook(request)` from `@shopify/shopify-app-remix`
 
-# Create and push
-gh repo create stockflows --public --description "Inventory management for Shopify" --source=. --remote=origin --push
-```
+Our implementation (`app/routes/webhooks.tsx`):
+1. Receives all webhooks at `POST /webhooks`
+2. Calls `authenticate.webhook(request)` which validates the HMAC via the Shopify library
+3. Returns HTTP 401 on invalid HMAC (thrown by the library)
+4. Returns HTTP 200 after processing
 
-Or manually:
-1. Go to https://github.com/new
-2. Name: `stockflows`
-3. Create repo
-4. Then:
-```bash
-git remote add origin git@github.com:YOUR_USER/stockflows.git
-git push -u origin main
-```
+The custom `verifyWebhook()` utility in `app/lib/shopify/webhooks.ts` provides a backup HMAC verification method using `crypto.createHmac("sha256", secret).update(rawBody).digest("base64")` with timing-safe comparison.
 
-### Step 2: Deploy to Cloudflare Pages
+---
 
-```bash
-# Install wrangler if needed
-npm install -g wrangler
+## Railway Deployment
 
-# Login to Cloudflare
-wrangler login
+### Prerequisites
 
-# Deploy
-npx wrangler pages deploy public --project-name=stockflows-tour --branch=main
-```
+- [Railway CLI](https://docs.railway.app/reference/cli): `npm install -g @railway/cli`
+- Railway account: `railway login`
 
-This deploys the `public/` directory (tour.html, privacy.html) to Cloudflare Pages.
-
-### Step 3: Set Up Custom Domain
-
-1. Go to https://dash.cloudflare.com
-2. Navigate to **Workers & Pages** > **stockflows-tour**
-3. Click **Custom domains**
-4. Click **Set up a custom domain**
-5. Enter: `stockflows.app`
-6. Cloudflare auto-adds DNS records and provisions SSL
-7. Wait 1-5 minutes for propagation
-8. Verify: https://stockflows.app
-
-### Step 4: Verify
+### 1. Create Project
 
 ```bash
-# Check the site is live
-curl -s -o /dev/null -w "%{http_code}" https://stockflows.app
-# Should return 200
-
-# Check privacy page
-curl -s -o /dev/null -w "%{http_code}" https://stockflows.app/privacy.html
-# Should return 200
+railway init           # Creates project "faithful-love" (or your chosen name)
+railway add --database postgres  # Adds PostgreSQL add-on
 ```
 
-## Updating the Tour
-
-After making changes to `public/tour.html`:
+### 2. Set Environment Variables
 
 ```bash
-# Commit changes
-git add public/
-git commit -m "Update tour: DESCRIPTION"
-git push origin main
+# Required
+railway variable set "SHOPIFY_API_KEY=your_key" --service <service>
+railway variable set "SHOPIFY_API_SECRET=your_secret" --service <service>
+railway variable set "SHOPIFY_APP_URL=https://stockflows.app" --service <service>
+railway variable set "DATABASE_URL=postgresql://..." --service <service>
 
-# Deploy to Cloudflare
-npx wrangler pages deploy public --project-name=stockflows-tour --branch=main
+# Optional (for background jobs)
+railway variable set "REDIS_HOST=redis" --service <service>
+railway variable set "REDIS_PORT=6379" --service <service>
+
+# Optional (for notifications)
+railway variable set "RESEND_API_KEY=..." --service <service>
+railway variable set "SLACK_WEBHOOK_URL=..." --service <service>
+railway variable set "TWILIO_ACCOUNT_SID=..." --service <service>
+railway variable set "TWILIO_AUTH_TOKEN=..." --service <service>
+railway variable set "TWILIO_PHONE_NUMBER=..." --service <service>
 ```
 
-The deployment takes ~30 seconds and propagates globally within minutes.
+### 3. Deploy
 
-## Environment Variables (Cloudflare Pages)
+```bash
+railway up --service <service-name>
+```
 
-Set these in the Cloudflare dashboard under Pages > stockflows-tour > Settings > Environment variables:
+Railway builds the Docker image, runs migrations (if configured), and starts the app.
 
-| Variable | Value | Required |
-|----------|-------|----------|
-| `OPENCODE_API_KEY` | Your OpenCode API key | For AI features |
-| `RESEND_API_KEY` | Your Resend API key | For email alerts |
-| `TWILIO_ACCOUNT_SID` | Your Twilio Account SID | For SMS alerts |
-| `SLACK_WEBHOOK_URL` | Your Slack webhook URL | For Slack alerts |
-| `SENTRY_DSN` | Your Sentry DSN | For error tracking |
+### 4. Run Database Migrations
 
-Note: The tour page (static HTML) doesn't use these — they're for the production Remix app.
+```bash
+railway run npx prisma migrate deploy
+```
+
+### 5. Generate a Public URL
+
+```bash
+railway domain --service <service>
+# Creates: https://<service>-production-<hash>.up.railway.app
+```
+
+### 6. Custom Domain (stockflows.app)
+
+1. Add a CNAME record in Cloudflare DNS:
+   ```
+   Type: CNAME
+   Name: @ (or stockflows.app)
+   Target: <service>-production-<hash>.up.railway.app
+   ```
+2. On Railway, add the custom domain:
+   ```bash
+   railway domain stockflows.app --service <service>
+   ```
+3. Update `SHOPIFY_APP_URL` in Railway:
+   ```bash
+   railway variable set "SHOPIFY_APP_URL=https://stockflows.app" --service <service>
+   ```
+
+### Health Check
+
+Railway uses the `/health` endpoint to determine if the app is running:
+
+```bash
+curl https://stockflows.app/health
+# {"status":"alive","timestamp":"2026-06-24T03:34:33.735Z"}
+```
+
+---
+
+## Cloudflare Pages (Static Site)
+
+The Cloudflare Pages project (`stockflows-tour`) serves the marketing pages from the `public/` directory.
+
+### Deploy
+
+```bash
+npx wrangler pages deploy public --project-name=stockflows --branch=main
+```
+
+Or push to `main` — Cloudflare Pages auto-deploys from the linked GitHub repo.
+
+### Custom Domain
+
+`stockflows.app` is already configured as a custom domain on the Cloudflare Pages project. When switching the Remix app to Railway, update the DNS so `stockflows.app` points to Railway instead.
+
+---
+
+## Dockerfile
+
+```dockerfile
+FROM node:22-bookworm-slim
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+COPY prisma ./prisma
+RUN npx prisma generate
+COPY . .
+RUN npm run build
+ENV NODE_ENV=production
+EXPOSE 3000
+CMD ["npm", "start"]
+```
+
+Key notes:
+- Uses `npx remix vite:build` (not plain `vite build`) — the Remix Vite plugin requires both client and SSR builds
+- Prisma schema must be copied separately for `prisma generate`
+- Redis is optional — BullMQ imports are lazy in `webhooks.tsx` and `entry.server.tsx`
+
+---
+
+## GitHub Actions CI
+
+The CI pipeline (`.github/workflows/ci.yml`) runs on every push:
+
+**Test job:**
+1. `npm ci`
+2. `npx tsc --noEmit --skipLibCheck` — TypeScript check
+3. `npx vitest run` — Unit/integration tests
+4. `npx vite build` — Production build
+
+**Deploy job** (main branch only):
+1. Runs Prisma migrations
+2. Deploys app config to Shopify Partners via `shopify app deploy --force`
+
+> **Note:** The deploy job requires `DATABASE_URL` as a GitHub Actions secret. Add it in Settings → Secrets → Actions.
+
+---
+
+## Shopify App Config Deploy
+
+Push the app config (webhook subscriptions, scopes, etc.) to Shopify Partners:
+
+```bash
+npx @shopify/cli app deploy --allow-updates
+```
+
+### Protected Customer Data (PCD)
+
+The `orders/create` and `orders/updated` webhook topics require PCD approval from Shopify. These topics are currently removed from `shopify.app.toml` until PCD is approved during app submission. To re-add:
+
+1. Apply for PCD in [Shopify Partners](https://partners.shopify.com)
+2. Add topics back to `shopify.app.toml` under `[[webhooks.subscriptions]].topics`
+3. Add them back to `REGISTERED_TOPICS` in `app/lib/shopify/webhooks.ts`
+4. Redeploy: `npx @shopify/cli app deploy --allow-updates`
+
+---
+
+## Fly.io (Alternative — Free Tier)
+
+Fly.io is configured in `fly.toml` but requires account verification before first deploy.
+
+### Setup
+
+```bash
+fly auth login
+fly launch --no-deploy
+fly postgres create   # Creates free 3GB Postgres
+fly secrets set SHOPIFY_API_KEY=... SHOPIFY_API_SECRET=... DATABASE_URL=...
+fly deploy
+```
+
+### Free Tier Includes
+
+- 3 shared-cpu-1x VMs (256MB RAM each)
+- 3GB Fly Postgres
+- Free TLS certificates
+- Auto-stop/start machines
+
+---
+
+## Troubleshooting
+
+### Webhook 405 error
+
+**Symptom:** Shopify validation reports "Expected HTTP 401, Received HTTP 405"
+
+**Cause:** The Remix app is not deployed — the domain serves static files only.
+
+**Fix:** Deploy the Remix app to Railway (or Fly.io) and ensure `stockflows.app` DNS points to the app server.
+
+### Webhook 400 error (not 401)
+
+**Symptom:** POST to `/webhooks` returns HTTP 400 instead of 401
+
+**Cause:** The request is missing the `X-Shopify-Hmac-SHA256` header entirely.
+
+**This is expected** — HTTP 400 means "no HMAC header present." HTTP 401 means "HMAC header present but invalid." Shopify validation sends a request with a valid HMAC structure, so it should get 401.
+
+### Background jobs not running
+
+**Cause:** Redis is not configured or not reachable.
+
+**Fix:** Redis is optional — the app starts without it. Add Redis via `railway add --database redis` and set `REDIS_HOST`.
+
+### Build fails on Railway
+
+**Cause:** Usually the SSR build not running (only client build completes).
+
+**Fix:** Ensure `package.json` build script is `remix vite:build` (not `vite build`).
+
+### Prisma migration failures
+
+```bash
+# Run migrations manually
+railway run npx prisma migrate deploy
+
+# Or reset the database (development only)
+railway run npx prisma migrate reset
+```

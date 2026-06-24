@@ -60,6 +60,12 @@ Secondary: Inventory and Order Management
 4. Purchasing — PO list with status badges
 5. Reports — valuation table + pie chart
 
+## Deployment
+- **Remix app (API server):** Railway (Node.js, PostgreSQL, optional Redis)
+- **Static site (tour/landing):** Cloudflare Pages at stockflows.app
+- **Webhook endpoint:** POST https://stockflows.app/webhooks (HMAC-SHA256 verified)
+- **Health check:** GET https://stockflows.app/health
+
 ## Support
 - Email: support@stockflows.app
 - In-app help: Built-in tooltips and guided tour

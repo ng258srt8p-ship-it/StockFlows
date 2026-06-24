@@ -4,10 +4,13 @@
 - App name, description, tags, pricing: DONE (APP-STORE-LISTING.md)
 - Privacy policy: DONE (public/privacy.html)
 - GDPR webhooks: DONE (webhooks.privacy.tsx)
-- Uninstall handler: DONE (webhooks.app_uninstalled.tsx)
+- Uninstall handler: DONE (webhooks.tsx — app/uninstalled topic)
 - Health check endpoints: DONE (/health, /health/ready)
-- E2E tests: DONE (66 passing)
+- E2E tests: DONE (41 passing)
 - Tour page: DONE (public/tour.html)
+- Webhook HMAC verification: DONE (POST /webhooks returns 401 on invalid HMAC)
+- Production deployment: DONE (Railway — Remix app + PostgreSQL)
+- Static site deployment: DONE (Cloudflare Pages — tour, landing, privacy)
 
 ## What Needs to Be Done
 
@@ -35,6 +38,14 @@ Need a Shopify Partner account to install on a dev store for testing.
 
 ### 6. Push all remaining changes to GitHub
 Ensure everything is committed and pushed.
+
+### 7. Apply for Protected Customer Data (PCD) access
+The `orders/create` and `orders/updated` webhooks require PCD approval from Shopify. Apply in the Partner Dashboard before app submission. Once approved, re-add these topics to `shopify.app.toml` and `REGISTERED_TOPICS`.
+
+### 8. Configure custom domain
+Point `stockflows.app` DNS to the Railway deployment:
+- CNAME record: `@ → <service>.up.railway.app`
+- Update `SHOPIFY_APP_URL` to `https://stockflows.app`
 
 ## What We Can Do Now (No Partner Account Needed)
 1. Fix the package.json scripts

@@ -130,6 +130,11 @@ support@stockflows.app
 https://stockflows.app
 ```
 
+**Privacy policy URL:**
+```
+https://stockflows.app/privacy.html
+```
+
 **Support phone number (optional):**
 Leave blank.
 
