@@ -14,6 +14,8 @@ COPY . .
 RUN npm run build
 
 ENV NODE_ENV=production
+# remix-serve listens on localhost by default — bind to all interfaces for Fly.io
+ENV HOST=0.0.0.0
 
 EXPOSE 3000
-CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
+CMD ["npm", "start"]
