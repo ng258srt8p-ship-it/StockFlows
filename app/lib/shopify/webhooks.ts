@@ -88,9 +88,12 @@ const log = logger.child({ module: "shopify/webhooks" });
 /**
  * Compute HMAC-SHA256 digest of a request body using the app's API secret.
  *
+ * Per Shopify's spec the digest is base64-encoded:
+ *   crypto.createHmac('sha256', secret).update(rawBody).digest('base64')
+ *
  * @param body     - Raw request body (string or Buffer).
  * @param secret   - HMAC secret (defaults to SHOPIFY_API_SECRET env var).
- * @returns        - Hex-encoded HMAC digest.
+ * @returns        - Base64-encoded HMAC digest.
  */
 function computeHmac(body: string | Buffer, secret?: string): string {
   const hmacSecret = secret ?? process.env.SHOPIFY_API_SECRET;
@@ -99,7 +102,7 @@ function computeHmac(body: string | Buffer, secret?: string): string {
   }
 
   const rawBody = Buffer.isBuffer(body) ? body : Buffer.from(body, "utf-8");
-  return crypto.createHmac("sha256", hmacSecret).update(rawBody).digest("hex");
+  return crypto.createHmac("sha256", hmacSecret).update(rawBody).digest("base64");
 }
 
 // ---------------------------------------------------------------------------
@@ -154,8 +157,9 @@ export async function verifyWebhook(
     const expectedHmac = computeHmac(rawBody, secret);
 
     // Use timing-safe comparison to prevent timing attacks
-    const hmacBuffer = Buffer.from(hmacHeader, "hex");
-    const expectedBuffer = Buffer.from(expectedHmac, "hex");
+    // Shopify sends the HMAC as base64 — match that encoding.
+    const hmacBuffer = Buffer.from(hmacHeader, "base64");
+    const expectedBuffer = Buffer.from(expectedHmac, "base64");
 
     if (hmacBuffer.length !== expectedBuffer.length) {
       logCtx.warn("HMAC length mismatch");
