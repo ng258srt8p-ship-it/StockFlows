@@ -21,6 +21,7 @@ vi.mock("~/lib/db/client", () => ({
 
 vi.mock("~/lib/jobs/queue.server", () => ({
   inventorySyncQueue: { add: vi.fn().mockResolvedValue({}) },
+  alertQueue: { add: vi.fn().mockResolvedValue({}) },
 }));
 
 vi.mock("~/lib/sse/manager.server", () => ({
@@ -59,12 +60,13 @@ describe("Webhook Handlers (Integration)", () => {
         },
       });
 
-      const { action } = await import(
-        "~/routes/webhooks.inventory_levels.update"
-      );
+      const { action } = await import("~/routes/webhooks");
 
-      const request = new Request("https://example.com/webhooks", {
+      const request = new Request("https://stockflows.app/webhooks", {
         method: "POST",
+        headers: {
+          "X-Shopify-Topic": "inventory_levels/update",
+        },
       });
 
       const response = await action({
@@ -85,7 +87,7 @@ describe("Webhook Handlers (Integration)", () => {
             }),
           ]),
         }),
-        expect.objectContaining({ jobId: expect.any(String) })
+        expect.objectContaining({ jobId: expect.any(String) }),
       );
     });
   });
@@ -97,14 +99,16 @@ describe("Webhook Handlers (Integration)", () => {
 
       (authenticate.webhook as any).mockResolvedValue({
         shop: "test-store.myshopify.com",
+        payload: {},
       });
 
-      const { action } = await import(
-        "~/routes/webhooks.app_uninstalled"
-      );
+      const { action } = await import("~/routes/webhooks");
 
-      const request = new Request("https://example.com/webhooks", {
+      const request = new Request("https://stockflows.app/webhooks", {
         method: "POST",
+        headers: {
+          "X-Shopify-Topic": "app/uninstalled",
+        },
       });
 
       const response = await action({
@@ -131,10 +135,13 @@ describe("Webhook Handlers (Integration)", () => {
         payload: {},
       });
 
-      const { action } = await import("~/routes/webhooks.privacy");
+      const { action } = await import("~/routes/webhooks");
 
-      const request = new Request("https://example.com/webhooks", {
+      const request = new Request("https://stockflows.app/webhooks", {
         method: "POST",
+        headers: {
+          "X-Shopify-Topic": "shop/redact",
+        },
       });
 
       const response = await action({
@@ -145,6 +152,36 @@ describe("Webhook Handlers (Integration)", () => {
 
       expect(response.status).toBe(200);
       expect(prisma.shop.delete).toHaveBeenCalled();
+    });
+  });
+
+  describe("unified webhook — returns 401 on invalid HMAC", () => {
+    it("returns 401 when shop is null (HMAC validation failed)", async () => {
+      const { authenticate } = await import("~/lib/shopify/server");
+
+      (authenticate.webhook as any).mockResolvedValue({
+        shop: null,
+        payload: {},
+      });
+
+      const { action } = await import("~/routes/webhooks");
+
+      const request = new Request("https://stockflows.app/webhooks", {
+        method: "POST",
+        headers: {
+          "X-Shopify-Topic": "inventory_levels/update",
+        },
+      });
+
+      const response = await action({
+        request,
+        params: {},
+        context: {},
+      } as any);
+
+      expect(response.status).toBe(401);
+      const body = await response.text();
+      expect(body).toBe("Unauthorized");
     });
   });
 });

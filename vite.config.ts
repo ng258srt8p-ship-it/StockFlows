@@ -11,4 +11,12 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  build: {
+    rollupOptions: {
+      // These packages are dynamically imported inside try/catch blocks
+      // (e.g. twilio in sms.ts, googleapis in google-sheets.ts). Externalizing
+      // them prevents Vite from failing the build when they're not installed.
+      external: ["twilio", "googleapis"],
+    },
+  },
 });

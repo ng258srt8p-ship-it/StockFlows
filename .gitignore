@@ -11,3 +11,9 @@ test-results/
 
 # App Store assets — not needed for website deploy
 screenshots/
+
+# IDE / editor
+.hermes/
+
+# Generated screenshots
+e2e/tour-debug.png
