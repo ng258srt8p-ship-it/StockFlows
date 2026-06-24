@@ -11,7 +11,8 @@ scopes = """
   read_products,
   write_products,
   read_locations,
-  write_content
+  write_content,
+  read_orders
 """
 optional_scopes = [
   "read_product_listings",
