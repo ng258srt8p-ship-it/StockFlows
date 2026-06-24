@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>StockFlows - Inventory Management for Shopify</title>
+<title>StockFlows - Explore the App</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
@@ -11,311 +11,49 @@
 <link rel="stylesheet" href="tour.css">
 </head>
 <body>
-<div class="landing" id="landing">
-<div class="eyebrow">Inventory Management for Shopify</div>
-<h1>StockFlows</h1>
-<div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:16px"><img src="glyph-white.png" alt="Shopify" width="20" height="20" style="object-fit:contain"> Built with Shopify APIs</div>
-<p class="sub">Inventory management and demand forecasting for Shopify merchants. Explore every feature, no setup required.</p>
-<div class="stats">
-<div class="stat"><div class="n">10</div><div class="l">Products</div></div>
-<div class="stat"><div class="n">2</div><div class="l">Locations</div></div>
-<div class="stat"><div class="n">30</div><div class="l">Days of History</div></div>
-<div class="stat"><div class="n">4</div><div class="l">Active Alerts</div></div>
+<!-- Back to landing link -->
+<div style="text-align:center;padding:8px 24px;background:#fafafa;border-bottom:1px solid var(--border)">
+  <a href="landing.html" style="font-size:.75rem;color:#666;text-decoration:none">&larr; Back to Landing</a>
 </div>
-<div class="btn-group">
-<a href="explore.html" class="btn" style="text-decoration:none">Explore</a>
-<a href="explore.html?tour=true" class="btn btn-outline" style="text-decoration:none">Take Tour</a>
-<a href="demo.html" class="btn btn-outline" style="text-decoration:none">Watch Demo</a>
+<!-- ════════════════════ APP ════════════════════ -->
+<div class="app active" id="app">
+<aside class="sidebar">
+<div class="logo"><img src="SF icon.svg" alt="StockFlows" width="20" height="20" style="object-fit:contain"> StockFlows</div>
+<div style="padding:8px 20px;border-bottom:1px solid var(--border);margin-bottom:4px;display:flex;align-items:center;gap:6px"><img src="glyph-black.png" alt="Shopify" width="14" height="14" style="object-fit:contain"> <span style="font-size:.6rem;color:#666">Shopify Partner</span></div>
+<nav>
+<a class="active" data-page="dashboard" onclick="go('dashboard')"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg><span>Dashboard</span></a>
+<a data-page="inventory" onclick="go('inventory')"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v11a3 3 0 106 0V4a2 2 0 00-2-2H4zm1 14a1 1 0 100-2 1 1 0 000 2zm5-1.757l4.9-4.9a2 2 0 000-2.828L13.485 5.1a2 2 0 00-2.828 0L10 5.757v8.486z" clip-rule="evenodd"/></svg><span>Inventory</span></a>
+<a data-page="purchasing" onclick="go('purchasing')"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg><span>Purchasing</span></a>
+<a data-page="forecasting" onclick="go('forecasting')"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg><span>Forecasting</span></a>
+<a data-page="reports" onclick="go('reports')"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg><span>Reports</span></a>
+<a data-page="settings" onclick="go('settings')"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span>Settings</span></a>
+</nav>
+<a href="demo.html" class="tour-btn" style="text-decoration:none;display:flex;align-items:center;gap:6px"><span class="material-symbols-outlined">play_circle</span> Watch Demo</a>
+<button class="tour-btn" onclick="startInAppTour()"><span class="material-symbols-outlined">tour</span> Take Tour</button>
+</aside>
+<main class="content">
+<!-- Dashboard -->
+<div class="page active" id="page-dashboard"></div>
+<!-- Inventory -->
+<div class="page" id="page-inventory"></div>
+<!-- Purchasing -->
+<div class="page" id="page-purchasing"></div>
+<!-- Forecasting -->
+<div class="page" id="page-forecasting"></div>
+<!-- Reports -->
+<div class="page" id="page-reports"></div>
+<!-- Settings -->
+<div class="page" id="page-settings"></div>
+</main>
 </div>
-</div>
-
-<!-- Features -->
-<div class="fade-in tour-section" id="tour-features" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
-<div style="max-width:960px;margin:0 auto">
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:32px">
-<div>
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">01 / Inventory</div>
-<div style="font-family:var(--serif);font-size:1.3rem;font-style:italic;margin-bottom:8px">Multi-location tracking</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">Real-time stock levels across warehouses and retail stores. Cycle counts, adjustments, and transfers all in one place.</p>
-</div>
-<div>
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">02 / Forecasting</div>
-<div style="font-family:var(--serif);font-size:1.3rem;font-style:italic;margin-bottom:8px">Demand forecasting</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">30-day demand forecasts using Exponential Smoothing with confidence intervals. Reorder recommendations with quantity suggestions based on forecast data.</p>
-</div>
-<div>
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">03 / Purchasing</div>
-<div style="font-family:var(--serif);font-size:1.3rem;font-style:italic;margin-bottom:8px">Smart purchase orders</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">Create POs with vendors, track partial receiving, landed costs, and landed cost per unit. Barcode scanning for fast warehouse receiving.</p>
-</div>
-<div>
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">04 / Alerts</div>
-<div style="font-family:var(--serif);font-size:1.3rem;font-style:italic;margin-bottom:8px">Automated notifications</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">Email, Slack, and SMS alerts when stock drops below thresholds. Reorder recommendations with quantity suggestions from your forecast.</p>
-</div>
-<div>
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">05 / Reports</div>
-<div style="font-family:var(--serif);font-size:1.3rem;font-style:italic;margin-bottom:8px">One-click exports</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">CSV downloads, PDF inventory valuations, and cycle count sheets. Generate reports in seconds, not hours.</p>
-</div>
-<div>
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">06/ Runs in the background</div>
-<div style="font-family:var(--serif);font-size:1.3rem;font-style:italic;margin-bottom:8px">Zero maintenance</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.6">Deploy once, never touch again. Managed infrastructure, automated backups, nightly forecast runs. Alerts are delivered in real-time as stock levels change.</p>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Screenshots - Webflow-style autoplay tabs -->
-<div class="screenshots-section tour-section" id="tour-screenshots">
-<div class="section-inner">
-<div class="eyebrow">Screenshots</div>
-<h2>See every screen.</h2>
-<p class="subtitle">From dashboard to forecasting - tabs auto-advance every 6 seconds, or click to jump.</p>
-
-<div class="ss-tabs" id="ss-tabs">
-  <!-- Left: tab menu -->
-  <div class="ss-tab-menu">
-    <div class="ss-tab-item active" data-index="0">
-      <div class="ss-tab-progress"><div class="ss-tab-progress-fill"></div></div>
-      <div class="ss-tab-title">Dashboard</div>
-      <div class="ss-tab-desc">Stock levels, alerts, and forecast accuracy at a glance. Color-coded bar chart shows inventory health across all products.</div>
-    </div>
-    <div class="ss-tab-item" data-index="1">
-      <div class="ss-tab-progress"><div class="ss-tab-progress-fill"></div></div>
-      <div class="ss-tab-title">Inventory</div>
-      <div class="ss-tab-desc">Searchable table with status badges, location filters, and status tabs. Click any row to adjust stock or view history.</div>
-    </div>
-    <div class="ss-tab-item" data-index="2">
-      <div class="ss-tab-progress"><div class="ss-tab-progress-fill"></div></div>
-      <div class="ss-tab-title">Forecasting</div>
-      <div class="ss-tab-desc">30-day demand predictions with confidence intervals. Statistical models trained on your sales data predict stockout risk.</div>
-    </div>
-    <div class="ss-tab-item" data-index="3">
-      <div class="ss-tab-progress"><div class="ss-tab-progress-fill"></div></div>
-      <div class="ss-tab-title">Purchasing</div>
-      <div class="ss-tab-desc">Purchase orders with vendor tracking, status badges, and partial receiving. Auto-generate POs from reorder alerts.</div>
-    </div>
-    <div class="ss-tab-item" data-index="4">
-      <div class="ss-tab-progress"><div class="ss-tab-progress-fill"></div></div>
-      <div class="ss-tab-title">Reports</div>
-      <div class="ss-tab-desc">Inventory valuation, stock status breakdown, and one-click CSV/PDF export. Generate reports in seconds, not hours.</div>
-    </div>
-  </div>
-
-  <!-- Right: image stage -->
-  <div class="ss-tab-stage">
-    <img src="dashboard.png" alt="Dashboard" class="active">
-    <img src="inventory.png" alt="Inventory">
-    <img src="forecasting.png" alt="Forecasting">
-    <img src="purchasing.png" alt="Purchasing">
-    <img src="reports.png" alt="Reports">
-  </div>
-</div>
-
-</div>
-</div>
-
-<!-- How It Works -->
-<div class="tour-section" id="tour-how-it-works" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
-<div style="max-width:960px;margin:0 auto">
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">How it works</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:40px">Three steps to zero stockouts.</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:40px">
-<div>
-<div style="font-family:var(--serif);font-size:3rem;font-style:italic;color:var(--border)">01</div>
-<div style="font-size:1rem;font-weight:600;margin:8px 0">Install & import</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.7">Connect your Shopify store. StockFlows pulls in all products, locations, and vendors automatically. Importing from Stocky? One CSV upload and you're set.</p>
-</div>
-<div>
-<div style="font-family:var(--serif);font-size:3rem;font-style:italic;color:var(--border)">02</div>
-<div style="font-size:1rem;font-weight:600;margin:8px 0">Set your thresholds</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.7">Define reorder points for each product. StockFlows learns your demand patterns from sales history and starts forecasting on day one.</p>
-</div>
-<div>
-<div style="font-family:var(--serif);font-size:3rem;font-style:italic;color:var(--border)">03</div>
-<div style="font-size:1rem;font-weight:600;margin:8px 0">Never worry again</div>
-<p style="font-size:.82rem;color:var(--text-dim);line-height:1.7">Nightly forecasts, auto alerts, and reorder recommendations. Just open the dashboard to check in, or let the alerts come to you.</p>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Alert Preview -->
-<div class="fade-in tour-section" id="tour-alerts" style="background:#fff;border-top:1px solid #e0e0e0;padding:80px 24px;color:#111">
-<div style="max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center">
-<div>
-<div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Instant alerts</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:16px">Know before it happens.</div>
-<p style="font-size:.85rem;color:#666;line-height:1.7;margin-bottom:24px">StockFlows monitors your inventory 24/7 and sends alerts the moment stock drops below your reorder point. Email, Slack, SMS - pick what works for your team.</p>
-<p style="font-size:.85rem;color:#666;line-height:1.7">Each alert includes the product name, current stock, reorder point, and a one-click button to create a purchase order.</p>
-</div>
-<div style="background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:24px;max-width:420px">
-<div style="font-size:.65rem;color:#999;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px;font-weight:600">Email Preview</div>
-<div style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:20px">
-<div style="font-size:.7rem;color:#999;margin-bottom:8px">From: alerts@stockflows.app</div>
-<div style="font-size:1rem;font-weight:600;margin-bottom:4px">Low Stock: Widget Basic</div>
-<div style="font-size:.8rem;color:#666;margin-bottom:12px;line-height:1.6"><strong>Widget Basic</strong> at <strong>Main Warehouse</strong> has dropped below the reorder point.</div>
-<div style="display:flex;gap:16px;margin-bottom:12px;padding:12px;background:#fafafa;border-radius:6px">
-<div style="font-size:.75rem"><div style="color:#999;margin-bottom:2px">Current</div><div style="font-weight:700;font-size:1.1rem">8 units</div></div>
-<div style="font-size:.75rem"><div style="color:#999;margin-bottom:2px">Reorder Pt</div><div style="font-weight:700;font-size:1.1rem">20 units</div></div>
-<div style="font-size:.75rem"><div style="color:#999;margin-bottom:2px">Order</div><div style="font-weight:700;font-size:1.1rem">50 units</div></div>
-</div>
-<div style="background:#111;color:#fff;padding:10px 20px;border-radius:6px;text-align:center;font-size:.8rem;font-weight:600;cursor:pointer">Create Purchase Order</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Competitor Comparison -->
-<div class="fade-in tour-section" id="tour-compare" style="background:#111;color:#fff;padding:80px 24px">
-<div style="max-width:960px;margin:0 auto">
-<div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Why switch</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:16px">Stocky is reportedly being discontinued.</div>
-<div id="countdown" style="display:flex;gap:24px;margin-bottom:40px;flex-wrap:wrap">
-<div style="text-align:center"><div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;font-weight:400;line-height:1" id="cd-days">--</div><div style="font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px">Days Left</div></div>
-<div style="text-align:center"><div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;font-weight:400;line-height:1" id="cd-hours">--</div><div style="font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px">Hours</div></div>
-<div style="text-align:center"><div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;font-weight:400;line-height:1" id="cd-mins">--</div><div style="font-size:.65rem;color:#888;text-transform:uppercase;letter-spacing:1px;margin-top:4px">Minutes</div></div>
-</div>
-<div style="font-size:.85rem;color:#888;max-width:520px;line-height:1.7;margin-bottom:40px">Shopify's built-in inventory app (Stocky) has consistently low ratings and is reportedly being discontinued. StockFlows replaces everything Stocky does, and adds working statistical forecasting on top.</div>
-<div class="compare-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;border:1px solid #333">
-<div style="padding:20px;border-right:1px solid #333">
-<div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Feature</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222">Inventory tracking</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222">Demand forecasting</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222">Purchase orders</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222">Barcode receiving</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222">Multi-location</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222">Alerts (email/Slack)</div>
-<div style="font-size:.8rem;padding:10px 0">Reorder suggestions</div>
-</div>
-<div style="padding:20px;border-right:1px solid #333">
-<div style="font-size:.55rem;color:#666;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px">Stocky (Shopify's built-in)</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#888">Basic</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#dc2626">Broken</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#dc2626">Broken</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#888">Basic</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#888">Limited</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#dc2626">Email only</div>
-<div style="font-size:.8rem;padding:10px 0;color:#dc2626">None</div>
-</div>
-<div style="padding:20px">
-<div style="font-size:.55rem;color:#fff;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:16px;font-weight:700">StockFlows</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222">Full</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#16a34a">Statistical</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#16a34a">Full + partial</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#16a34a">USB + camera</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#16a34a">Unlimited</div>
-<div style="font-size:.8rem;padding:10px 0;border-bottom:1px solid #222;color:#16a34a">Email + Slack + SMS</div>
-<div style="font-size:.8rem;padding:10px 0;color:#16a34a">Statistical</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Social Proof -->
-<div class="fade-in tour-section" id="tour-social" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
-<div style="max-width:960px;margin:0 auto">
-<div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Why StockFlows</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:40px">Built for real inventory workflows.</div>
-<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px">
-<div style="border:1px solid #e0e0e0;padding:24px;border-radius:8px">
-<div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:8px">Replaces Stocky</div>
-<div style="font-size:1rem;font-weight:600;margin-bottom:8px">Everything Stocky did, plus more</div>
-<p style="font-size:.82rem;color:#666;line-height:1.7">StockFlows covers every feature Stocky offered: inventory tracking, purchase orders, barcode receiving, transfers, and cycle counts. Plus statistical forecasting and multi-channel alerts that Stocky never had.</p>
-</div>
-<div style="border:1px solid #e0e0e0;padding:24px;border-radius:8px">
-<div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:8px">Real Forecasting</div>
-<div style="font-size:1rem;font-weight:600;margin-bottom:8px">30-day predictions per SKU</div>
-<p style="font-size:.82rem;color:#666;line-height:1.7">Not a placeholder. Exponential Smoothing models trained on your sales data predict demand for each product and flag stockout risk before it happens.</p>
-</div>
-<div style="border:1px solid #e0e0e0;padding:24px;border-radius:8px">
-<div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:8px">5 Minute Migration</div>
-<div style="font-size:1rem;font-weight:600;margin-bottom:8px">From Stocky to StockFlows</div>
-<p style="font-size:.82rem;color:#666;line-height:1.7">Import your products, vendors, and purchase orders with a single CSV upload. No data loss, no manual re-entry.</p>
-</div>
-</div>
-</div>
-</div>
-<!-- ROI Calculator -->
-<div class="tour-section" id="tour-roi" style="background:#fff;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
-<div style="max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center">
-<div>
-<div style="font-size:.55rem;color:#999;text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">ROI Calculator</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:16px">See what you would save.</div>
-<p style="font-size:.85rem;color:#666;line-height:1.7;margin-bottom:24px">Enter your monthly inventory spend and number of SKUs. StockFlows pays for itself by preventing just one stockout per month.</p>
-<div style="background:#f9f9f9;border:1px solid #e0e0e0;border-radius:8px;padding:24px">
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-<div class="form-group"><label>Monthly inventory spend</label><input type="number" id="calc-spend" value="5000" min="0" oninput="updateROI()"></div>
-<div class="form-group"><label>Number of SKUs</label><input type="number" id="calc-skus" value="100" min="1" oninput="updateROI()"></div>
-</div>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-<div class="form-group"><label>Average stockout cost ($)</label><input type="number" id="calc-cost" value="500" min="0" oninput="updateROI()"></div>
-<div class="form-group"><label>Monthly stockouts (avg)</label><input type="number" id="calc-outs" value="4" min="0" oninput="updateROI()"></div>
-</div>
-<div id="roi-result" style="background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:16px;text-align:center">
-<div style="font-size:.6rem;color:#999;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px">Estimated monthly savings</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;color:var(--success)">$2,000</div>
-<div style="font-size:.75rem;color:#666;margin-top:4px">StockFlows Starter plan costs $19/mo</div>
-</div>
-</div>
-</div>
-<div>
-<div style="font-size:.6rem;color:#999;text-transform:uppercase;letter-spacing:1.5px;font-weight:600;margin-bottom:16px">How the math works</div>
-<div style="font-size:.85rem;color:#666;line-height:1.8">
-<p style="margin-bottom:12px"><strong>1. Prevented stockouts.</strong> Each prevented stockout saves you the cost of lost sales. Most merchants underestimate how often they stock out.</p>
-<p style="margin-bottom:12px"><strong>2. Faster receiving.</strong> Barcode scanning can reduce receiving time significantly. At a typical warehouse rate, faster PO receiving saves labor costs per shipment.</p>
-<p style="margin-bottom:12px"><strong>3. Less overstock.</strong> Statistical forecasting helps you order the right amount, potentially reducing excess inventory over time.</p>
-<p><strong>4. Time saved.</strong> Automated alerts, forecasting, and PO generation reduce the time spent on manual inventory management.</p>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Pricing -->
-<div class="tour-section" id="tour-pricing" style="background:#fafafa;padding:80px 24px;border-top:1px solid #e0e0e0;color:#111">
-<div style="max-width:960px;margin:0 auto">
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600;margin-bottom:8px">Pricing</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin-bottom:40px">Simple, transparent pricing.</div>
-<div class="pricing-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0;border:1px solid var(--border)">
-<div style="padding:28px;border-right:1px solid var(--border)">
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600">Free</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin:8px 0">$0</div>
-<div style="font-size:.75rem;color:var(--text-dim);margin-bottom:20px">forever</div>
-<div style="font-size:.8rem;color:var(--text-dim);line-height:1.7">50 SKUs, 1 location, basic alerts, CSV export. No credit card required.</div>
-<div style="margin-top:24px"><a href="explore.html" class="btn" style="width:100%;font-size:.7rem;padding:10px;text-decoration:none">Try Free</a></div>
-</div>
-<div style="padding:28px;border-right:1px solid var(--border)">
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600">Starter</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin:8px 0">$19<span style="font-size:1rem;font-style:normal;color:var(--text-dim)">/mo</span></div>
-<div style="font-size:.75rem;color:var(--text-dim);margin-bottom:20px">14-day free trial</div>
-<div style="font-size:.8rem;color:var(--text-dim);line-height:1.7">500 SKUs, 3 locations, demand forecasting, Slack alerts, PDF reports, barcode scanning.</div>
-</div>
-<div style="padding:28px;border-right:1px solid var(--border)">
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600">Pro</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin:8px 0">$49<span style="font-size:1rem;font-style:normal;color:var(--text-dim)">/mo</span></div>
-<div style="font-size:.75rem;color:var(--text-dim);margin-bottom:20px">14-day free trial</div>
-<div style="font-size:.8rem;color:var(--text-dim);line-height:1.7">5,000 SKUs, 10 locations, landed costs, SMS alerts, cycle counts, vendor management, CSV/Google Sheets export.</div>
-</div>
-<div style="padding:28px">
-<div style="font-size:.55rem;color:var(--text-dimmer);text-transform:uppercase;letter-spacing:2px;font-weight:600">Enterprise</div>
-<div style="font-family:var(--serif);font-size:2.5rem;font-style:italic;margin:8px 0">$149<span style="font-size:1rem;font-style:normal;color:var(--text-dim)">/mo</span></div>
-<div style="font-size:.75rem;color:var(--text-dim);margin-bottom:20px">14-day free trial</div>
-<div style="font-size:.8rem;color:var(--text-dim);line-height:1.7">Unlimited SKUs and locations, priority support, API access, custom integrations.</div>
-</div>
-</div>
-</div>
-</div>
-
-<!-- Footer -->
-<div style="background:#111;color:#fff;padding:40px 24px;text-align:center;border-top:1px solid #333">
-<div style="margin-bottom:16px"><img src="glyph-black.png" alt="Shopify" width="24" height="28" style="object-fit:contain;filter:grayscale(1);opacity:.6"></div>
-<div style="font-size:.65rem;color:#555;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">StockFlows / Inventory Management for Shopify</div>
-<div style="font-size:.6rem;color:#444;margin-bottom:8px">Always working, even when you are not</div>
-<div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px"><img src="glyph-black.png" alt="Shopify" width="12" height="14" style="object-fit:contain;filter:grayscale(1)"> <span style="font-size:.6rem;color:#555">Built with Shopify APIs</span></div>
-<div><a href="demo.html" style="font-size:.65rem;color:#555;text-decoration:none">Demo Video</a> &nbsp;·&nbsp; <a href="privacy.html" style="font-size:.65rem;color:#555;text-decoration:none">Privacy Policy</a></div>
-</div>
+<!-- Modal -->
+<div class="modal-overlay" id="modal"><div class="modal" id="modal-content"></div></div>
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+<!-- Tour Overlay -->
+<div class="tour-overlay" id="tour-overlay"></div>
+<div class="tour-tooltip" id="tour-tooltip" style="display:none"></div>
+<div class="tour-progress" id="tour-progress"></div>
 <script>
 // ══════════════════════════════════════════════════════
 //  DATA
@@ -349,7 +87,7 @@ function fmtM(n){return '$'+n.toFixed(2)}
 //  NAVIGATION
 // ══════════════════════════════════════════════════════
 let currentPage='dashboard';
-function enterApp(){document.getElementById('landing').classList.add('hidden');document.getElementById('app').classList.add('active');go('dashboard')}
+function enterApp(){go('dashboard')}
 function go(page){currentPage=page;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');document.querySelectorAll('.sidebar nav a').forEach(a=>{a.classList.toggle('active',a.dataset.page===page)});render()}
 function render(){const fn={dashboard:renderDashboard,inventory:renderInventory,purchasing:renderPurchasing,forecasting:renderForecasting,reports:renderReports,settings:renderSettings};if(fn[currentPage])fn[currentPage]();requestAnimationFrame(()=>{document.querySelectorAll('.bar-fill').forEach(el=>{el.style.width=el.dataset.width+'%'})})}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
@@ -952,144 +690,61 @@ document.getElementById('page-settings').innerHTML=`
 <button class="btn-sm btn-danger" onclick="if(confirm('Reset all data?')){PRODUCTS.forEach(p=>{const orig=PRODUCTS.find(x=>x.id===p.id);if(orig){/* would reset */}});toast('Data reset to defaults');render()}">Reset Demo Data</button></div>`;
 }
 // ══════════════════════════════════════════════════════
-//  GUIDED TOUR - scrolls through landing page sections
+//  IN-APP GUIDED TOUR - walks through each app page
 // ══════════════════════════════════════════════════════
-let tourStep=0;
-const tourSteps=[
-{id:'tour-features',title:'Features',text:'Six core capabilities: multi-location tracking, demand forecasting, smart purchase orders, automated alerts, one-click reports, and zero-maintenance operation.'},
-{id:'tour-screenshots',title:'Screenshots',text:'See every screen in the app. Tabs auto-advance every 6 seconds, or click to jump between Dashboard, Inventory, Forecasting, Purchasing, and Reports.'},
-{id:'tour-how-it-works',title:'How It Works',text:'Three steps to zero stockouts: install and import your data, set reorder thresholds, and let StockFlows handle the rest with nightly forecasts and auto alerts.'},
-{id:'tour-alerts',title:'Instant Alerts',text:'StockFlows monitors your inventory 24/7. When stock drops below your reorder point, you get an email with the product name, current stock, reorder point, and a one-click button to create a purchase order.'},
-{id:'tour-compare',title:'Why Switch from Stocky',text:'Stocky is reportedly being discontinued. StockFlows replaces everything Stocky did and adds working statistical forecasting on top.'},
-{id:'tour-social',title:'Built for Real Workflows',text:'Replaces Stocky with more features, real 30-day statistical forecasting per SKU, and a 5-minute migration from Stocky with a single CSV upload.'},
-{id:'tour-roi',title:'ROI Calculator',text:'Enter your monthly inventory spend and SKU count to see how much you could save. StockFlows pays for itself by preventing just one stockout per month.'},
-{id:'tour-pricing',title:'Simple Pricing',text:'Free for up to 50 SKUs. Starter at $19/mo for 500 SKUs with forecasting. Pro at $49/mo for 5,000 SKUs. Enterprise at $149/mo for unlimited.'},
+let inAppTourStep=0;
+const inAppTourSteps=[
+{page:'dashboard',title:'Dashboard',text:'Your command center. See SKU counts, low stock alerts, and AI-powered insights at a glance. The bar chart shows inventory health across all products.'},
+{page:'inventory',title:'Inventory',text:'Search, filter, and adjust stock for every product. Scan barcodes, transfer between locations, and track stock levels with color-coded status badges.'},
+{page:'purchasing',title:'Purchasing',text:'Create and manage purchase orders. Track expected deliveries, receive items partially, and evaluate vendor reliability scores.'},
+{page:'forecasting',title:'Forecasting',text:'30-day demand predictions per SKU using Exponential Smoothing. Click any product to see its forecast chart and stockout risk.'},
+{page:'reports',title:'Reports',text:'Inventory valuations, stock status breakdowns, and one-click CSV/PDF exports. See your data by location with a donut chart of stock health.'},
+{page:'settings',title:'Settings',text:'Configure stock thresholds, notification channels (email/Slack/SMS), and AI features. Import from Stocky or reset demo data.'},
 ];
-function startTour(){
-// Ensure we are on the landing page, not in the app
-if(document.getElementById('app').classList.contains('active')){
-document.getElementById('app').classList.remove('active');
-document.getElementById('landing').classList.remove('hidden');
+function startInAppTour(){
+  inAppTourStep=0;
+  renderInAppTour();
 }
-tourStep=0;
-// Scroll to top first
-window.scrollTo({top:0,behavior:'smooth'});
-setTimeout(()=>renderTour(),400);
+function renderInAppTour(){
+  if(inAppTourStep>=inAppTourSteps.length){endInAppTour();return}
+  const s=inAppTourSteps[inAppTourStep];
+  // Navigate to the page first
+  go(s.page);
+  setTimeout(()=>{
+    document.getElementById('tour-overlay').classList.add('active');
+    const tooltip=document.getElementById('tour-tooltip');
+    const prog=document.getElementById('tour-progress');
+    tooltip.style.display='block';
+    prog.style.display='flex';
+    tooltip.innerHTML='<h4>'+s.title+'</h4><p>'+s.text+'</p><div class="actions"><span style="font-size:.8rem;color:#666">'+(inAppTourStep+1)+' / '+inAppTourSteps.length+'</span><div style="display:flex;gap:8px"><button class="btn-sm btn-ghost" onclick="endInAppTour()">Skip</button><button class="btn-sm btn-brand" onclick="nextInAppTour()">Next</button></div></div>';
+    prog.innerHTML=inAppTourSteps.map((_,i)=>'<div class="tour-dot '+(i===inAppTourStep?'active':'')+'" onclick="inAppTourStep='+i+';renderInAppTour()"></div>').join('');
+    const tooltipW=Math.min(380,window.innerWidth-32);
+    tooltip.style.width=tooltipW+'px';
+    tooltip.style.transform='none';
+    tooltip.style.top='50%';
+    tooltip.style.left='auto';
+    tooltip.style.right='24px';
+    tooltip.style.transform='translateY(-50%)';
+  },200);
 }
-function renderTour(){
-if(tourStep>=tourSteps.length){endTour();return}
-const s=tourSteps[tourStep];
-document.querySelectorAll('.tour-highlight').forEach(el=>el.classList.remove('tour-highlight'));
-const target=document.getElementById(s.id);
-if(!target){tourStep++;renderTour();return}
-target.classList.add('tour-highlight');
-target.scrollIntoView({block:'center',behavior:'smooth'});
-setTimeout(()=>{
-document.getElementById('tour-overlay').classList.add('active');
-const tooltip=document.getElementById('tour-tooltip');
-const prog=document.getElementById('tour-progress');
-tooltip.style.display='block';
-prog.style.display='flex';
-tooltip.innerHTML='<h4>'+s.title+'</h4><p>'+s.text+'</p><div class="actions"><span style="font-size:.8rem;color:#666">'+(tourStep+1)+' / '+tourSteps.length+'</span><div style="display:flex;gap:8px"><button class="btn-sm btn-ghost" onclick="endTour()">Skip</button><button class="btn-sm btn-brand" onclick="nextTour()">Next</button></div></div>';
-prog.innerHTML=tourSteps.map((_,i)=>'<div class="tour-dot '+(i===tourStep?'active':'')+'" onclick="tourStep='+i+';renderTour()"></div>').join('');
-const tooltipW=Math.min(380,window.innerWidth-32);
-tooltip.style.width=tooltipW+'px';
-tooltip.style.transform='none';
-tooltip.style.top='50%';
-tooltip.style.left='auto';
-tooltip.style.right='24px';
-tooltip.style.transform='translateY(-50%)';
-},500);
-}
-
-function nextTour(){tourStep++;renderTour()}
-function endTour(){
-document.getElementById('tour-overlay').classList.remove('active');
-document.getElementById('tour-tooltip').style.display='none';
-document.getElementById('tour-progress').style.display='none';
-document.querySelectorAll('.tour-highlight').forEach(el=>el.classList.remove('tour-highlight'));
-toast('Tour complete! Click Explore to launch the interactive demo app.');
+function nextInAppTour(){inAppTourStep++;renderInAppTour()}
+function endInAppTour(){
+  document.getElementById('tour-overlay').classList.remove('active');
+  document.getElementById('tour-tooltip').style.display='none';
+  document.getElementById('tour-progress').style.display='none';
+  toast('Explore complete! Try clicking around the app.');
 }
 // ══════════════════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════════════════
 poItemCount=POS[0]?.items.length||0;
-// Countdown timer - Stocky discontinuation date: August 1, 2026
-function updateCountdown(){
-const target=new Date('2026-08-01T00:00:00');
-const now=new Date();
-const diff=target-now;
-if(diff<=0){
-document.getElementById('cd-days').textContent='0';
-document.getElementById('cd-hours').textContent='0';
-document.getElementById('cd-mins').textContent='0';
-return;
+// Initialize the app
+enterApp();
+// Check if ?tour=true is in the URL to auto-start the tour
+const urlParams=new URLSearchParams(window.location.search);
+if(urlParams.get('tour')==='true'){
+  setTimeout(()=>startInAppTour(),600);
 }
-const days=Math.floor(diff/(1000*60*60*24));
-const hours=Math.floor((diff%(1000*60*60*24))/(1000*60*60));
-const mins=Math.floor((diff%(1000*60*60))/(1000*60));
-document.getElementById('cd-days').textContent=days;
-document.getElementById('cd-hours').textContent=hours;
-document.getElementById('cd-mins').textContent=mins;
-}
-updateCountdown();
-setInterval(updateCountdown,60000);
-function updateROI(){
-const spend=parseInt(document.getElementById('calc-spend')?.value)||0;
-const skus=parseInt(document.getElementById('calc-skus')?.value)||0;
-const costPerOut=parseInt(document.getElementById('calc-cost')?.value)||0;
-const outsPerMonth=parseInt(document.getElementById('calc-outs')?.value)||0;
-const savings=costPerOut*outsPerMonth;
-const monthlyPlan=skus<=50?0:skus<=500?19:skus<=5000?49:149;
-const roi=savings>0?Math.round((savings-monthlyPlan)/monthlyPlan*100):0;
-const el=document.getElementById('roi-result');
-if(el){
-el.innerHTML=`<div style="font-size:.6rem;color:#999;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px">Estimated monthly savings</div>
-<div style="font-family:Georgia,serif;font-size:2.5rem;font-style:italic;color:${savings>monthlyPlan?'#16a34a':'#666'}">${fmtM(savings)}</div>
-<div style="font-size:.75rem;color:#666;margin-top:4px">StockFlows ${skus<=50?'Free':skus<=500?'Starter ($19/mo)':skus<=5000?'Pro ($49/mo)':'Enterprise ($149/mo)'} plan</div>
-${roi>0?`<div style="margin-top:8px"><span class="badge badge-success">${roi}% ROI</span></div>`:''}
-${savings>0?`<div style="font-size:.75rem;color:#666;margin-top:8px">Pays for itself after preventing just <strong>${savings>monthlyPlan?Math.ceil(monthlyPlan/costPerOut)||'one':'one'}</strong> stockout${monthlyPlan>0?' per month':''}</div>`:''}`;
-}}
-updateROI();
-
-// ══════════════════════════════════════════════════════
-//  SCREENSHOT AUTOPLAY TABS (Webflow-style)
-// ══════════════════════════════════════════════════════
-const ssTabs=document.getElementById('ss-tabs');
-let ssIdx=0,ssTimer=null;
-function ssGoTo(i){
-  if(!ssTabs)return;
-  const items=ssTabs.querySelectorAll('.ss-tab-item');
-  const imgs=ssTabs.querySelectorAll('.ss-tab-stage img');
-  if(!items[i]||!imgs[i])return;
-  items.forEach((el,j)=>el.classList.toggle('active',j===i));
-  imgs.forEach((el,j)=>el.classList.toggle('active',j===i));
-  ssIdx=i;
-}
-function ssNext(){ssGoTo((ssIdx+1)%5)}
-function ssAutoplay(){
-  clearInterval(ssTimer);
-  ssTimer=setInterval(ssNext,6000);
-}
-if(ssTabs){
-  ssTabs.querySelectorAll('.ss-tab-item').forEach((el,i)=>{
-    el.addEventListener('click',()=>{ssGoTo(i);ssAutoplay()});
-  });
-  ssAutoplay();
-}
-
-// ══════════════════════════════════════════════════════
-//  SCROLL FADE-IN ANIMATION
-// ══════════════════════════════════════════════════════
-function initFadeIn(){
-  const els=document.querySelectorAll('.fade-in');
-  if(!els.length)return;
-  const observer=new IntersectionObserver((entries)=>{
-    entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target)}});
-  },{threshold:0.15,rootMargin:'0px 0px -40px 0px'});
-  els.forEach(el=>observer.observe(el));
-}
-initFadeIn();
 </script>
 </body>
 </html>
