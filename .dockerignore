@@ -1,0 +1,11 @@
+node_modules
+build
+dist
+.git
+.env*
+test-results
+playwright-report
+screenshots
+*.log
+.DS_Store
+.hermes

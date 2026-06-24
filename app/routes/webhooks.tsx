@@ -14,8 +14,20 @@
 import type { ActionFunctionArgs } from "@remix-run/node";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
-import { inventorySyncQueue, alertQueue } from "~/lib/jobs/queue.server";
 import { logger } from "~/lib/logger";
+
+// Lazy queue imports — avoid connecting to Redis at module load time
+// (the Queue/Worker constructors connect eagerly).
+async function getInventorySyncQueue() {
+  if (!process.env.REDIS_HOST && !process.env.REDIS_URL) return null;
+  const { inventorySyncQueue } = await import("~/lib/jobs/queue.server");
+  return inventorySyncQueue;
+}
+async function getAlertQueue() {
+  if (!process.env.REDIS_HOST && !process.env.REDIS_URL) return null;
+  const { alertQueue } = await import("~/lib/jobs/queue.server");
+  return alertQueue;
+}
 
 interface WebhookLogger {
   info: (msgOrObj: string | object, msg?: string) => void;
@@ -68,7 +80,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 // --- Inventory levels ---
 
 const inventoryLevelsUpdateHandler: WebhookHandler = async (shop, payload, log) => {
-  await inventorySyncQueue.add(
+  await (await getInventorySyncQueue())?.add(
     "webhook-inventory-update",
     {
       shopDomain: shop,
@@ -94,7 +106,7 @@ const passThroughHandler: WebhookHandler = async () => {
 // --- Inventory items ---
 
 const inventoryItemsCreateHandler: WebhookHandler = async (shop, payload, log) => {
-  await inventorySyncQueue.add(
+  await (await getInventorySyncQueue())?.add(
     "webhook-inventory-item-create",
     {
       shopDomain: shop,
@@ -114,7 +126,7 @@ const inventoryItemsCreateHandler: WebhookHandler = async (shop, payload, log) =
 };
 
 const inventoryItemsUpdateHandler: WebhookHandler = async (shop, payload, log) => {
-  await inventorySyncQueue.add(
+  await (await getInventorySyncQueue())?.add(
     "webhook-inventory-item-update",
     {
       shopDomain: shop,
@@ -136,7 +148,7 @@ const inventoryItemsUpdateHandler: WebhookHandler = async (shop, payload, log) =
 // --- Variants ---
 
 const variantsOutOfStockHandler: WebhookHandler = async (shop, payload, log) => {
-  await alertQueue.add(
+  await (await getAlertQueue())?.add(
     "variant-out-of-stock",
     {
       shopDomain: shop,

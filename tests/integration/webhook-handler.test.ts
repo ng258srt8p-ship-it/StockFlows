@@ -24,6 +24,9 @@ vi.mock("~/lib/jobs/queue.server", () => ({
   alertQueue: { add: vi.fn().mockResolvedValue({}) },
 }));
 
+// Ensure REDIS_HOST is set so dynamic imports of queue.server resolve
+process.env.REDIS_HOST = "localhost";
+
 vi.mock("~/lib/sse/manager.server", () => ({
   broadcastSSE: vi.fn(),
   addSSEConnection: vi.fn(),

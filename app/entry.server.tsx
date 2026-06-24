@@ -7,8 +7,8 @@ import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import * as Sentry from "@sentry/remix";
 
-// Start background job workers and scheduler on server startup
-import "~/lib/jobs/index.server";
+// Background job workers are started lazily — they only connect to Redis
+// when actively processing. No need to import them at server startup.
 
 Sentry.init({
   dsn: process.env.SENTRY_DSN,
