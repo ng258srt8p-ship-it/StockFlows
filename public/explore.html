@@ -653,7 +653,16 @@ ${PRODUCTS.filter(p=>p.loc==='L1').map(p=>`<tr style="border-bottom:1px solid #e
 // ══════════════════════════════════════════════════════
 //  SETTINGS
 // ══════════════════════════════════════════════════════
+function pillToggle(name,label,icon,checked,onchange){
+const cls=checked?'on':'';
+return `<div class="pill-toggle"><label class="${cls}" for="pill-${name}" onclick="this.classList.toggle('on');document.getElementById('pill-${name}').checked=this.classList.contains('on');${onchange}"><span class="material-symbols-outlined pill-icon">${icon}</span><span>${label}</span><span class="pill-badge">${checked?'ON':'OFF'}</span></label><input type="checkbox" id="pill-${name}" name="${name}" ${checked?'checked':''}></div>`;
+}
 function renderSettings(){
+const emailOn=SETTINGS.emailAlerts!==false;
+const slackOn=!!SETTINGS.slackEnabled;
+const smsOn=!!SETTINGS.smsEnabled;
+const aiOn=!!SETTINGS.aiInsights;
+const fxOn=!!SETTINGS.forecastExplanations;
 document.getElementById('page-settings').innerHTML=`
 <h2>Settings</h2><p style="color:var(--text-dim);margin-bottom:16px">Configure StockFlows for your store</p>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
@@ -662,13 +671,15 @@ document.getElementById('page-settings').innerHTML=`
 <div class="form-group"><label>Critical Stock Threshold</label><input type="number" value="${SETTINGS.criticalThreshold}" onchange="SETTINGS.criticalThreshold=parseInt(this.value);toast('Setting saved')"></div>
 <div class="form-group"><label>Forecast Horizon (days)</label><input type="number" value="${SETTINGS.forecastHorizon}" onchange="SETTINGS.forecastHorizon=parseInt(this.value);toast('Setting saved')"></div></div>
 <div class="card"><h3 style="margin-bottom:16px">Notifications</h3>
-<div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" ${SETTINGS.emailAlerts?'checked':''} onchange="SETTINGS.emailAlerts=this.checked;toast(this.checked?'Email alerts enabled':'Email alerts disabled')"> Email Alerts</label><p style="color:var(--text-dim);font-size:.8rem;margin-left:24px;line-height:1.5">Sends low stock alerts via <strong>Resend</strong> (resend.com). Requires a Resend API key set as RESEND_API_KEY in your app environment. Free tier: 100 emails/day.</p></div>
-<div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" ${SETTINGS.slackEnabled?'checked':''} onchange="SETTINGS.slackEnabled=this.checked;toast(this.checked?'Slack alerts enabled':'Slack alerts disabled')"> Slack Webhooks</label><p style="color:var(--text-dim);font-size:.8rem;margin-left:24px;line-height:1.5">Real-time alerts in your Slack channel. Requires a webhook URL from <strong>Slack</strong> (slack.com) set as SLACK_WEBHOOK_URL in your app environment. Create one at Settings > Apps > Incoming Webhooks.</p></div>
-<div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" ${SETTINGS.smsEnabled?'checked':''} onchange="SETTINGS.smsEnabled=this.checked;toast(this.checked?'SMS alerts enabled':'SMS alerts disabled')"> SMS Alerts</label><p style="color:var(--text-dim);font-size:.8rem;margin-left:24px;line-height:1.5">Critical stockout alerts via <strong>Twilio</strong> (twilio.com). Requires TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, and TWILIO_PHONE_NUMBER in your app environment. Free trial available.</p></div>
+${pillToggle('emailAlerts','Email Alerts','mail',emailOn,"SETTINGS.emailAlerts=document.getElementById('pill-emailAlerts').checked;toast(SETTINGS.emailAlerts?'Email alerts enabled':'Email alerts disabled')")}
+${pillToggle('slackEnabled','Slack Alerts','chat',slackOn,"SETTINGS.slackEnabled=document.getElementById('pill-slackEnabled').checked;toast(SETTINGS.slackEnabled?'Slack alerts enabled':'Slack alerts disabled')")}
+${pillToggle('smsEnabled','SMS Alerts','smartphone',smsOn,"SETTINGS.smsEnabled=document.getElementById('pill-smsEnabled').checked;toast(SETTINGS.smsEnabled?'SMS alerts enabled':'SMS alerts disabled')")}
 </div></div>
 <div class="card"><h3 style="margin-bottom:16px">AI Features</h3>
-<div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" ${SETTINGS.aiInsights?'checked':''} onchange="SETTINGS.aiInsights=this.checked;toast(this.checked?'AI insights enabled':'AI insights disabled')"> Enable AI Insights</label><p style="color:var(--text-dim);font-size:.8rem;margin-left:24px;line-height:1.5">Uses the <strong>OpenCode API</strong> with the Big Pickle model to analyze your inventory data and generate insights. Requires an OpenCode API key set as OPENCODE_API_KEY in your app environment. Your inventory levels, forecasts, and alerts are sent to an external AI service for analysis. Statistical forecasting (the core demand engine) still works when AI is disabled.</p></div>
-<div class="form-group"><label style="display:flex;align-items:center;gap:8px;cursor:pointer"><input type="checkbox" ${SETTINGS.forecastExplanations?'checked':''} onchange="SETTINGS.forecastExplanations=this.checked;toast(this.checked?'Forecast explanations enabled':'Forecast explanations disabled')"> Enable Forecast Explanations</label><p style="color:var(--text-dim);font-size:.8rem;margin-left:24px;line-height:1.5">Shows AI-generated natural language explanations of forecast data when you view a product's forecast. These explanations help you understand what the numbers mean.</p></div>
+${pillToggle('aiInsights','Enable AI Insights','auto_awesome',aiOn,"SETTINGS.aiInsights=document.getElementById('pill-aiInsights').checked;toast(SETTINGS.aiInsights?'AI insights enabled':'AI insights disabled')")}
+<p class="pill-section-desc">Uses the <strong>OpenCode API</strong> with the Big Pickle model to analyze your inventory data and generate insights. Requires an OpenCode API key set as OPENCODE_API_KEY in your app environment. Your inventory levels, forecasts, and alerts are sent to an external AI service for analysis. Statistical forecasting (the core demand engine) still works when AI is disabled.</p>
+${pillToggle('forecastExplanations','Enable Forecast Explanations','auto_stories',fxOn,"SETTINGS.forecastExplanations=document.getElementById('pill-forecastExplanations').checked;toast(SETTINGS.forecastExplanations?'Forecast explanations enabled':'Forecast explanations disabled')")}
+<p class="pill-section-desc">Shows AI-generated natural language explanations of forecast data when you view a product's forecast. These explanations help you understand what the numbers mean.</p>
 </div>
 <div class="card"><h3 style="margin-bottom:16px">Store Information</h3>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
