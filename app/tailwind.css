@@ -112,7 +112,8 @@
   transition: transform 0.25s ease;
   pointer-events: none;
 }
-.ios-toggle input:checked ~ .ios-toggle-thumb {
+.ios-toggle input:checked ~ .ios-toggle-thumb,
+.ios-toggle input:checked + .ios-toggle-track + .ios-toggle-thumb {
   transform: translateX(20px);
 }
 .ios-row-sublabel {

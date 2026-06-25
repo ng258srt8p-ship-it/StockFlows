@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StockFlows - Explore the App</title>
+<link rel="icon" type="image/png" href="/favicon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
@@ -88,7 +89,7 @@ function fmtM(n){return '$'+n.toFixed(2)}
 // ══════════════════════════════════════════════════════
 let currentPage='dashboard';
 function enterApp(){go('dashboard')}
-function go(page){currentPage=page;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');document.querySelectorAll('.sidebar nav a').forEach(a=>{a.classList.toggle('active',a.dataset.page===page)});render()}
+function go(page){currentPage=page;document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));document.getElementById('page-'+page).classList.add('active');document.querySelectorAll('.sidebar nav a').forEach(a=>{a.classList.toggle('active',a.dataset.page===page)});document.body.classList.toggle('page-settings-active',page==='settings');render()}
 function render(){const fn={dashboard:renderDashboard,inventory:renderInventory,purchasing:renderPurchasing,forecasting:renderForecasting,reports:renderReports,settings:renderSettings};if(fn[currentPage])fn[currentPage]();requestAnimationFrame(()=>{document.querySelectorAll('.bar-fill').forEach(el=>{el.style.width=el.dataset.width+'%'})})}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500)}
 function openModal(html){document.getElementById('modal-content').innerHTML=html;document.getElementById('modal').classList.add('active')}
