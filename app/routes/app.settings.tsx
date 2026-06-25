@@ -4,17 +4,8 @@ import { useLoaderData, Form, useNavigation, useActionData } from "@remix-run/re
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
 import { requirePermission } from "~/lib/auth/middleware";
-import {
-  Page,
-  Layout,
-  TextField,
-  Select,
-  Button,
-  Banner,
-  Text,
-} from "@shopify/polaris";
 import { useState } from "react";
-import { PillToggle } from "~/components/ui/PillToggle";
+import { IosToggle } from "~/components/ui/PillToggle";
 
 // ---------------------------------------------------------------------------
 // Server
@@ -65,31 +56,76 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 // ---------------------------------------------------------------------------
-// Section card — consistent card wrapper
+// iOS Settings helpers
 // ---------------------------------------------------------------------------
 
-function Section({
-  title,
-  icon,
-  children,
+function SectionHeader({ children }: { children: React.ReactNode }) {
+  return <p className="ios-section-header">{children}</p>;
+}
+
+function SectionGroup({ children }: { children: React.ReactNode }) {
+  return <div className="ios-section">{children}</div>;
+}
+
+function NumberRow({
+  name,
+  label,
+  value,
+  onChange,
+  suffix,
 }: {
-  title: string;
-  icon?: string;
-  children: React.ReactNode;
+  name: string;
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+  suffix?: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-      <div className="px-5 py-3.5 border-b border-gray-100 flex items-center gap-2.5">
-        {icon && (
-          <span className="material-symbols-outlined text-gray-400" style={{ fontSize: 20 }}>
-            {icon}
-          </span>
-        )}
-        <Text variant="headingSm" as="h3">
-          {title}
-        </Text>
+    <div className="ios-row">
+      <span className="ios-row-label">{label}</span>
+      <div className="flex items-center gap-2">
+        <input
+          name={name}
+          type="number"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-16 text-right bg-transparent border-none outline-none text-[0.9375rem] text-black font-normal"
+        />
+        {suffix && <span className="ios-row-value text-sm">{suffix}</span>}
+        <span className="ios-chevron" />
       </div>
-      <div className="px-5 py-4 space-y-4">{children}</div>
+    </div>
+  );
+}
+
+function SelectRow({
+  name,
+  label,
+  value,
+  options,
+}: {
+  name: string;
+  label: string;
+  value: string;
+  options: { label: string; value: string }[];
+}) {
+  return (
+    <div className="ios-row">
+      <span className="ios-row-label">{label}</span>
+      <div className="flex items-center gap-2">
+        <select
+          name={name}
+          defaultValue={value}
+          className="bg-transparent border-none outline-none text-[0.9375rem] text-[#6d6d72] appearance-none cursor-pointer"
+        >
+          {options.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
+        <span className="ios-chevron" />
+      </div>
     </div>
   );
 }
@@ -114,7 +150,6 @@ export default function Settings() {
       : ""
   );
 
-  // Pill toggle states — controlled, so config fields expand/collapse
   const [emailOn, setEmailOn] = useState(settings?.emailAlerts ?? true);
   const [slackOn, setSlackOn] = useState(!!settings?.slackWebhookUrl);
   const [smsOn, setSmsOn] = useState(Array.isArray(settings?.smsPhoneNumbers) && (settings.smsPhoneNumbers as string[]).length > 0);
@@ -122,195 +157,176 @@ export default function Settings() {
   const [forecastExplOn, setForecastExplOn] = useState(settings?.enableForecastExplanations ?? false);
 
   return (
-    <Page title="Settings">
-      <Layout>
-        <Layout.Section>
-          {actionData?.success && (
-            <div className="mb-4">
-              <Banner tone="success">
-                <p>Settings saved successfully.</p>
-              </Banner>
-            </div>
-          )}
+    <div className="ios-settings">
+      <h1 className="text-[2rem] font-bold text-black -mt-4 mb-2 pl-4">Settings</h1>
 
-          <Form method="post">
-            <div className="space-y-4 max-w-2xl">
-              {/* ── Notifications ─────────────────────────────── */}
-              <Section title="Notifications" icon="notifications">
-                <div className="space-y-4">
-                  {/* Email — simple toggle, no config */}
-                  <PillToggle
-                    name="emailAlerts"
-                    label="Email Alerts"
-                    icon="mail"
-                    value={emailOn}
-                    onChange={setEmailOn}
-                  />
+      {actionData?.success && (
+        <div className="ios-section mb-4 mx-5">
+          <div className="px-4 py-3 text-sm text-[#008060] font-medium">
+            Settings saved successfully.
+          </div>
+        </div>
+      )}
 
-                  {/* Slack — toggle + expandable webhook config */}
-                  <div>
-                    <PillToggle
-                      name="slackEnabled"
-                      label="Slack Alerts"
-                      icon="chat"
-                      value={slackOn}
-                      onChange={setSlackOn}
-                    />
-                    <div
-                      className="grid transition-all duration-300 ease-in-out"
-                      style={{ gridTemplateRows: slackOn ? "1fr" : "0fr" }}
-                    >
-                      <div className="overflow-hidden">
-                        <div className="pt-3 pl-10 pr-2">
-                          <TextField
-                            name="slackWebhookUrl"
-                            label="Slack Webhook URL"
-                            value={slackUrl}
-                            onChange={(val) => setSlackUrl(val)}
-                            autoComplete="off"
-                            placeholder="https://hooks.slack.com/services/..."
-                            helpText="Create one at Settings > Apps > Incoming Webhooks"
-                            disabled={!slackOn}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* SMS — toggle + expandable phone config */}
-                  <div>
-                    <PillToggle
-                      name="smsEnabled"
-                      label="SMS Alerts"
-                      icon="smartphone"
-                      value={smsOn}
-                      onChange={setSmsOn}
-                    />
-                    <div
-                      className="grid transition-all duration-300 ease-in-out"
-                      style={{ gridTemplateRows: smsOn ? "1fr" : "0fr" }}
-                    >
-                      <div className="overflow-hidden">
-                        <div className="pt-3 pl-10 pr-2">
-                          <TextField
-                            name="smsPhoneNumbers"
-                            label="SMS Alert Phone Numbers"
-                            value={smsPhones}
-                            onChange={(val) => setSmsPhones(val)}
-                            autoComplete="off"
-                            placeholder="+15551234567, +15559876543"
-                            helpText="Comma-separated list of phone numbers for critical stock alerts"
-                            disabled={!smsOn}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </Section>
-
-              {/* ── Alert Thresholds ──────────────────────────── */}
-              <Section title="Alert Thresholds" icon="warning">
-                <div className="grid grid-cols-2 gap-4">
-                  <TextField
-                    name="lowStockThreshold"
-                    label="Low stock"
-                    type="number"
-                    value={lowStock}
-                    onChange={(val) => setLowStock(val)}
-                    autoComplete="off"
-                    helpText="Trigger warning when stock drops below"
-                  />
-                  <TextField
-                    name="criticalStockThreshold"
-                    label="Critical stock"
-                    type="number"
-                    value={criticalStock}
-                    onChange={(val) => setCriticalStock(val)}
-                    autoComplete="off"
-                    helpText="Trigger critical alert below this level"
-                  />
-                </div>
-              </Section>
-
-              {/* ── Forecasting ───────────────────────────────── */}
-              <Section title="Forecasting" icon="query_stats">
-                <TextField
-                  name="forecastHorizonDays"
-                  label="Forecast horizon"
-                  type="number"
-                  value={forecastHorizon}
-                  onChange={(val) => setForecastHorizon(val)}
-                  autoComplete="off"
-                  helpText="Number of days to predict demand ahead"
+      <Form method="post">
+        {/* ── Notifications ─────────────────────────────── */}
+        <SectionHeader>Notifications</SectionHeader>
+        <SectionGroup>
+          <IosToggle
+            name="emailAlerts"
+            label="Email Alerts"
+            icon="mail"
+            iconBg="#008060"
+            value={emailOn}
+            onChange={setEmailOn}
+          />
+          <IosToggle
+            name="slackEnabled"
+            label="Slack Alerts"
+            icon="chat"
+            iconBg="#36a64f"
+            value={slackOn}
+            onChange={setSlackOn}
+          />
+          <div
+            className="ios-expand"
+            style={{ gridTemplateRows: slackOn ? "1fr" : "0fr" }}
+          >
+            <div className="ios-expand-inner">
+              <div className="ios-expand-input">
+                <input
+                  name="slackWebhookUrl"
+                  type="url"
+                  value={slackUrl}
+                  onChange={(e) => setSlackUrl(e.target.value)}
+                  placeholder="https://hooks.slack.com/services/..."
+                  disabled={!slackOn}
+                  className="w-full px-3 py-2 rounded-lg bg-[#f2f2f7] border border-[#e5e5ea] text-sm outline-none focus:border-[#008060] disabled:opacity-40"
                 />
-              </Section>
-
-              {/* ── AI Features ───────────────────────────────── */}
-              <Section title="AI Features" icon="psychology">
-                <div className="space-y-4">
-                  {/* AI Insights — toggle + always-visible description */}
-                  <div>
-                    <PillToggle
-                      name="enableAiInsights"
-                      label="Enable AI Insights"
-                      icon="auto_awesome"
-                      value={aiInsightsOn}
-                      onChange={setAiInsightsOn}
-                    />
-                    <p className="text-xs text-gray-500 pl-10 pt-2 leading-relaxed">
-                      Uses the OpenCode API with the Big Pickle model to analyze your inventory
-                      data and generate insights. Requires an OpenCode API key set as
-                      OPENCODE_API_KEY in your app environment. Your inventory levels, forecasts,
-                      and alerts are sent to an external AI service for analysis. Statistical
-                      forecasting (the core demand engine) still works when AI is disabled.
-                    </p>
-                  </div>
-
-                  {/* Forecast Explanations — toggle + always-visible description */}
-                  <div>
-                    <PillToggle
-                      name="enableForecastExplanations"
-                      label="Enable Forecast Explanations"
-                      icon="auto_stories"
-                      value={forecastExplOn}
-                      onChange={setForecastExplOn}
-                    />
-                    <p className="text-xs text-gray-500 pl-10 pt-2 leading-relaxed">
-                      Shows AI-generated natural language explanations of forecast data when you
-                      view a product's forecast. These explanations help you understand what
-                      the numbers mean.
-                    </p>
-                  </div>
-                </div>
-              </Section>
-
-              {/* ── General ────────────────────────────────────── */}
-              <Section title="General" icon="tune">
-                <Select
-                  name="currency"
-                  label="Currency"
-                  options={[
-                    { label: "USD ($)", value: "USD" },
-                    { label: "EUR (€)", value: "EUR" },
-                    { label: "GBP (£)", value: "GBP" },
-                    { label: "CAD (C$)", value: "CAD" },
-                    { label: "AUD (A$)", value: "AUD" },
-                  ]}
-                  value={settings?.currency || "USD"}
-                />
-              </Section>
-
-              {/* ── Save ──────────────────────────────────────── */}
-              <div className="flex justify-end pt-2 pb-8">
-                <Button submit primary loading={isSubmitting}>
-                  Save Settings
-                </Button>
+                <p className="text-xs text-[#6d6d72] mt-1 ml-1">
+                  Create one at Settings &gt; Apps &gt; Incoming Webhooks
+                </p>
               </div>
             </div>
-          </Form>
-        </Layout.Section>
-      </Layout>
-    </Page>
+          </div>
+          <IosToggle
+            name="smsEnabled"
+            label="SMS Alerts"
+            icon="smartphone"
+            iconBg="#af52de"
+            value={smsOn}
+            onChange={setSmsOn}
+          />
+          <div
+            className="ios-expand"
+            style={{ gridTemplateRows: smsOn ? "1fr" : "0fr" }}
+          >
+            <div className="ios-expand-inner">
+              <div className="ios-expand-input">
+                <input
+                  name="smsPhoneNumbers"
+                  type="text"
+                  value={smsPhones}
+                  onChange={(e) => setSmsPhones(e.target.value)}
+                  placeholder="+15551234567, +15559876543"
+                  disabled={!smsOn}
+                  className="w-full px-3 py-2 rounded-lg bg-[#f2f2f7] border border-[#e5e5ea] text-sm outline-none focus:border-[#008060] disabled:opacity-40"
+                />
+                <p className="text-xs text-[#6d6d72] mt-1 ml-1">
+                  Comma-separated phone numbers for critical stock alerts
+                </p>
+              </div>
+            </div>
+          </div>
+        </SectionGroup>
+
+        {/* ── Alert Thresholds ──────────────────────────── */}
+        <SectionHeader>Alert Thresholds</SectionHeader>
+        <SectionGroup>
+          <NumberRow
+            name="lowStockThreshold"
+            label="Low Stock"
+            value={lowStock}
+            onChange={setLowStock}
+          />
+          <NumberRow
+            name="criticalStockThreshold"
+            label="Critical Stock"
+            value={criticalStock}
+            onChange={setCriticalStock}
+          />
+        </SectionGroup>
+
+        {/* ── Forecasting ───────────────────────────────── */}
+        <SectionHeader>Forecasting</SectionHeader>
+        <SectionGroup>
+          <NumberRow
+            name="forecastHorizonDays"
+            label="Forecast Horizon"
+            value={forecastHorizon}
+            onChange={setForecastHorizon}
+            suffix="days"
+          />
+        </SectionGroup>
+
+        {/* ── AI Features ───────────────────────────────── */}
+        <SectionHeader>AI Features</SectionHeader>
+        <SectionGroup>
+          <IosToggle
+            name="enableAiInsights"
+            label="AI Insights"
+            icon="auto_awesome"
+            iconBg="#ff9500"
+            value={aiInsightsOn}
+            onChange={setAiInsightsOn}
+          />
+          <p className="ios-row-sublabel">
+            Uses OpenCode API to analyze inventory data and generate insights.
+            Statistical forecasting still works when AI is disabled.
+          </p>
+          <IosToggle
+            name="enableForecastExplanations"
+            label="Forecast Explanations"
+            icon="auto_stories"
+            iconBg="#5856d6"
+            value={forecastExplOn}
+            onChange={setForecastExplOn}
+          />
+          <p className="ios-row-sublabel">
+            Shows AI-generated natural language explanations of forecast data.
+          </p>
+        </SectionGroup>
+
+        {/* ── General ────────────────────────────────────── */}
+        <SectionHeader>General</SectionHeader>
+        <SectionGroup>
+          <SelectRow
+            name="currency"
+            label="Currency"
+            value={settings?.currency || "USD"}
+            options={[
+              { label: "USD ($)", value: "USD" },
+              { label: "EUR (€)", value: "EUR" },
+              { label: "GBP (£)", value: "GBP" },
+              { label: "CAD (C$)", value: "CAD" },
+              { label: "AUD (A$)", value: "AUD" },
+            ]}
+          />
+        </SectionGroup>
+
+        {/* ── Save ──────────────────────────────────────── */}
+        <div className="px-5 pt-4 pb-10">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="w-full py-3 rounded-xl bg-[#008060] text-white font-semibold text-base
+              hover:bg-[#006e50] active:scale-[0.98] transition-all duration-150
+              disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {isSubmitting ? "Saving..." : "Save Settings"}
+          </button>
+        </div>
+      </Form>
+    </div>
   );
 }

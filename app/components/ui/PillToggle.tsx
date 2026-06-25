@@ -1,16 +1,15 @@
 import { useState, useId } from "react";
 
 /**
- * PillToggle — a compact, pill-shaped toggle button for on/off settings.
+ * IosToggle — iOS-style toggle row for settings pages.
+ * Renders a full row: colored icon + label + iOS toggle switch.
  * Supports both controlled (value + onChange) and uncontrolled (defaultChecked) modes.
- *
- * Uses the existing theme colors: --color-success (#008060) when ON,
- * Tailwind grays when OFF.
  */
-export function PillToggle({
+export function IosToggle({
   name,
   label,
   icon,
+  iconBg = "#008060",
   value: controlledValue,
   onChange: controlledOnChange,
   defaultChecked = false,
@@ -19,6 +18,7 @@ export function PillToggle({
   name: string;
   label: string;
   icon?: string;
+  iconBg?: string;
   /** Controlled: current on/off state */
   value?: boolean;
   /** Controlled: called with new boolean on toggle */
@@ -30,7 +30,6 @@ export function PillToggle({
   const [internalOn, setInternalOn] = useState(defaultChecked);
   const checkboxId = useId();
 
-  // Controlled takes priority; fall back to internal state
   const on = controlledValue !== undefined ? controlledValue : internalOn;
 
   function toggle() {
@@ -43,52 +42,31 @@ export function PillToggle({
   }
 
   return (
-    <div className={`flex items-stretch gap-3 ${className}`}>
-      {/* The pill — acts as the visible toggle */}
-      <label
-        htmlFor={checkboxId}
-        className={`
-          flex items-center gap-3 px-4 py-3 rounded-full cursor-pointer
-          transition-all duration-200 ease-in-out select-none
-          ${
-            on
-              ? "bg-success text-white shadow-sm"
-              : "bg-gray-100 text-gray-500 hover:bg-gray-200"
-          }
-        `}
-      >
-        {/* Hidden checkbox — drives form submission */}
+    <div className={`ios-row ${className}`}>
+      {icon && (
+        <span className="ios-icon" style={{ backgroundColor: iconBg }}>
+          <span className="material-symbols-outlined" style={{ fontSize: 18 }}>
+            {icon}
+          </span>
+        </span>
+      )}
+      <label htmlFor={checkboxId} className="ios-row-label cursor-pointer select-none">
+        {label}
+      </label>
+      <label htmlFor={checkboxId} className="ios-toggle cursor-pointer">
         <input
           id={checkboxId}
           type="checkbox"
           name={name}
           checked={on}
           onChange={toggle}
-          className="sr-only"
         />
-
-        {icon && (
-          <span
-            className={`material-symbols-outlined ${on ? "text-white" : "text-gray-400"}`}
-            style={{ fontSize: 18 }}
-          >
-            {icon}
-          </span>
-        )}
-
-        <span className="text-sm font-medium whitespace-nowrap">{label}</span>
-
-        {/* ON/OFF badge */}
-        <span
-          className={`
-            text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full
-            transition-colors duration-200
-            ${on ? "bg-white/20 text-white" : "bg-gray-200 text-gray-400"}
-          `}
-        >
-          {on ? "ON" : "OFF"}
-        </span>
+        <span className="ios-toggle-track" />
+        <span className="ios-toggle-thumb" />
       </label>
     </div>
   );
 }
+
+/** @deprecated Use IosToggle instead */
+export const PillToggle = IosToggle;

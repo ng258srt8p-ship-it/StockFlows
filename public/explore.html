@@ -653,9 +653,16 @@ ${PRODUCTS.filter(p=>p.loc==='L1').map(p=>`<tr style="border-bottom:1px solid #e
 // ══════════════════════════════════════════════════════
 //  SETTINGS
 // ══════════════════════════════════════════════════════
-function pillToggle(name,label,icon,checked,onchange){
-const cls=checked?'on':'';
-return `<div class="pill-toggle"><label class="${cls}" for="pill-${name}" onclick="this.classList.toggle('on');document.getElementById('pill-${name}').checked=this.classList.contains('on');${onchange}"><span class="material-symbols-outlined pill-icon">${icon}</span><span>${label}</span><span class="pill-badge">${checked?'ON':'OFF'}</span></label><input type="checkbox" id="pill-${name}" name="${name}" ${checked?'checked':''}></div>`;
+function iosToggle(name,label,icon,iconBg,checked,onchange){
+const id='ios-'+name;
+const cls=checked?'checked':'';
+return `<div class="ios-row"><span class="ios-icon" style="background:${iconBg}"><span class="material-symbols-outlined" style="font-size:18px">${icon}</span></span><label for="${id}" class="ios-row-label" style="cursor:pointer">${label}</label><label for="${id}" class="ios-toggle" style="cursor:pointer"><input type="checkbox" id="${id}" name="${name}" ${checked?'checked':''} onchange="${onchange}"><span class="ios-toggle-track"></span><span class="ios-toggle-thumb"></span></label></div>`;
+}
+function iosInput(name,label,value,onchange,type='number'){
+return `<div class="ios-row"><span class="ios-row-label">${label}</span><div style="display:flex;align-items:center;gap:8px"><input name="${name}" type="${type}" value="${value}" onchange="${onchange}" style="width:64px;text-align:right;background:transparent;border:none;outline:none;font-size:.9375rem;color:#000;font-family:inherit"><span class="ios-chevron"></span></div></div>`;
+}
+function iosSelectRow(label,value,options){
+return `<div class="ios-row"><span class="ios-row-label">${label}</span><div style="display:flex;align-items:center;gap:8px"><select onchange="SETTINGS.currency=this.value;toast('Setting saved')" style="background:transparent;border:none;outline:none;font-size:.9375rem;color:#6d6d72;font-family:inherit;appearance:none;cursor:pointer">${options.map(o=>`<option value="${o.v}" ${o.v===value?'selected':''}>${o.l}</option>`).join('')}</select><span class="ios-chevron"></span></div></div>`;
 }
 function renderSettings(){
 const emailOn=SETTINGS.emailAlerts!==false;
@@ -664,41 +671,56 @@ const smsOn=!!SETTINGS.smsEnabled;
 const aiOn=!!SETTINGS.aiInsights;
 const fxOn=!!SETTINGS.forecastExplanations;
 document.getElementById('page-settings').innerHTML=`
-<h2>Settings</h2><p style="color:var(--text-dim);margin-bottom:16px">Configure StockFlows for your store</p>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div class="card"><h3 style="margin-bottom:16px">Stock Thresholds</h3>
-<div class="form-group"><label>Low Stock Threshold</label><input type="number" value="${SETTINGS.lowStockThreshold}" onchange="SETTINGS.lowStockThreshold=parseInt(this.value);toast('Setting saved')"></div>
-<div class="form-group"><label>Critical Stock Threshold</label><input type="number" value="${SETTINGS.criticalThreshold}" onchange="SETTINGS.criticalThreshold=parseInt(this.value);toast('Setting saved')"></div>
-<div class="form-group"><label>Forecast Horizon (days)</label><input type="number" value="${SETTINGS.forecastHorizon}" onchange="SETTINGS.forecastHorizon=parseInt(this.value);toast('Setting saved')"></div></div>
-<div class="card"><h3 style="margin-bottom:16px">Notifications</h3>
-${pillToggle('emailAlerts','Email Alerts','mail',emailOn,"SETTINGS.emailAlerts=document.getElementById('pill-emailAlerts').checked;toast(SETTINGS.emailAlerts?'Email alerts enabled':'Email alerts disabled')")}
-${pillToggle('slackEnabled','Slack Alerts','chat',slackOn,"SETTINGS.slackEnabled=document.getElementById('pill-slackEnabled').checked;toast(SETTINGS.slackEnabled?'Slack alerts enabled':'Slack alerts disabled')")}
-${pillToggle('smsEnabled','SMS Alerts','smartphone',smsOn,"SETTINGS.smsEnabled=document.getElementById('pill-smsEnabled').checked;toast(SETTINGS.smsEnabled?'SMS alerts enabled':'SMS alerts disabled')")}
-</div></div>
-<div class="card"><h3 style="margin-bottom:16px">AI Features</h3>
-${pillToggle('aiInsights','Enable AI Insights','auto_awesome',aiOn,"SETTINGS.aiInsights=document.getElementById('pill-aiInsights').checked;toast(SETTINGS.aiInsights?'AI insights enabled':'AI insights disabled')")}
-<p class="pill-section-desc">Uses the <strong>OpenCode API</strong> with the Big Pickle model to analyze your inventory data and generate insights. Requires an OpenCode API key set as OPENCODE_API_KEY in your app environment. Your inventory levels, forecasts, and alerts are sent to an external AI service for analysis. Statistical forecasting (the core demand engine) still works when AI is disabled.</p>
-${pillToggle('forecastExplanations','Enable Forecast Explanations','auto_stories',fxOn,"SETTINGS.forecastExplanations=document.getElementById('pill-forecastExplanations').checked;toast(SETTINGS.forecastExplanations?'Forecast explanations enabled':'Forecast explanations disabled')")}
-<p class="pill-section-desc">Shows AI-generated natural language explanations of forecast data when you view a product's forecast. These explanations help you understand what the numbers mean.</p>
+<div class="ios-settings">
+<p class="ios-section-header">Notifications</p>
+<div class="ios-section">
+${iosToggle('emailAlerts','Email Alerts','mail','#008060',emailOn,"SETTINGS.emailAlerts=this.checked;toast(this.checked?'Email alerts enabled':'Email alerts disabled')")}
+${iosToggle('slackEnabled','Slack Alerts','chat','#36a64f',slackOn,"SETTINGS.slackEnabled=this.checked;toast(this.checked?'Slack alerts enabled':'Slack alerts disabled')")}
+${iosToggle('smsEnabled','SMS Alerts','smartphone','#af52de',smsOn,"SETTINGS.smsEnabled=this.checked;toast(this.checked?'SMS alerts enabled':'SMS alerts disabled')")}
 </div>
-<div class="card"><h3 style="margin-bottom:16px">Store Information</h3>
-<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-<div class="form-group"><label>Shopify Domain</label><input type="text" value="demo-store.myshopify.com" disabled style="background:rgba(255,255,255,0.03)"></div>
-<div class="form-group"><label>Currency</label><select><option>USD (US Dollar)</option><option>EUR (Euro)</option><option>GBP (British Pound)</option><option>CAD (Canadian Dollar)</option><option>AUD (Australian Dollar)</option></select></div>
-<div class="form-group"><label>Plan</label><input type="text" value="Starter ($19/mo)" disabled style="background:rgba(255,255,255,0.03)"></div>
-<div class="form-group"><label>App Version</label><input type="text" value="1.0.0" disabled style="background:rgba(255,255,255,0.03)"></div>
+
+<p class="ios-section-header">Alert Thresholds</p>
+<div class="ios-section">
+${iosInput('lowStockThreshold','Low Stock',SETTINGS.lowStockThreshold,"SETTINGS.lowStockThreshold=parseInt(this.value);toast('Setting saved')")}
+${iosInput('criticalStockThreshold','Critical Stock',SETTINGS.criticalThreshold,"SETTINGS.criticalThreshold=parseInt(this.value);toast('Setting saved')")}
 </div>
-<p style="color:var(--text-dimmer);font-size:.7rem;margin-top:12px;line-height:1.5">Error tracking by <strong>Sentry</strong> (sentry.io). Requires SENTRY_DSN in your app environment. Optional.</p></div>
-<div class="card" style="border-color:var(--border)"><h3 style="margin-bottom:12px">Import from Stocky</h3>
-<p style="color:var(--text-dim);font-size:.85rem;margin-bottom:12px">Migrating from Stocky? Import your products, vendors, and purchase order history in one click.</p>
-<div style="display:flex;gap:8px;flex-wrap:wrap">
-<button class="btn-sm btn-brand" onclick="openStockyImport()">Import Stocky Data</button>
-<button class="btn-sm btn-ghost" onclick="downloadSampleCSV()">Download Sample CSV</button>
+
+<p class="ios-section-header">Forecasting</p>
+<div class="ios-section">
+${iosInput('forecastHorizon','Forecast Horizon',SETTINGS.forecastHorizon,"SETTINGS.forecastHorizon=parseInt(this.value);toast('Setting saved')")}
 </div>
-<p style="color:var(--text-dimmer);font-size:.7rem;margin-top:8px">Supports CSV import of products, vendors, and POs from Stocky exports.</p></div>
-<div class="card" style="margin-top:16px;border-color:var(--border)"><h3 style="margin-bottom:8px">Danger Zone</h3>
-<p style="color:var(--text-dim);font-size:.85rem;margin-bottom:12px">Reset all demo data to the original seeded values.</p>
-<button class="btn-sm btn-danger" onclick="if(confirm('Reset all data?')){PRODUCTS.forEach(p=>{const orig=PRODUCTS.find(x=>x.id===p.id);if(orig){/* would reset */}});toast('Data reset to defaults');render()}">Reset Demo Data</button></div>`;
+
+<p class="ios-section-header">AI Features</p>
+<div class="ios-section">
+${iosToggle('aiInsights','AI Insights','auto_awesome','#ff9500',aiOn,"SETTINGS.aiInsights=this.checked;toast(this.checked?'AI insights enabled':'AI insights disabled')")}
+<p style="font-size:.8125rem;color:#6d6d72;padding:0 16px 12px">Uses OpenCode API to analyze inventory data. Statistical forecasting still works when AI is disabled.</p>
+${iosToggle('forecastExplanations','Forecast Explanations','auto_stories','#5856d6',fxOn,"SETTINGS.forecastExplanations=this.checked;toast(this.checked?'Forecast explanations enabled':'Forecast explanations disabled')")}
+<p style="font-size:.8125rem;color:#6d6d72;padding:0 16px 12px">Shows AI-generated natural language explanations of forecast data.</p>
+</div>
+
+<p class="ios-section-header">General</p>
+<div class="ios-section">
+${iosSelectRow('Currency',SETTINGS.currency,[{v:'USD',l:'USD ($)'},{v:'EUR',l:'EUR (€)'},{v:'GBP',l:'GBP (£)'},{v:'CAD',l:'CAD (C$)'},{v:'AUD',l:'AUD (A$)'}])}
+</div>
+
+<p class="ios-section-header">Store</p>
+<div class="ios-section">
+<div class="ios-row"><span class="ios-row-label">Shopify Domain</span><span class="ios-row-value">demo-store.myshopify.com</span></div>
+<div class="ios-row"><span class="ios-row-label">Plan</span><span class="ios-row-value">Starter ($19/mo)</span></div>
+<div class="ios-row"><span class="ios-row-label">App Version</span><span class="ios-row-value">1.0.0</span></div>
+</div>
+
+<p class="ios-section-header">Import from Stocky</p>
+<div class="ios-section">
+<div class="ios-row" style="cursor:pointer" onclick="openStockyImport()"><span class="ios-icon" style="background:#007aff"><span class="material-symbols-outlined" style="font-size:18px">upload_file</span></span><span class="ios-row-label">Import Stocky Data</span><span class="ios-chevron"></span></div>
+<div class="ios-row" style="cursor:pointer" onclick="downloadSampleCSV()"><span class="ios-icon" style="background:#5856d6"><span class="material-symbols-outlined" style="font-size:18px">download</span></span><span class="ios-row-label">Download Sample CSV</span><span class="ios-chevron"></span></div>
+</div>
+
+<p class="ios-section-header">Danger Zone</p>
+<div class="ios-section">
+<div class="ios-row" style="cursor:pointer" onclick="if(confirm('Reset all data?')){PRODUCTS.forEach(p=>{const orig=PRODUCTS.find(x=>x.id===p.id);if(orig){/* would reset */}});toast('Data reset to defaults');render()}"><span class="ios-icon" style="background:#ff3b30"><span class="material-symbols-outlined" style="font-size:18px">restart_alt</span></span><span class="ios-row-label" style="color:#ff3b30">Reset Demo Data</span><span class="ios-chevron"></span></div>
+</div>
+</div>`;
 }
 // ══════════════════════════════════════════════════════
 //  IN-APP GUIDED TOUR - walks through each app page

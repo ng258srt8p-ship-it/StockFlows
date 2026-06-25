@@ -275,6 +275,29 @@ tr:hover{background:#f5f5f5}
 .form-group select option{background:#fff;color:var(--text)}
 
 /* ═══════════════════════════════════════════════════
+   iOS SETTINGS STYLE
+   ═══════════════════════════════════════════════════ */
+.ios-settings{background:#f2f2f7;padding:16px 0 32px;font-family:-apple-system,BlinkMacSystemFont,'SF Pro Text','Helvetica Neue',sans-serif}
+.ios-section-header{font-size:.75rem;font-weight:400;color:#6d6d72;text-transform:uppercase;letter-spacing:.5px;padding:24px 20px 8px;margin-bottom:0}
+.ios-section{background:#fff;border-radius:12px;margin:0 20px 24px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.ios-row{display:flex;align-items:center;padding:12px 16px;border-bottom:1px solid #e5e5e5;min-height:44px;gap:14px}
+.ios-row:last-child{border-bottom:none}
+.ios-row-label{flex:1;font-size:.9375rem;color:#000}
+.ios-row-value{font-size:.9375rem;color:#6d6d72;margin-left:auto}
+.ios-icon{width:30px;height:30px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;font-size:16px}
+.ios-chevron{width:14px;height:14px;border-right:2px solid #c7c7cc;border-bottom:2px solid #c7c7cc;transform:rotate(-45deg);flex-shrink:0;margin-left:6px}
+.ios-toggle{position:relative;width:51px;height:31px;flex-shrink:0;cursor:pointer}
+.ios-toggle input{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.ios-toggle-track{width:100%;height:100%;border-radius:16px;background:#e9e9ea;transition:background .25s ease;position:relative}
+.ios-toggle input:checked+.ios-toggle-track{background:#008060}
+.ios-toggle-thumb{position:absolute;top:2px;left:2px;width:27px;height:27px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .25s ease;pointer-events:none}
+.ios-toggle input:checked~.ios-toggle-thumb{transform:translateX(20px)}
+.ios-row-sublabel{font-size:.8125rem;color:#6d6d72;padding:0 16px 12px;display:block}
+.ios-expand{display:grid;transition:grid-template-rows .3s ease}
+.ios-expand-inner{overflow:hidden}
+.ios-expand-input{padding:0 16px 12px}
+
+/* ═══════════════════════════════════════════════════
    PILL TOGGLE
    ═══════════════════════════════════════════════════ */
 .pill-toggle{
