@@ -375,6 +375,8 @@ model ShopSetting {
   slackWebhookUrl        String?
   smsPhoneNumbers        Json?
   currency               String  @default("USD")
+  enableAiInsights           Boolean @default(false)
+  enableForecastExplanations Boolean @default(false)
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 

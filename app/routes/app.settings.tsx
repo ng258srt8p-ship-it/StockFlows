@@ -14,6 +14,7 @@ import {
   Text,
 } from "@shopify/polaris";
 import { useState } from "react";
+import { PillToggle } from "~/components/ui/PillToggle";
 
 // ---------------------------------------------------------------------------
 // Server
@@ -50,6 +51,8 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     slackWebhookUrl: formData.get("slackWebhookUrl") as string || null,
     smsPhoneNumbers: smsPhoneNumbers as any,
     currency: formData.get("currency") as string || "USD",
+    enableAiInsights: formData.get("enableAiInsights") === "on",
+    enableForecastExplanations: formData.get("enableForecastExplanations") === "on",
   };
 
   await prisma.shopSetting.upsert({
@@ -60,49 +63,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   return json({ success: true });
 };
-
-// ---------------------------------------------------------------------------
-// Toggle — custom sleek toggle switch (replaces Polaris Checkbox)
-// ---------------------------------------------------------------------------
-
-function Toggle({
-  name,
-  label,
-  description,
-  defaultChecked,
-}: {
-  name: string;
-  label: string;
-  description?: string;
-  defaultChecked: boolean;
-}) {
-  const [on, setOn] = useState(defaultChecked);
-
-  return (
-    <label className="flex items-center justify-between gap-4 py-1 cursor-pointer group">
-      <input
-        type="checkbox"
-        name={name}
-        checked={on}
-        onChange={() => setOn(!on)}
-        className="sr-only peer"
-      />
-      <div className="flex-1 min-w-0">
-        <span className="text-sm font-medium text-gray-900 group-hover:text-gray-700 transition-colors">
-          {label}
-        </span>
-        {description && (
-          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{description}</p>
-        )}
-      </div>
-      {/* Track */}
-      <div className="relative w-11 h-6 rounded-full bg-gray-200 peer-checked:bg-[#008060] transition-colors duration-200 ease-in-out shrink-0 shadow-inner">
-        {/* Thumb */}
-        <div className="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-sm transition-transform duration-200 ease-in-out peer-checked:translate-x-5 group-has-[:checked]:translate-x-5" />
-      </div>
-    </label>
-  );
-}
 
 // ---------------------------------------------------------------------------
 // Section card — consistent card wrapper
@@ -154,6 +114,13 @@ export default function Settings() {
       : ""
   );
 
+  // Pill toggle states — controlled, so config fields expand/collapse
+  const [emailOn, setEmailOn] = useState(settings?.emailAlerts ?? true);
+  const [slackOn, setSlackOn] = useState(!!settings?.slackWebhookUrl);
+  const [smsOn, setSmsOn] = useState(Array.isArray(settings?.smsPhoneNumbers) && (settings.smsPhoneNumbers as string[]).length > 0);
+  const [aiInsightsOn, setAiInsightsOn] = useState(settings?.enableAiInsights ?? false);
+  const [forecastExplOn, setForecastExplOn] = useState(settings?.enableForecastExplanations ?? false);
+
   return (
     <Page title="Settings">
       <Layout>
@@ -170,30 +137,76 @@ export default function Settings() {
             <div className="space-y-4 max-w-2xl">
               {/* ── Notifications ─────────────────────────────── */}
               <Section title="Notifications" icon="notifications">
-                <Toggle
-                  name="emailAlerts"
-                  label="Email alerts"
-                  description="Get notified about low stock alerts and purchase order updates"
-                  defaultChecked={settings?.emailAlerts ?? true}
-                />
-                <TextField
-                  name="slackWebhookUrl"
-                  label="Slack Webhook URL"
-                  value={slackUrl}
-                  onChange={(val) => setSlackUrl(val)}
-                  autoComplete="off"
-                  placeholder="https://hooks.slack.com/services/..."
-                  helpText="Leave empty to disable Slack notifications"
-                />
-                <TextField
-                  name="smsPhoneNumbers"
-                  label="SMS Alert Phone Numbers"
-                  value={smsPhones}
-                  onChange={(val) => setSmsPhones(val)}
-                  autoComplete="off"
-                  placeholder="+15551234567, +15559876543"
-                  helpText="Comma-separated list of phone numbers for critical stock alerts"
-                />
+                <div className="space-y-4">
+                  {/* Email — simple toggle, no config */}
+                  <PillToggle
+                    name="emailAlerts"
+                    label="Email Alerts"
+                    icon="mail"
+                    value={emailOn}
+                    onChange={setEmailOn}
+                  />
+
+                  {/* Slack — toggle + expandable webhook config */}
+                  <div>
+                    <PillToggle
+                      name="slackEnabled"
+                      label="Slack Alerts"
+                      icon="chat"
+                      value={slackOn}
+                      onChange={setSlackOn}
+                    />
+                    <div
+                      className="grid transition-all duration-300 ease-in-out"
+                      style={{ gridTemplateRows: slackOn ? "1fr" : "0fr" }}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="pt-3 pl-10 pr-2">
+                          <TextField
+                            name="slackWebhookUrl"
+                            label="Slack Webhook URL"
+                            value={slackUrl}
+                            onChange={(val) => setSlackUrl(val)}
+                            autoComplete="off"
+                            placeholder="https://hooks.slack.com/services/..."
+                            helpText="Create one at Settings > Apps > Incoming Webhooks"
+                            disabled={!slackOn}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* SMS — toggle + expandable phone config */}
+                  <div>
+                    <PillToggle
+                      name="smsEnabled"
+                      label="SMS Alerts"
+                      icon="smartphone"
+                      value={smsOn}
+                      onChange={setSmsOn}
+                    />
+                    <div
+                      className="grid transition-all duration-300 ease-in-out"
+                      style={{ gridTemplateRows: smsOn ? "1fr" : "0fr" }}
+                    >
+                      <div className="overflow-hidden">
+                        <div className="pt-3 pl-10 pr-2">
+                          <TextField
+                            name="smsPhoneNumbers"
+                            label="SMS Alert Phone Numbers"
+                            value={smsPhones}
+                            onChange={(val) => setSmsPhones(val)}
+                            autoComplete="off"
+                            placeholder="+15551234567, +15559876543"
+                            helpText="Comma-separated list of phone numbers for critical stock alerts"
+                            disabled={!smsOn}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </Section>
 
               {/* ── Alert Thresholds ──────────────────────────── */}
@@ -231,6 +244,45 @@ export default function Settings() {
                   autoComplete="off"
                   helpText="Number of days to predict demand ahead"
                 />
+              </Section>
+
+              {/* ── AI Features ───────────────────────────────── */}
+              <Section title="AI Features" icon="psychology">
+                <div className="space-y-4">
+                  {/* AI Insights — toggle + always-visible description */}
+                  <div>
+                    <PillToggle
+                      name="enableAiInsights"
+                      label="Enable AI Insights"
+                      icon="auto_awesome"
+                      value={aiInsightsOn}
+                      onChange={setAiInsightsOn}
+                    />
+                    <p className="text-xs text-gray-500 pl-10 pt-2 leading-relaxed">
+                      Uses the OpenCode API with the Big Pickle model to analyze your inventory
+                      data and generate insights. Requires an OpenCode API key set as
+                      OPENCODE_API_KEY in your app environment. Your inventory levels, forecasts,
+                      and alerts are sent to an external AI service for analysis. Statistical
+                      forecasting (the core demand engine) still works when AI is disabled.
+                    </p>
+                  </div>
+
+                  {/* Forecast Explanations — toggle + always-visible description */}
+                  <div>
+                    <PillToggle
+                      name="enableForecastExplanations"
+                      label="Enable Forecast Explanations"
+                      icon="auto_stories"
+                      value={forecastExplOn}
+                      onChange={setForecastExplOn}
+                    />
+                    <p className="text-xs text-gray-500 pl-10 pt-2 leading-relaxed">
+                      Shows AI-generated natural language explanations of forecast data when you
+                      view a product's forecast. These explanations help you understand what
+                      the numbers mean.
+                    </p>
+                  </div>
+                </div>
               </Section>
 
               {/* ── General ────────────────────────────────────── */}
