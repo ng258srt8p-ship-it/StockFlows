@@ -46,7 +46,7 @@ test.describe("Forecasting Engine — Integration", () => {
     expect(dailySales.length).toBeGreaterThan(7);
 
     // Run forecast
-    const forecast = runForecast(dailySales, 30);
+    const forecast = await runForecast(dailySales, 30);
 
     expect(forecast.predictions).toHaveLength(30);
     expect(forecast.confidence).toBeGreaterThan(0);

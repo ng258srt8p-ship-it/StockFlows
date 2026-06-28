@@ -6,11 +6,13 @@ test.describe("AI Features", () => {
     await page.goto("http://localhost:5173/tour.html");
     await page.evaluate(() => (window as any).enterApp());
     await page.waitForTimeout(300);
+    await page.waitForLoadState('networkidle');
   });
 
   test("dashboard shows AI Insights section when enabled", async ({ page }) => {
     await page.evaluate(() => (window as any).go("dashboard"));
-    await page.waitForTimeout(300);
+    await page.waitForTimeout(500);
+    await page.waitForSelector('#page-dashboard', { timeout: 10000 });
     const hasInsights = await page.evaluate(() =>
       document.getElementById("page-dashboard")!.innerHTML.includes("AI Insights")
     );

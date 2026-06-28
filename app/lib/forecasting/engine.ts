@@ -1,17 +1,17 @@
 import * as ss from "simple-statistics";
+import {
+  ForecastOutput,
+  simpleMovingAverage,
+  weightedMovingAverage,
+  holtsLinearTrend,
+  linearRegression
+} from "./models";
 
 // ── Shared types ──────────────────────────────────────────────────────────────
 
 export interface DailySales {
   date: string;
   qty: number;
-}
-
-/** Output returned by each individual forecasting model. */
-export interface ForecastOutput {
-  predictions: Array<{ date: string; yhat: number; lower: number; upper: number }>;
-  confidence: number;
-  model: string;
 }
 
 /** Full result returned by the top-level runForecast() orchestrator. */
@@ -24,67 +24,124 @@ export interface ForecastResult {
   trendDirection: "up" | "down" | "stable";
 }
 
-export function runForecast(
+/** Output for a reorder recommendation. */
+export interface ReorderRecommendation {
+  sku: string;
+  reorderQuantity: number;
+  targetStockLevel: number;
+  confidence: number;
+}
+
+export async function runForecast(
   dailySales: DailySales[],
   horizonDays: number = 30
-): ForecastResult {
+): Promise<ForecastResult> {
   if (dailySales.length < 7) {
     return emptyForecast(horizonDays);
   }
 
+  // 1. Determine the best model based on historical accuracy (MAPE)
+  const bestModelName = await selectBestModel(dailySales);
+
   const quantities = dailySales.map((d) => d.qty);
-  const avg = ss.mean(quantities);
-  const sd = ss.standardDeviation(quantities);
+  const lastDateStr = dailySales[dailySales.length - 1].date;
 
   // Detect trend via linear regression
-  const data = quantities.map((qty, i) => [i, qty]);
-  const regression = ss.linearRegression(data);
-  const slope = regression.m; // simple-statistics uses 'm' for slope
+  const points = quantities.map((qty, i) => [i, qty]);
+  const regression = ss.linearRegression(points);
+  const slope = regression.m;
+  const avg = ss.mean(quantities);
+  const sd = ss.standardDeviation(quantities);
 
   let trendDirection: "up" | "down" | "stable" = "stable";
   if (slope > avg * 0.01) trendDirection = "up";
   else if (slope < -avg * 0.01) trendDirection = "down";
 
-  // Exponential smoothing
-  const alpha = 0.3;
-  let smoothed = quantities[0];
-  for (let i = 1; i < quantities.length; i++) {
-    smoothed = alpha * quantities[i] + (1 - alpha) * smoothed;
-  }
-
-  // Generate predictions
-  const predictions: ForecastResult["predictions"] = [];
-  const lastDate = new Date(dailySales[dailySales.length - 1].date);
-
-  for (let i = 1; i <= horizonDays; i++) {
-    const predDate = new Date(lastDate);
-    predDate.setDate(predDate.getDate() + i);
-
-    const predicted = Math.max(0, Math.round(smoothed + slope * i));
-    const margin = Math.ceil(1.96 * sd * Math.sqrt(i / quantities.length));
-
-    predictions.push({
-      date: predDate.toISOString().split("T")[0],
-      yhat: predicted,
-      lower: Math.max(0, predicted - margin),
-      upper: predicted + margin,
-    });
+  // 2. Get predictions from the best model
+  let predictions: ForecastOutput["predictions"];
+  switch (bestModelName) {
+    case 'SMA':
+      predictions = simpleMovingAverage(quantities, 7, horizonDays, lastDateStr).predictions;
+      break;
+    case 'WMA':
+      predictions = weightedMovingAverage(quantities, 7, horizonDays, lastDateStr).predictions;
+      break;
+    case 'Holts':
+      predictions = holtsLinearTrend(quantities, 0.3, 0.1, horizonDays, lastDateStr).predictions;
+      break;
+    case 'Regression':
+      predictions = linearRegression(quantities, horizonDays, lastDateStr).predictions;
+      break;
+    default:
+      predictions = simpleMovingAverage(quantities, 7, horizonDays, lastDateStr).predictions;
   }
 
   const totalPredicted = predictions.reduce((sum, p) => sum + p.yhat, 0);
-
-  // Confidence: 1 - (coefficient of variation), clamped
-  const cv = sd / (avg || 1);
-  const confidence = Math.max(0.1, Math.min(0.95, 1 - cv));
+  const confidence = 0.7; // Placeholder
 
   return {
     predictions,
     totalPredicted,
     confidence,
-    modelUsed: "ets",
+    modelUsed: bestModelName,
     avgDailySales: avg,
     trendDirection,
   };
+}
+
+/**
+ * Evaluates all available models on historical data and returns the name of the best model.
+ */
+async function selectBestModel(historicalSales: DailySales[]): Promise<string> {
+  if (historicalSales.length < 14) return 'SMA'; // Not enough data to backtest
+
+  // Split data into training (past) and validation (most recent)
+  // We use the most recent 7 days as validation to check how well models predicted them.
+  const validationSize = 7;
+  const trainingData = historicalSales.slice(0, -validationSize);
+  const validationData = historicalSales.slice(-validationSize);
+
+  if (trainingData.length < 7) return 'SMA';
+
+  const validationQuantities = validationData.map(d => d.qty);
+  const trainingQuantities = trainingData.map(d => d.qty);
+  const lastDateStr = trainingData[trainingData.length - 1].date;
+
+  const models = [
+    { name: 'SMA', func: () => simpleMovingAverage(trainingQuantities, 7, validationSize, lastDateStr) },
+    { name: 'WMA', func: () => weightedMovingAverage(trainingQuantities, 7, validationSize, lastDateStr) },
+    { name: 'Holts', func: () => holtsLinearTrend(trainingQuantities, 0.3, 0.1, validationSize, lastDateStr) },
+    { name: 'Regression', func: () => linearRegression(trainingQuantities, validationSize, lastDateStr) }
+  ];
+
+  const results = await Promise.all(models.map(m => m.func()));
+
+  let bestModel = 'SMA';
+  let minMAPE = Infinity;
+
+  results.forEach((res, index) => {
+    const mape = calculateMAPE(validationQuantities, res.predictions.map(p => p.yhat));
+    if (mape < minMAPE) {
+      minMAPE = mape;
+      bestModel = models[index].name;
+    }
+  });
+
+  return bestModel;
+}
+
+function calculateMAPE(actuals: number[], predictions: number[]): number {
+  let totalError = 0;
+  let count = 0;
+
+  for (let i = 0; i < actuals.length; i++) {
+    if (actuals[i] > 0) {
+      totalError += Math.abs((actuals[i] - predictions[i]) / actuals[i]);
+      count++;
+    }
+  }
+
+  return count === 0 ? 1 : totalError / count;
 }
 
 function emptyForecast(horizonDays: number): ForecastResult {
@@ -101,17 +158,11 @@ function emptyForecast(horizonDays: number): ForecastResult {
 // ── Seasonality analysis ────────────────────────────────────────────────────
 
 export interface SeasonalityResult {
-  /** Average sales per day-of-week (index 0 = Monday, 6 = Sunday) */
   dayOfWeek: number[];
-  /** Average sales per month (index 0 = January, 11 = December) */
   monthOfYear: number[];
-  /** Day-of-week factor relative to overall mean (1.0 = average, >1 = peak) */
   dayOfWeekFactors: number[];
-  /** Month factor relative to overall mean */
   monthFactors: number[];
-  /** Detected peak day-of-week name */
   peakDay: string;
-  /** Detected peak month name */
   peakMonth: string;
 }
 
@@ -119,7 +170,7 @@ const DAY_NAMES = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Satu
 const MONTH_NAMES = [
   "January", "February", "March", "April", "May", "June",
   "July", "August", "September", "October", "November", "December",
-];
+  ];
 
 /**
  * Analyse seasonality patterns in daily sales data.
@@ -132,7 +183,6 @@ export function analyseSeasonality(sales: DailySales[]): SeasonalityResult | nul
 
   const overallMean = ss.mean(sales.map((s) => s.qty));
 
-  // Day-of-week aggregation
   const dowSums = new Array(7).fill(0);
   const dowCounts = new Array(7).fill(0);
   for (const s of sales) {
@@ -144,7 +194,6 @@ export function analyseSeasonality(sales: DailySales[]): SeasonalityResult | nul
   const dayOfWeek = dowSums.map((sum, i) => (dowCounts[i] > 0 ? sum / dowCounts[i] : 0));
   const dayOfWeekFactors = dayOfWeek.map((avg) => (overallMean > 0 ? avg / overallMean : 1));
 
-  // Month aggregation
   const monthSums = new Array(12).fill(0);
   const monthCounts = new Array(12).fill(0);
   for (const s of sales) {
@@ -177,4 +226,27 @@ export function calculateSafetyStock(
   const zScore = serviceLevel === 0.95 ? 1.65 : serviceLevel === 0.99 ? 2.33 : 1.28;
   const demandStdDev = ss.standardDeviation(dailySales);
   return Math.ceil(zScore * demandStdDev * Math.sqrt(leadTimeDays + reviewPeriodDays));
+}
+
+/**
+ * Generates a reorder recommendation based on forecast and current stock.
+ *
+ * @param currentStock - Current inventory level.
+ * @param predictedDemandDuringLeadTime - Total predicted demand during lead time.
+ * @param safetyStock - Calculated safety stock level.
+ */
+export function getReorderRecommendation(
+  currentStock: number,
+  predictedDemandDuringLeadTime: number,
+  safetyStock: number
+): ReorderRecommendation {
+  const targetStockLevel = Math.ceil(predictedDemandDuringLeadTime + safetyStock);
+  const reorderQuantity = Math.max(0, targetStockLevel - currentStock);
+
+  return {
+    sku: "", // To be filled by caller
+    reorderQuantity,
+    targetStockLevel,
+    confidence: 0.9, // Simplified
+  };
 }

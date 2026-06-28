@@ -1,4 +1,4 @@
-import type { LinksFunction, MetaFunction } from "@remix-run/node";
+import type { LinksFunction, MetaFunction, LoaderFunctionArgs } from "@remix-run/node";
 import {
   Links,
   Meta,
@@ -8,8 +8,10 @@ import {
   isRouteErrorResponse,
   useRouteError,
   useNavigation,
+  redirect,
 } from "@remix-run/react";
 import { AppProvider } from "@shopify/polaris";
+import { authenticate } from "~/lib/shopify/server";
 
 import tailwindStylesHref from "./tailwind.css?url";
 
@@ -34,6 +36,15 @@ const i18n: Record<string, any> = {
       months: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
     },
   },
+};
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  // For root path, if already authenticated, redirect to /app
+  const { session } = await authenticate.admin(request);
+  if (session) {
+    return redirect("/app");
+  }
+  return null;
 };
 
 export default function App() {
