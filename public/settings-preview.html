@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockFlows Settings — Preview</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif; background: #f6f6f7; color: #202223; }
+
+    /* Polaris-like Page chrome */
+    .polaris-page { padding: 32px 20px; max-width: 1200px; margin: 0 auto; }
+    .polaris-page-header { margin-bottom: 16px; }
+    .polaris-page-title { font-size: 1.375rem; font-weight: 600; line-height: 1.3; color: #202223; }
+    .polaris-page-subtitle { font-size: 0.875rem; color: #6d7175; margin-top: 4px; }
+
+    /* Polaris-like Layout */
+    .polaris-layout { display: flex; flex-direction: column; gap: 16px; }
+    .polaris-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+    @media (min-width: 1024px) { .polaris-grid { grid-template-columns: 1fr 1fr; } }
+
+    /* Polaris-like Card */
+    .polaris-card { background: #fff; border: 1px solid #e1e3e5; border-radius: 8px; box-shadow: 0 1px 0 rgba(0,0,0,0.05); }
+    .polaris-card-inner { padding: 16px; }
+    .polaris-card-header { font-size: 1.25rem; font-weight: 600; line-height: 1.4; margin-bottom: 12px; }
+
+    /* Polaris-like Banner */
+    .polaris-banner { display: flex; align-items: flex-start; padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; }
+    .polaris-banner-success { background: #5bcdd3; border: 1px solid #449c9a; color: #004d40; }
+    .polaris-banner-success::before { content: '✓'; margin-right: 8px; font-weight: 700; font-size: 1.125rem; }
+
+    /* Polaris-like Checkbox row */
+    .polaris-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #f1f1f2; }
+    .polaris-row:last-child { border-bottom: none; }
+    .polaris-row-label { font-size: 0.875rem; font-weight: 400; color: #202223; }
+    .polaris-row-desc { font-size: 0.8125rem; color: #6d7175; margin-top: 2px; }
+
+    /* Polaris-like Checkbox */
+    .polaris-checkbox { position: relative; width: 20px; height: 20px; cursor: pointer; }
+    .polaris-checkbox input { position: absolute; opacity: 0; width: 0; height: 0; }
+    .polaris-checkbox-visual { width: 20px; height: 20px; border: 2px solid #8c9196; border-radius: 4px; background: #fff; display: flex; align-items: center; justify-content: center; transition: all 0.15s; }
+    .polaris-checkbox input:checked + .polaris-checkbox-visual { background: #008060; border-color: #008060; }
+    .polaris-checkbox input:checked + .polaris-checkbox-visual::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 700; }
+    .polaris-checkbox input:focus-visible + .polaris-checkbox-visual { box-shadow: 0 0 0 2px #4c6efb; }
+
+    /* Polaris-like TextField */
+    .polaris-field { margin-bottom: 16px; }
+    .polaris-field:last-child { margin-bottom: 0; }
+    .polaris-field-label { display: block; font-size: 0.8125rem; font-weight: 600; color: #202223; margin-bottom: 4px; }
+    .polaris-field-input { width: 100%; padding: 7px 12px; border: 1px solid #c9cccf; border-radius: 6px; font-size: 0.875rem; color: #202223; background: #fff; outline: none; transition: border-color 0.15s; }
+    .polaris-field-input:focus { border-color: #008060; box-shadow: 0 0 0 1px #008060; }
+    .polaris-field-suffix { display: flex; align-items: center; gap: 4px; }
+    .polaris-field-suffix .polaris-field-input { flex: 1; }
+    .polaris-field-suffix-text { font-size: 0.875rem; color: #6d7175; white-space: nowrap; }
+    .polaris-field-help { font-size: 0.75rem; color: #6d7175; margin-top: 4px; }
+
+    /* Polaris-like Select */
+    .polaris-select { width: 100%; padding: 7px 32px 7px 12px; border: 1px solid #c9cccf; border-radius: 6px; font-size: 0.875rem; color: #202223; background: #fff; appearance: none; background-image: url("data:image/svg+xml,%3Csvg width='12' height='12' viewBox='0 0 12 12' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M6 8L1 3h10L6 8z' fill='%236d7175'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 10px center; outline: none; }
+    .polaris-select:focus { border-color: #008060; box-shadow: 0 0 0 1px #008060; }
+
+    /* Polaris-like Button */
+    .polaris-btn { display: inline-flex; align-items: center; justify-content: center; padding: 7px 16px; border: none; border-radius: 6px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: background 0.15s; }
+    .polaris-btn-primary { background: #D97706; color: #fff; }
+    .polaris-btn-primary:hover { background: #b85f05; }
+    .polaris-btn-primary:active { background: #934c04; }
+    .polaris-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .polaris-btn-loading { position: relative; color: transparent; }
+    .polaris-btn-loading::after { content: ''; position: absolute; width: 14px; height: 14px; border: 2px solid #fff; border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .polaris-section-text { font-size: 0.8125rem; color: #6d7175; margin-top: 4px; line-height: 1.4; }
+
+    .conditional-field { margin-top: 12px; }
+    .save-row { display: flex; justify-content: flex-end; }
+  </style>
+</head>
+<body>
+  <div class="polaris-page">
+    <!-- Page Header -->
+    <div class="polaris-page-header">
+      <h1 class="polaris-page-title">Settings</h1>
+      <p class="polaris-page-subtitle">Manage your preferences</p>
+    </div>
+
+    <!-- Success Banner (hidden) -->
+    <div id="success-banner" class="polaris-banner polaris-banner-success" style="display:none;">
+      Settings saved successfully.
+    </div>
+
+    <div class="polaris-layout">
+      <div class="polaris-grid">
+        <!-- Notifications Card -->
+        <div class="polaris-card">
+          <div class="polaris-card-inner">
+            <div class="polaris-card-header">Notifications</div>
+
+            <div class="polaris-row">
+              <span class="polaris-row-label">Email Alerts</span>
+              <label class="polaris-checkbox">
+                <input type="checkbox" name="emailAlerts" checked onchange="this.value = this.checked ? 'on' : ''">
+                <span class="polaris-checkbox-visual"></span>
+              </label>
+            </div>
+
+            <div class="polaris-row">
+              <span class="polaris-row-label">Slack Alerts</span>
+              <label class="polaris-checkbox">
+                <input type="checkbox" id="slackToggle" onchange="document.getElementById('slackFields').style.display = this.checked ? 'block' : 'none'; this.value = this.checked ? 'on' : '';">
+                <span class="polaris-checkbox-visual"></span>
+              </label>
+            </div>
+            <div id="slackFields" class="conditional-field" style="display:none;">
+              <div class="polaris-field">
+                <label class="polaris-field-label">Slack Webhook URL</label>
+                <input class="polaris-field-input" type="url" name="slackWebhookUrl" placeholder="https://hooks.slack.com/services/..." autocomplete="off">
+                <p class="polaris-field-help">Create one at Settings > Apps > Incoming Webhooks</p>
+              </div>
+            </div>
+
+            <div class="polaris-row">
+              <span class="polaris-row-label">SMS Alerts</span>
+              <label class="polaris-checkbox">
+                <input type="checkbox" id="smsToggle" onchange="document.getElementById('smsFields').style.display = this.checked ? 'block' : 'none'; this.value = this.checked ? 'on' : '';">
+                <span class="polaris-checkbox-visual"></span>
+              </label>
+            </div>
+            <div id="smsFields" class="conditional-field" style="display:none;">
+              <div class="polaris-field">
+                <label class="polaris-field-label">Phone Numbers</label>
+                <input class="polaris-field-input" type="text" name="smsPhoneNumbers" placeholder="+155****4567, +155****6543" autocomplete="off">
+                <p class="polaris-field-help">Comma-separated phone numbers for critical stock alerts</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Alert Thresholds Card -->
+        <div class="polaris-card">
+          <div class="polaris-card-inner">
+            <div class="polaris-card-header">Alert Thresholds</div>
+
+            <div class="polaris-field">
+              <label class="polaris-field-label">Low Stock Threshold</label>
+              <div class="polaris-field-suffix">
+                <input class="polaris-field-input" type="number" name="lowStockThreshold" value="10" autocomplete="off">
+                <span class="polaris-field-suffix-text">units</span>
+              </div>
+            </div>
+
+            <div class="polaris-field">
+              <label class="polaris-field-label">Critical Stock Threshold</label>
+              <div class="polaris-field-suffix">
+                <input class="polaris-field-input" type="number" name="criticalStockThreshold" value="3" autocomplete="off">
+                <span class="polaris-field-suffix-text">units</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Forecasting Card -->
+        <div class="polaris-card">
+          <div class="polaris-card-inner">
+            <div class="polaris-card-header">Forecasting</div>
+
+            <div class="polaris-field">
+              <label class="polaris-field-label">Forecast Horizon</label>
+              <div class="polaris-field-suffix">
+                <input class="polaris-field-input" type="number" name="forecastHorizonDays" value="30" autocomplete="off">
+                <span class="polaris-field-suffix-text">days</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Features Card -->
+        <div class="polaris-card">
+          <div class="polaris-card-inner">
+            <div class="polaris-card-header">AI Features</div>
+
+            <div class="polaris-row">
+              <span class="polaris-row-label">AI Insights</span>
+              <label class="polaris-checkbox">
+                <input type="checkbox" name="enableAiInsights" onchange="this.value = this.checked ? 'on' : ''">
+                <span class="polaris-checkbox-visual"></span>
+              </label>
+            </div>
+            <p class="polaris-section-text">Uses OpenCode API to analyze inventory data and generate insights. Statistical forecasting still works when AI is disabled.</p>
+
+            <div class="polaris-row" style="margin-top: 8px;">
+              <span class="polaris-row-label">Forecast Explanations</span>
+              <label class="polaris-checkbox">
+                <input type="checkbox" name="enableForecastExplanations" onchange="this.value = this.checked ? 'on' : ''">
+                <span class="polaris-checkbox-visual"></span>
+              </label>
+            </div>
+            <p class="polaris-section-text">Shows AI-generated natural language explanations of forecast data.</p>
+          </div>
+        </div>
+
+        <!-- General Card -->
+        <div class="polaris-card">
+          <div class="polaris-card-inner">
+            <div class="polaris-card-header">General</div>
+
+            <div class="polaris-field">
+              <label class="polaris-field-label">Currency</label>
+              <select class="polaris-select" name="currency">
+                <option value="USD">USD ($)</option>
+                <option value="EUR">EUR (€)</option>
+                <option value="GBP">GBP (£)</option>
+                <option value="CAD">CAD (C$)</option>
+                <option value="AUD">AUD (A$)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <div class="save-row">
+        <button id="saveBtn" type="button" class="polaris-btn polaris-btn-primary" onclick="handleSave()">
+          Save Settings
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function handleSave() {
+      const btn = document.getElementById('saveBtn');
+      btn.classList.add('polaris-btn-loading');
+      btn.disabled = true;
+      setTimeout(() => {
+        btn.classList.remove('polaris-btn-loading');
+        btn.disabled = false;
+        document.getElementById('success-banner').style.display = 'flex';
+        setTimeout(() => { document.getElementById('success-banner').style.display = 'none'; }, 3000);
+      }, 600);
+    }
+  </script>
+</body>
+</html>

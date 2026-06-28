@@ -40,40 +40,50 @@ export async function runForecast(
     return emptyForecast(horizonDays);
   }
 
-  // 1. Determine the best model based on historical accuracy (MAPE)
-  const bestModelName = await selectBestModel(dailySales);
-
   const quantities = dailySales.map((d) => d.qty);
-  const lastDateStr = dailySales[dailySales.length - 1].date;
+  const dates = dailySales.map((d) => d.date);
+  const mitigatedQuantities = mitigateOutliers(quantities);
 
-  // Detect trend via linear regression
-  const points = quantities.map((qty, i) => [i, qty]);
+  // Create mitigated dailySales array for model selection
+  const mitigatedDailySales: DailySales[] = mitigatedQuantities.map((qty, idx) => ({
+    qty,
+    date: dates[idx],
+  }));
+
+  // 1. Determine the best model based on historical accuracy (MAPE) using mitigated data
+  const bestModelName = await selectBestModel(mitigatedDailySales);
+
+  // Use mitigated data for trend detection and final prediction
+  const mitigatedLastDateStr = dates[dates.length - 1];
+
+  // Detect trend via linear regression on mitigated data
+  const points = mitigatedQuantities.map((qty, i) => [i, qty]);
   const regression = ss.linearRegression(points);
   const slope = regression.m;
-  const avg = ss.mean(quantities);
-  const sd = ss.standardDeviation(quantities);
+  const avg = ss.mean(mitigatedQuantities);
+  const sd = ss.standardDeviation(mitigatedQuantities);
 
   let trendDirection: "up" | "down" | "stable" = "stable";
   if (slope > avg * 0.01) trendDirection = "up";
   else if (slope < -avg * 0.01) trendDirection = "down";
 
-  // 2. Get predictions from the best model
+  // 2. Get predictions from the best model using mitigated data
   let predictions: ForecastOutput["predictions"];
   switch (bestModelName) {
     case 'SMA':
-      predictions = simpleMovingAverage(quantities, 7, horizonDays, lastDateStr).predictions;
+      predictions = simpleMovingAverage(mitigatedQuantities, 7, horizonDays, mitigatedLastDateStr).predictions;
       break;
     case 'WMA':
-      predictions = weightedMovingAverage(quantities, 7, horizonDays, lastDateStr).predictions;
+      predictions = weightedMovingAverage(mitigatedQuantities, 7, horizonDays, mitigatedLastDateStr).predictions;
       break;
     case 'Holts':
-      predictions = holtsLinearTrend(quantities, 0.3, 0.1, horizonDays, lastDateStr).predictions;
+      predictions = holtsLinearTrend(mitigatedQuantities, 0.3, 0.1, horizonDays, mitigatedLastDateStr).predictions;
       break;
     case 'Regression':
-      predictions = linearRegression(quantities, horizonDays, lastDateStr).predictions;
+      predictions = linearRegression(mitigatedQuantities, horizonDays, mitigatedLastDateStr).predictions;
       break;
     default:
-      predictions = simpleMovingAverage(quantities, 7, horizonDays, lastDateStr).predictions;
+      predictions = simpleMovingAverage(mitigatedQuantities, 7, horizonDays, mitigatedLastDateStr).predictions;
   }
 
   const totalPredicted = predictions.reduce((sum, p) => sum + p.yhat, 0);
@@ -92,6 +102,9 @@ export async function runForecast(
 /**
  * Evaluates all available models on historical data and returns the name of the best model.
  */
+/**
+ * Evaluates all available models on historical data and returns the name of the best model.
+ */
 async function selectBestModel(historicalSales: DailySales[]): Promise<string> {
   if (historicalSales.length < 14) return 'SMA'; // Not enough data to backtest
 
@@ -101,17 +114,21 @@ async function selectBestModel(historicalSales: DailySales[]): Promise<string> {
   const trainingData = historicalSales.slice(0, -validationSize);
   const validationData = historicalSales.slice(-validationSize);
 
-  if (trainingData.length < 7) return 'SMA';
-
+  // Extract quantities and apply outlier mitigation before model evaluation
   const validationQuantities = validationData.map(d => d.qty);
   const trainingQuantities = trainingData.map(d => d.qty);
+  const cleanedTraining = mitigateOutliers(trainingQuantities);
+  const cleanedValidation = mitigateOutliers(validationQuantities);
+
+  const trainingDates = trainingData.map(d => d.date);
+  const validationDates = validationData.map(d => d.date);
   const lastDateStr = trainingData[trainingData.length - 1].date;
 
   const models = [
-    { name: 'SMA', func: () => simpleMovingAverage(trainingQuantities, 7, validationSize, lastDateStr) },
-    { name: 'WMA', func: () => weightedMovingAverage(trainingQuantities, 7, validationSize, lastDateStr) },
-    { name: 'Holts', func: () => holtsLinearTrend(trainingQuantities, 0.3, 0.1, validationSize, lastDateStr) },
-    { name: 'Regression', func: () => linearRegression(trainingQuantities, validationSize, lastDateStr) }
+    { name: 'SMA', func: () => simpleMovingAverage(cleanedTraining, 7, validationSize, lastDateStr) },
+    { name: 'WMA', func: () => weightedMovingAverage(cleanedTraining, 7, validationSize, lastDateStr) },
+    { name: 'Holts', func: () => holtsLinearTrend(cleanedTraining, 0.3, 0.1, validationSize, lastDateStr) },
+    { name: 'Regression', func: () => linearRegression(cleanedTraining, validationSize, lastDateStr) }
   ];
 
   const results = await Promise.all(models.map(m => m.func()));
@@ -120,7 +137,7 @@ async function selectBestModel(historicalSales: DailySales[]): Promise<string> {
   let minMAPE = Infinity;
 
   results.forEach((res, index) => {
-    const mape = calculateMAPE(validationQuantities, res.predictions.map(p => p.yhat));
+    const mape = calculateMAPE(cleanedValidation, res.predictions.map(p => p.yhat));
     if (mape < minMAPE) {
       minMAPE = mape;
       bestModel = models[index].name;
@@ -142,6 +159,61 @@ function calculateMAPE(actuals: number[], predictions: number[]): number {
   }
 
   return count === 0 ? 1 : totalError / count;
+}
+
+// ── Outlier Detection ─────────────────────────────────────────────────────────
+/**
+ * Detect outliers in a numeric array using median absolute deviation (MAD).
+ * Returns an array of booleans where true indicates an outlier.
+ * @param data - Array of numbers
+ * @param threshold - Number of MADs beyond which a point is considered an outlier (default 3)
+ */
+function detectOutliers(data: number[], threshold: number = 3): boolean[] {
+  if (data.length < 2) return data.map(() => false);
+
+  // Compute median
+  const sorted = [...data].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  const median = sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
+
+  // Compute absolute deviations from median
+  const absDevs = data.map(val => Math.abs(val - median));
+  const sortedAbsDevs = [...absDevs].sort((a, b) => a - b);
+  const medianAbsDev = sortedAbsDevs.length % 2 === 0
+    ? (sortedAbsDevs[mid - 1] + sortedAbsDevs[mid]) / 2
+    : sortedAbsDevs[mid];
+
+  // Avoid division by zero
+  if (medianAbsDev === 0) {
+    // If all values are the same, no outliers
+    return data.map(() => false);
+  }
+
+  // Compute modified z-scores
+  const modifiedZScores = absDevs.map(dev => (0.6745 * dev) / medianAbsDev);
+  return modifiedZScores.map(z => Math.abs(z) > threshold);
+}
+
+/**
+ * Mitigate outliers in a numeric array by replacing them with the median.
+ * @param data - Array of numbers
+ * @param threshold - Number of MADs beyond which a point is considered an outlier (default 3)
+ * @returns New array with outliers replaced by median
+ */
+function mitigateOutliers(data: number[], threshold: number = 3): number[] {
+  const outliers = detectOutliers(data, threshold);
+  if (!outliers.some(isOutlier => isOutlier)) return data;
+
+  // Compute median
+  const sorted = [...data].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  const median = sorted.length % 2 === 0
+    ? (sorted[mid - 1] + sorted[mid]) / 2
+    : sorted[mid];
+
+  return data.map((val, idx) => outliers[idx] ? median : val);
 }
 
 function emptyForecast(horizonDays: number): ForecastResult {

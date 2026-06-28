@@ -371,6 +371,7 @@ model ShopSetting {
   criticalStockThreshold Int     @default(3)
   enableAutoReorder      Boolean @default(false)
   forecastHorizonDays    Int     @default(30)
+  safetyStockMultiplier  Float   @default(1.5)
   emailAlerts            Boolean @default(true)
   slackWebhookUrl        String?
   smsPhoneNumbers        Json?
