@@ -8,6 +8,7 @@
   --color-warning: #f49342;
   --color-success: #008060;
   --color-info: #5bcdd3;
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', 'Courier New', serif;
 
   /* Brutalist Modern Palette (Based on Reference Image) */
   --color-brutalist-magenta: #FF00FF;
@@ -22,7 +23,7 @@
 
 /* ═══════════════════════════════════════════════════
    BRUTALIST SETTINGS STYLE
-   ═══════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════ */
 
 .brutalist-settings {
   background: var(--color-brutalist-magenta) !important;

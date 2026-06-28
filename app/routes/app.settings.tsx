@@ -101,10 +101,10 @@ export default function Settings() {
             <Card>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <Text variant="headingMd" as="h2">
-                    Notifications
-                  </Text>
-                </div>
+                            <Text variant="headingMd" as="h2" style={{ fontFamily: 'var(--serif)' }}>
+                              Notifications
+                            </Text>
+                          </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
                     <Text variant="bodyMd" as="p">
@@ -190,7 +190,7 @@ export default function Settings() {
             <Card>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <Text variant="headingMd" as="h2">
+                  <Text variant="headingMd" as="h2" style={{ fontFamily: 'var(--serif)' }}>
                     Alert Thresholds
                   </Text>
                 </div>
@@ -221,7 +221,7 @@ export default function Settings() {
             <Card>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <Text variant="headingMd" as="h2">
+                  <Text variant="headingMd" as="h2" style={{ fontFamily: 'var(--serif)' }}>
                     Forecasting
                   </Text>
                 </div>
@@ -243,7 +243,7 @@ export default function Settings() {
             <Card>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <Text variant="headingMd" as="h2">
+                  <Text variant="headingMd" as="h2" style={{ fontFamily: 'var(--serif)' }}>
                     AI Features
                   </Text>
                 </div>
@@ -292,7 +292,7 @@ export default function Settings() {
             <Card>
               <div className="p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <Text variant="headingMd" as="h2">
+                  <Text variant="headingMd" as="h2" style={{ fontFamily: 'var(--serif)' }}>
                     General
                   </Text>
                 </div>
