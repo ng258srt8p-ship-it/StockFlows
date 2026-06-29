@@ -10,7 +10,7 @@ import {
   useNavigation,
   redirect,
 } from "@remix-run/react";
-import { AppProvider } from "@shopify/polaris";
+import { AppProvider, Page, Layout, Card, Text, Button } from "@shopify/polaris";
 import { authenticate } from "~/lib/shopify/server";
 
 import tailwindStylesHref from "./tailwind.css?url";
@@ -57,7 +57,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="bg-gray-50 antialiased">
+      <body className="antialiased">
         <AppProvider i18n={i18n}>
           {isLoading && (
             <div className="fixed top-0 left-0 right-0 h-1 bg-blue-600 animate-pulse z-50" />
@@ -82,26 +82,33 @@ export function ErrorBoundary() {
           <Meta />
           <Links />
         </head>
-        <body className="flex min-h-screen items-center justify-center bg-gray-50">
+        <body className="antialiased">
           <AppProvider i18n={i18n}>
-            <div className="max-w-md rounded-lg border border-gray-200 bg-white p-8 text-center shadow-sm">
-              <h1 className="mb-2 text-5xl font-bold text-gray-900">
-                {error.status}
-              </h1>
-              <p className="mb-1 text-lg font-medium text-gray-700">
-                {error.statusText}
-              </p>
-              <p className="mb-6 text-sm text-gray-500">
-                {(error.data as { message?: string })?.message ??
-                  "An unexpected error occurred."}
-              </p>
-              <a
-                href="/app"
-                className="inline-block rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-              >
-                Return to Dashboard
-              </a>
-            </div>
+            <Page title={`${error.status} ${error.statusText}`}>
+              <Layout>
+                <Layout.Section>
+                  <Card>
+                    <div className="text-center p-4">
+                      <Text variant="headingLg" as="p">
+                        {error.status}
+                      </Text>
+                      <Text variant="headingMd" as="p" tone="subdued">
+                        {error.statusText}
+                      </Text>
+                      <Text variant="bodySm" as="p" tone="subdued">
+                        {(error.data as { message?: string })?.message ??
+                          "An unexpected error occurred."}
+                      </Text>
+                      <div className="mt-4">
+                        <Button primary url="/app">
+                          Return to Dashboard
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                </Layout.Section>
+              </Layout>
+            </Page>
           </AppProvider>
           <Scripts />
         </body>
@@ -116,22 +123,26 @@ export function ErrorBoundary() {
         <Meta />
         <Links />
       </head>
-      <body className="flex min-h-screen items-center justify-center bg-gray-50">
+      <body className="antialiased">
         <AppProvider i18n={i18n}>
-          <div className="max-w-md rounded-lg border border-red-200 bg-white p-8 text-center shadow-sm">
-            <h1 className="mb-2 text-2xl font-bold text-gray-900">
-              Something went wrong
-            </h1>
-            <p className="mb-6 text-sm text-gray-500">
-              An unexpected error occurred. Please try again or contact support.
-            </p>
-            <a
-              href="/app"
-              className="inline-block rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-            >
-              Return to Dashboard
-            </a>
-          </div>
+          <Page title="Something went wrong">
+            <Layout>
+              <Layout.Section>
+                <Card>
+                  <div className="text-center p-4">
+                    <Text variant="headingMd" as="p" tone="subdued">
+                      An unexpected error occurred. Please try again or contact support.
+                    </Text>
+                    <div className="mt-4">
+                      <Button primary url="/app">
+                        Return to Dashboard
+                      </Button>
+                    </div>
+                  </div>
+                </Card>
+              </Layout.Section>
+            </Layout>
+          </Page>
         </AppProvider>
         <Scripts />
       </body>

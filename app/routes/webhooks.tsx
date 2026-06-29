@@ -11,7 +11,7 @@
  * paths like /webhooks/{topic} — paths Shopify never sends to.
  */
 
-import type { ActionFunctionArgs } from "@remix-run/node";
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
 import { logger } from "~/lib/logger";
@@ -41,6 +41,14 @@ type WebhookHandler = (
   payload: Record<string, unknown>,
   log: WebhookLogger,
 ) => Promise<void>;
+
+// ---------------------------------------------------------------------------
+// Loader — reject GET requests (webhooks are POST-only)
+// ---------------------------------------------------------------------------
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  return new Response("Method Not Allowed", { status: 405 });
+};
 
 // ---------------------------------------------------------------------------
 // Action — entry point for every webhook delivery

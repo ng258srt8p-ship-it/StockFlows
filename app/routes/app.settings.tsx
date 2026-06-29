@@ -47,6 +47,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const data = {
     lowStockThreshold: Number(formData.get("lowStockThreshold")) || 10,
     criticalStockThreshold: Number(formData.get("criticalStockThreshold")) || 3,
+    safetyStockMultiplier: Number(formData.get("safetyStockMultiplier")) || 1.5,
     forecastHorizonDays: Number(formData.get("forecastHorizonDays")) || 30,
     emailAlerts: formData.get("emailAlerts") === "on",
     slackWebhookUrl: formData.get("slackWebhookUrl") as string || null,
@@ -77,6 +78,7 @@ export default function Settings() {
 
   const [lowStock, setLowStock] = useState(String(settings?.lowStockThreshold || 10));
   const [criticalStock, setCriticalStock] = useState(String(settings?.criticalStockThreshold || 3));
+  const [safetyStockMultiplier, setSafetyStockMultiplier] = useState(String(settings?.safetyStockMultiplier || 1.5));
   const [forecastHorizon, setForecastHorizon] = useState(String(settings?.forecastHorizonDays || 30));
   const [slackUrl, setSlackUrl] = useState(settings?.slackWebhookUrl || "");
   const [smsPhones, setSmsPhones] = useState(
@@ -211,6 +213,16 @@ export default function Settings() {
                       value={criticalStock}
                       onChange={setCriticalStock}
                       suffix="units"
+                      autoComplete="off"
+                    />
+                    <TextField
+                      label="Safety Stock Multiplier"
+                      type="number"
+                      step="0.1"
+                      name="safetyStockMultiplier"
+                      value={safetyStockMultiplier}
+                      onChange={setSafetyStockMultiplier}
+                      suffix="×"
                       autoComplete="off"
                     />
                   </div>

@@ -44,7 +44,7 @@ export default function Reports() {
   };
 
   return (
-    <Page title="Reports">
+    <Page title="Reports" subtitle="Export inventory data and analytics">
       <Layout>
         <Layout.Section>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

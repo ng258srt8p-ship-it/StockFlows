@@ -99,6 +99,7 @@ export default function PurchasingList() {
   return (
     <Page
       title="Purchase Orders"
+      subtitle="Manage vendor orders and receiving"
       primaryAction={{
         content: "Create PO",
         onAction: () => navigate("/app/purchasing/new"),
