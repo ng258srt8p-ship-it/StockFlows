@@ -18,7 +18,7 @@ import {
 } from "@shopify/polaris";
 
 // ---------------------------------------------------------------------------
-// Server — UNCHANGED from current implementation
+// Server
 // ---------------------------------------------------------------------------
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -102,38 +102,25 @@ export default function Settings() {
               {/* ── Notifications Card ─────────────────────────── */}
               <Card>
                 <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Text variant="headingMd" as="h2">
-                      Notifications
-                    </Text>
-                  </div>
+                  <Text variant="headingMd" as="h2">
+                    Notifications
+                  </Text>
+                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
+                    Configure how StockFlows alerts your team about low stock levels.
+                  </Text>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">
-                        Email Alerts
-                      </Text>
+                      <Text variant="bodyMd" as="p">Email Alerts</Text>
                       <div>
-                        <Checkbox
-                          label="Email Alerts"
-                          labelHidden
-                          checked={emailOn}
-                          onChange={setEmailOn}
-                        />
+                        <Checkbox label="Email Alerts" labelHidden checked={emailOn} onChange={setEmailOn} />
                         <input type="hidden" name="emailAlerts" value={emailOn ? "on" : ""} />
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">
-                        Slack Alerts
-                      </Text>
+                      <Text variant="bodyMd" as="p">Slack Alerts</Text>
                       <div>
-                        <Checkbox
-                          label="Slack Alerts"
-                          labelHidden
-                          checked={slackOn}
-                          onChange={setSlackOn}
-                        />
+                        <Checkbox label="Slack Alerts" labelHidden checked={slackOn} onChange={setSlackOn} />
                         <input type="hidden" name="slackEnabled" value={slackOn ? "on" : ""} />
                       </div>
                     </div>
@@ -149,22 +136,15 @@ export default function Settings() {
                           autoComplete="off"
                         />
                         <Text variant="bodySm" as="p" tone="subdued">
-                          Create one at Settings &gt; Apps &gt; Incoming Webhooks
+                          Create one at Settings → Apps → Incoming Webhooks
                         </Text>
                       </div>
                     )}
 
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">
-                        SMS Alerts
-                      </Text>
+                      <Text variant="bodyMd" as="p">SMS Alerts</Text>
                       <div>
-                        <Checkbox
-                          label="SMS Alerts"
-                          labelHidden
-                          checked={smsOn}
-                          onChange={setSmsOn}
-                        />
+                        <Checkbox label="SMS Alerts" labelHidden checked={smsOn} onChange={setSmsOn} />
                         <input type="hidden" name="smsEnabled" value={smsOn ? "on" : ""} />
                       </div>
                     </div>
@@ -176,7 +156,7 @@ export default function Settings() {
                           name="smsPhoneNumbers"
                           value={smsPhones}
                           onChange={setSmsPhones}
-                          placeholder="+155****4567, +155****6543"
+                          placeholder="+15558675310, +15558675311"
                           autoComplete="off"
                         />
                         <Text variant="bodySm" as="p" tone="subdued">
@@ -191,11 +171,12 @@ export default function Settings() {
               {/* ── Alert Thresholds Card ──────────────────────── */}
               <Card>
                 <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Text variant="headingMd" as="h2">
-                      Alert Thresholds
-                    </Text>
-                  </div>
+                  <Text variant="headingMd" as="h2">
+                    Alert Thresholds
+                  </Text>
+                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
+                    Set stock levels that trigger reorder alerts. Critical must be lower than Low.
+                  </Text>
                   <div className="space-y-4">
                     <TextField
                       label="Low Stock Threshold"
@@ -218,7 +199,7 @@ export default function Settings() {
                     <TextField
                       label="Safety Stock Multiplier"
                       type="number"
-                      step="0.1"
+                      step={0.1}
                       name="safetyStockMultiplier"
                       value={safetyStockMultiplier}
                       onChange={setSafetyStockMultiplier}
@@ -232,11 +213,12 @@ export default function Settings() {
               {/* ── Forecasting Card ───────────────────────────── */}
               <Card>
                 <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Text variant="headingMd" as="h2">
-                      Forecasting
-                    </Text>
-                  </div>
+                  <Text variant="headingMd" as="h2">
+                    Forecasting
+                  </Text>
+                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
+                    Configure how far ahead the demand forecast predicts future sales.
+                  </Text>
                   <div className="space-y-4">
                     <TextField
                       label="Forecast Horizon"
@@ -254,23 +236,17 @@ export default function Settings() {
               {/* ── AI Features Card ───────────────────────────── */}
               <Card>
                 <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Text variant="headingMd" as="h2">
-                      AI Features
-                    </Text>
-                  </div>
+                  <Text variant="headingMd" as="h2">
+                    AI Features
+                  </Text>
+                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
+                    Enable AI-powered insights and natural language explanations for your inventory data.
+                  </Text>
                   <div className="space-y-2">
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">
-                        AI Insights
-                      </Text>
+                      <Text variant="bodyMd" as="p">AI Insights</Text>
                       <div>
-                        <Checkbox
-                          label="AI Insights"
-                          labelHidden
-                          checked={aiInsightsOn}
-                          onChange={setAiInsightsOn}
-                        />
+                        <Checkbox label="AI Insights" labelHidden checked={aiInsightsOn} onChange={setAiInsightsOn} />
                         <input type="hidden" name="enableAiInsights" value={aiInsightsOn ? "on" : ""} />
                       </div>
                     </div>
@@ -280,16 +256,9 @@ export default function Settings() {
                     </Text>
 
                     <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">
-                        Forecast Explanations
-                      </Text>
+                      <Text variant="bodyMd" as="p">Forecast Explanations</Text>
                       <div>
-                        <Checkbox
-                          label="Forecast Explanations"
-                          labelHidden
-                          checked={forecastExplOn}
-                          onChange={setForecastExplOn}
-                        />
+                        <Checkbox label="Forecast Explanations" labelHidden checked={forecastExplOn} onChange={setForecastExplOn} />
                         <input type="hidden" name="enableForecastExplanations" value={forecastExplOn ? "on" : ""} />
                       </div>
                     </div>
@@ -303,11 +272,12 @@ export default function Settings() {
               {/* ── General Card ───────────────────────────────── */}
               <Card>
                 <div className="p-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <Text variant="headingMd" as="h2">
-                      General
-                    </Text>
-                  </div>
+                  <Text variant="headingMd" as="h2">
+                    General
+                  </Text>
+                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
+                    Configure general settings for your StockFlows account.
+                  </Text>
                   <div className="space-y-4">
                     <Select
                       label="Currency"
