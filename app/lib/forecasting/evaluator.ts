@@ -1,4 +1,5 @@
-import type { ForecastOutput, DailySales } from "./engine";
+import type { DailySales } from "./engine";
+import type { ForecastOutput } from "./models";
 
 /**
  * Model evaluation, selection and ensemble blending.

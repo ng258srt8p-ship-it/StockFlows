@@ -7,6 +7,8 @@ import {
   linearRegression
 } from "./models";
 
+export type { ForecastOutput } from "./models";
+
 // ── Shared types ──────────────────────────────────────────────────────────────
 
 export interface DailySales {

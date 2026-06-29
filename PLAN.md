@@ -1,80 +1,159 @@
-# Plan: AI Transparency & Opt-Out Toggle
+# StockFlows — Deployment to Shopify Dev Testing Environment
 
-## Problem
-The tour page and app have AI features (insights on dashboard, forecast explanations) but:
-1. No documentation explains what AI technology is used or what data is sent
-2. There's no way for users to disable AI if they don't want their data going through an external API
-3. The privacy policy doesn't mention AI
+> **Goal:** Push all local changes to the Shopify dev testing environment at https://admin.shopify.com/store/stockflows/apps/stockflows-app
 
-## Solution
+---
 
-### 1. Add AI toggle to Settings page
+## Current State
 
-Add a new "AI Features" card in the settings grid (between Notifications and Store Information):
+### Local Changes (Not Yet Deployed)
+| Change | File | Status |
+|--------|------|--------|
+| Settings page restructure (`<Page>` outermost) | `app/routes/app.settings.tsx` | ✅ Local commit |
+| Marketing buttons removed from explore.html | `public/explore.html` | ✅ Local commit |
+| Safety Stock Multiplier field added | `app/routes/app.settings.tsx` | ✅ Local commit |
+| Section descriptions on all settings cards | `app/routes/app.settings.tsx` | ✅ Local commit |
+| Consistent card padding (`p-4`) & grid gaps (`gap-4`) | All route files | ✅ Local commit |
+| New E2E test suites | `e2e/` | ✅ Local commit |
+| TypeScript strict mode clean | All files | ✅ Local commit |
 
-```
-┌─────────────────────────────────────┐
-│ AI Features                          │
-│                                      │
-│ ☑ Enable AI Insights                │
-│ Uses OpenCode API with Big Pickle    │
-│ model to analyze inventory data and  │
-│ generate insights. Your inventory    │
-│ data, forecasts, and alerts are sent │
-│ to an external AI service for        │
-│ analysis. Statistical forecasting    │
-│ (the core demand engine) still works │
-│ when AI is disabled.                 │
-│                                      │
-│ ☐ Enable Forecast Explanations       │
-│ Shows AI-generated natural language  │
-│ explanations of forecast data when   │
-│ you click a product.                │
-└─────────────────────────────────────┘
+### Git Status
+```bash
+On branch main
+Your branch is ahead of 'origin/main' by 5 commits.
+  (use "git push" to publish your local commits)
 ```
 
-State stored in `SETTINGS.aiInsights = true` and `SETTINGS.forecastExplanations = true`.
+---
 
-### 2. Dashboard: Conditionally render AI insights
+## Deployment Plan
 
-In `generateAIInsights()` and the dashboard HTML:
-- If `SETTINGS.aiInsights === false`, skip the AI Insights section entirely
-- If true, show the insights as currently implemented
+### Phase 1: Push to GitHub (Triggers CI/CD)
 
-### 3. Forecasting: Conditionally render AI insight card
+```bash
+cd "/Users/georgetozer/Development/Shopify Apps/stockflows"
+git push origin main
+```
 
-In `generateForecastInsight()` and the forecast detail HTML:
-- If `SETTINGS.forecastExplanations === false`, hide the AI Insight card below the sparkline
-- The sparkline chart and statistical numbers still show (they're not AI)
+**Expected CI/CD Pipeline:**
+1. **GitHub Actions CI** runs:
+   - `npm ci`
+   - `npx tsc --noEmit --skipLibCheck` — TypeScript check
+   - `npx vitest run` — Unit tests
+   - `npx vite build` — Production build
+2. **Deploy job** (main branch only):
+   - Runs Prisma migrations on Railway
+   - Deploys app config to Shopify Partners via `shopify app deploy --force`
 
-### 4. Privacy policy update
+### Phase 2: Verify Railway Deployment
 
-Add a new section "AI and Data Processing":
-- **What we use:** OpenCode API with Big Pickle model
-- **What data is sent:** Aggregated inventory data (product counts, stock levels, forecast summaries, alert lists). No customer PII, no individual order data.
-- **Why:** To generate actionable inventory insights and explain forecast trends in plain language
-- **Opt-out:** Users can disable AI in Settings > AI Features. Statistical forecasting continues to work without AI.
-- **Data retention:** AI requests are not stored by StockFlows. OpenCode's data retention policy applies.
+```bash
+# Check Railway service status
+railway status --service stockflows-app
 
-### 5. App Store listing update
+# Check logs
+railway logs --service stockflows-app
 
-Add to the description:
-> "AI insights are optional. StockFlows can analyze your inventory data to provide natural language insights and forecast explanations powered by the OpenCode API. You can disable AI features in Settings at any time. The core statistical forecasting engine works without AI."
+# Verify health endpoint
+curl https://stockflows.app/health
+# Expected: {"status":"alive","timestamp":"..."}
+```
 
-### 6. Tour step update
+### Phase 3: Verify Shopify App Config Deployed
 
-Add a step on the Settings page showing the AI toggle with explanation.
+```bash
+# Check Shopify app config version
+npx @shopify/cli app info
+```
 
-## Files Changed
+Should show the latest config version with updated webhook subscriptions.
 
-| File | Change |
-|------|--------|
-| `public/tour.html` | Settings: add AI toggle card. Dashboard: wrap AI insights in `SETTINGS.aiInsights` check. Forecasting: wrap insight card in `SETTINGS.forecastExplanations` check. Tour: add settings tour step. |
-| `public/privacy.html` | Add "AI and Data Processing" section |
-| `APP-STORE-LISTING.md` | Add AI opt-out bullet point |
+### Phase 4: Test in Dev Store
 
-## Verification
-- Toggle both AI settings off → insights and forecast explanations hidden
-- Toggle both on → sections reappear
-- Privacy policy documents AI usage
-- All 68 E2E tests pass
+1. Navigate to: https://admin.shopify.com/store/stockflows/apps/stockflows-app
+2. Install/update the app if needed
+3. Verify all pages load correctly:
+   - Dashboard
+   - Inventory
+   - Purchasing
+   - Forecasting
+   - Reports
+   - Settings (verify structure matches Dashboard)
+4. Test settings save:
+   - Change Low Stock Threshold → Save → Reload → Verify persisted
+   - Toggle Email Alerts → Save → Reload → Verify persisted
+   - Toggle AI Insights → Save → Reload → Verify persisted
+
+### Phase 5: Verify Marketing Pages Removed
+
+```bash
+# Check explore.html no longer has marketing buttons
+curl -s https://stockflows.app/explore.html | grep -i "watch demo\|take tour"
+# Expected: no output (empty)
+```
+
+### Phase 6: Run Full Test Suite Against Deployed App
+
+```bash
+# Point Playwright at production
+BASE_URL=https://stockflows.app npx playwright test e2e/settings-visual-match.spec.ts --reporter=list
+BASE_URL=https://stockflows.app npx playwright test e2e/comprehensive-noauth.spec.ts --reporter=list
+```
+
+---
+
+## Expected Results After Deployment
+
+| Check | Expected Result |
+|-------|-----------------|
+| Git push | ✅ 5 commits pushed to origin/main |
+| GitHub Actions CI | ✅ All checks pass |
+| Railway deploy | ✅ Service healthy, health check passes |
+| Shopify app config | ✅ Deployed with updated webhooks |
+| Dev store app | ✅ Loads without errors |
+| Settings page | ✅ Matches Dashboard structure exactly |
+| Settings form save | ✅ All fields persist after reload |
+| explore.html | ✅ No "Watch Demo" or "Take Tour" buttons |
+| Marketing site | ✅ tour.html still has buttons (marketing site OK) |
+| E2E tests vs prod | ✅ All pass |
+
+---
+
+## Rollback Plan (If Issues)
+
+```bash
+# 1. Revert to previous Railway deployment
+railway rollback --service stockflows-app
+
+# 2. Or revert git and re-push
+git revert HEAD~5..HEAD
+git push origin main
+
+# 3. Re-deploy Shopify app config
+npx @shopify/cli app deploy --allow-updates
+```
+
+---
+
+## Verification Checklist (Post-Deploy)
+
+- [ ] `git push origin main` completed
+- [ ] GitHub Actions CI: All green
+- [ ] Railway service: Healthy
+- [ ] `curl https://stockflows.app/health` returns 200
+- [ ] Shopify app config deployed: `npx @shopify/cli app info` shows latest
+- [ ] Dev store: App loads at https://admin.shopify.com/store/stockflows/apps/stockflows-app
+- [ ] Settings page: Visual match with Dashboard (no Form wrapper, correct subtitle)
+- [ ] Settings form: Save → Reload → Values persist
+- [ ] explore.html: No Watch Demo / Take Tour buttons
+- [ ] tour.html: Still has marketing buttons (expected)
+- [ ] Playwright tests vs prod: All pass
+
+---
+
+## Post-Deploy Monitoring
+
+- Watch Sentry for new errors (1 hour)
+- Watch Railway logs for background job errors (1 hour)
+- Verify nightly forecast job runs (check logs next morning)
+- Verify webhook processing (check processed_webhooks table)

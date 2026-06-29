@@ -14,11 +14,14 @@
  */
 import { test, expect } from "@playwright/test";
 
-const BASE_URL = "http://localhost:5173";
+// App routes (Railway deployment)
+const APP_BASE_URL = "https://faithful-love-production-18fb.up.railway.app";
+// Marketing pages (Cloudflare Pages deployment)
+const MARKETING_BASE_URL = "https://stockflows.app";
 
 test.describe("Marketing buttons removed from app pages", () => {
   test("explore.html has no Watch Demo button", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explore.html`, { waitUntil: "networkidle" });
+    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
 
     const watchDemo = page.locator('text="Watch Demo"');
     const count = await watchDemo.count();
@@ -26,7 +29,7 @@ test.describe("Marketing buttons removed from app pages", () => {
   });
 
   test("explore.html has no Take Tour button", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explore.html`, { waitUntil: "networkidle" });
+    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
 
     const takeTour = page.locator('text="Take Tour"');
     const count = await takeTour.count();
@@ -34,7 +37,7 @@ test.describe("Marketing buttons removed from app pages", () => {
   });
 
   test("explore.html has no tour-btn class elements", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explore.html`, { waitUntil: "networkidle" });
+    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
 
     const tourBtns = page.locator(".tour-btn");
     const count = await tourBtns.count();
@@ -42,7 +45,7 @@ test.describe("Marketing buttons removed from app pages", () => {
   });
 
   test("explore.html has no demo.html links", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explore.html`, { waitUntil: "networkidle" });
+    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
 
     const demoLinks = page.locator('a[href="demo.html"]');
     const count = await demoLinks.count();
@@ -50,7 +53,7 @@ test.describe("Marketing buttons removed from app pages", () => {
   });
 
   test("explore.html has no startInAppTour function", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explore.html`, { waitUntil: "networkidle" });
+    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
 
     const hasFunction = await page.evaluate(() => {
       return typeof (window as any).startInAppTour === "function";
@@ -59,7 +62,7 @@ test.describe("Marketing buttons removed from app pages", () => {
   });
 
   test("explore.html has no tour-overlay element", async ({ page }) => {
-    await page.goto(`${BASE_URL}/explore.html`, { waitUntil: "networkidle" });
+    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
 
     const overlay = page.locator("#tour-overlay");
     const count = await overlay.count();
@@ -72,7 +75,7 @@ test.describe("Marketing buttons removed from app pages", () => {
       if (msg.type() === "error") errors.push(msg.text());
     });
 
-    await page.goto(`${BASE_URL}/explore.html`, { waitUntil: "networkidle" });
+    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
     expect(errors).toEqual([]);
   });
 
@@ -82,12 +85,12 @@ test.describe("Marketing buttons removed from app pages", () => {
       if (msg.type() === "error") errors.push(msg.text());
     });
 
-    await page.goto(`${BASE_URL}/tour.html`, { waitUntil: "networkidle" });
+    await page.goto(`${MARKETING_BASE_URL}/tour.html`, { waitUntil: "networkidle" });
     expect(errors).toEqual([]);
   });
 
   test("tour.html has CTA buttons (marketing site - OK)", async ({ page }) => {
-    await page.goto(`${BASE_URL}/tour.html`, { waitUntil: "networkidle" });
+    await page.goto(`${MARKETING_BASE_URL}/tour.html`, { waitUntil: "networkidle" });
 
     // These are OK on the marketing site
     const exploreBtn = page.locator('a[href="explore.html"]').first();
@@ -113,7 +116,7 @@ test.describe("Marketing buttons removed from app pages", () => {
     ];
 
     for (const route of appRoutes) {
-      const response = await page.goto(`${BASE_URL}${route}`);
+      const response = await page.goto(`${APP_BASE_URL}${route}`);
       // App routes require Shopify auth - 410 Gone or 500 Internal Server Error expected without auth
       expect([410, 500]).toContain(response?.status());
     }

@@ -27,7 +27,8 @@ test.describe('Full Settings → Forecast → Purchase Order flow', () => {
     const recommendedQtyText = page.locator('.recommendedQty');
     await expect(recommendedQtyText).toBeVisible({ timeout: 5000 });
     const qtyString = await recommendedQtyText.textContent();
-    const recommendedQty = parseFloat(qtyString.trim());
+    expect(qtyString).not.toBeNull();
+    const recommendedQty = parseFloat(qtyString!.trim());
 
     // The recommended quantity must be > 0
     expect(recommendedQty).toBeGreaterThan(0);

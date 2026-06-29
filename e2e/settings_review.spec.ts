@@ -46,7 +46,8 @@ test.describe('Settings and Forecasting Flow', () => {
 
     // Extract the numeric value
     const recommendedQty = await recommendedQtyText.textContent();
-    const recommendedQtyNum = parseFloat(recommendedQty);
+    expect(recommendedQty).not.toBeNull();
+    const recommendedQtyNum = parseFloat(recommendedQty!);
     expect(recommendedQtyNum).toBeGreaterThan(0);
 
     // Verify the "Create PO" button is present

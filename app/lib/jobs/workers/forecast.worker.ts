@@ -65,7 +65,7 @@ export const forecastWorker = new Worker(
         }
 
         // Run forecast
-        const forecast = runForecast(dailySales, 30);
+        const forecast = await runForecast(dailySales, 30);
 
         // Save result
         await prisma.forecastResult.create({

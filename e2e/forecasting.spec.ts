@@ -99,7 +99,7 @@ test.describe("Forecasting Engine — Integration", () => {
     const item = await prisma.inventoryItem.findFirst({ where: { sku: "WDG-001" } });
     expect(item).not.toBeNull();
 
-    const forecast = runForecast(
+    const forecast = await runForecast(
       Array.from({ length: 30 }, (_, i) => ({
         date: `2026-06-${String(i + 1).padStart(2, "0")}`,
         qty: 10 + Math.round(Math.random() * 5),

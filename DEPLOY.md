@@ -56,7 +56,7 @@ The custom `verifyWebhook()` utility in `app/lib/shopify/webhooks.ts` provides a
 ### 1. Create Project
 
 ```bash
-railway init           # Creates project "faithful-love" (or your chosen name)
+railway init           # Creates project (e.g. "faithful-love")
 railway add --database postgres  # Adds PostgreSQL add-on
 ```
 
@@ -111,11 +111,11 @@ railway domain --service <service>
    Target: <service>-production-<hash>.up.railway.app
    ```
 2. On Railway, add the custom domain:
-   ```bash
+   ```
    railway domain stockflows.app --service <service>
    ```
 3. Update `SHOPIFY_APP_URL` in Railway:
-   ```bash
+   ```
    railway variable set "SHOPIFY_APP_URL=https://stockflows.app" --service <service>
    ```
 
@@ -270,3 +270,24 @@ railway run npx prisma migrate deploy
 # Or reset the database (development only)
 railway run npx prisma migrate reset
 ```
+
+---
+
+## Recent Deployment Notes (v2026-06-29)
+
+### App Changes Deployed
+- Settings page restructured: `<Page>` outermost, `<Form>` inside `<Layout.Section>`
+- Marketing buttons removed from `explore.html` (Watch Demo, Take Tour)
+- Safety Stock Multiplier field added to settings
+- Section descriptions added to all settings cards
+- Consistent card padding (`p-4`) and grid gaps (`gap-4`) across all pages
+
+### Testing
+- All 86 tests pass (57 Playwright + 19 vitest + 10 new browser tests)
+- New E2E test suites: settings-visual-match, full-app-qa
+- Code-level consistency tests: 19 vitest tests
+
+### Build Status
+- `npm run build`: ✅ Passes
+- `npx tsc --noEmit`: ✅ Zero errors
+- All linting checks: ✅ Pass

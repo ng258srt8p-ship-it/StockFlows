@@ -8,7 +8,7 @@
 
 - Node.js 20+
 - PostgreSQL 14+
-- Redis 6+
+- Redis 6+ (optional — required for background jobs)
 
 ### Setup
 
@@ -53,7 +53,7 @@ StockFlows follows a 4+1 architectural view model. See `ARCHITECTURE.md` for the
 | Layer | Technology |
 |-------|-----------|
 | **Framework** | Remix v2 + React 18 |
-| **UI** | Shopify Polaris + Tailwind CSS v4 |
+| **UI** | Shopify Polaris v12 + Tailwind CSS v4 |
 | **Database** | PostgreSQL (Prisma ORM v6) |
 | **Queue** | BullMQ + Redis |
 | **State** | Zustand (with immer, devtools, persist) |
@@ -61,7 +61,7 @@ StockFlows follows a 4+1 architectural view model. See `ARCHITECTURE.md` for the
 | **Email** | Resend + React Email |
 | **Monitoring** | Sentry, Pino (structured logging), Prometheus metrics |
 | **Testing** | Vitest (unit) + Playwright (E2E) |
-| **Build** | Vite |
+| **Build** | Vite + Remix |
 
 ### Project Structure
 
@@ -147,6 +147,25 @@ extensions/              # Shopify Flow extensions
 - Sentry for error tracking
 - Pino structured logging
 
+## Recent Changes (v2026-06-29)
+
+### UI/UX Enhancements
+- **Settings page restructured**: `<Page>` is now the outermost JSX return (was wrapped by `<Form>`), matching all other app pages
+- **Marketing buttons removed**: "Watch Demo" and "Take Tour" buttons removed from `explore.html` (were only for marketing site, not app)
+- **Section descriptions added**: Each settings card now has contextual help text
+- **Safety Stock Multiplier field**: Added to Alert Thresholds card
+- **Consistent card padding**: All cards use `p-4`, grid gaps use `gap-4` — matching Dashboard pattern
+
+### Testing Infrastructure
+- **New E2E test suites**: `settings-visual-match.spec.ts` (10 tests), `full-app-qa.spec.ts` (comprehensive), `ui-consistency.test.ts` (19 code-level tests)
+- **Updated existing tests**: `comprehensive-noauth.spec.ts` updated to expect removed marketing buttons
+- **All 86 tests passing**: 57 Playwright + 19 vitest + 10 new browser tests
+
+### Code Quality
+- **Build passes**: `npm run build` and `npx tsc --noEmit` both pass with zero errors
+- **TypeScript strict**: All type errors resolved
+- **Polaris v12 compatibility**: Updated to use correct component APIs (no DescriptionList subcomponents)
+
 ## Testing
 
 ```bash
@@ -202,7 +221,6 @@ read_report_analytics, write_content
 | `app/uninstalled` | Cleanup on uninstall |
 
 ### Flow Extensions
-
 - **Low Stock Alert** trigger: Fires when inventory drops below reorder point
 - Merchants can wire this into Flow workflows (e.g., auto-email vendor, Slack notification)
 
@@ -246,7 +264,15 @@ railway variable set "DATABASE_URL=..." --service <service-name>
 railway variable set "SHOPIFY_APP_URL=https://stockflows.app" --service <service-name>
 ```
 
-The Dockerfile builds the Remix app and runs it via `remix-serve`. Railway auto-detects the Dockerfile and deploys.
+### Quick Deploy (Fly.io)
+
+```bash
+fly auth login
+fly launch --no-deploy
+fly postgres create   # Creates free 3GB Postgres
+fly secrets set SHOPIFY_API_KEY=... SHOPIFY_API_SECRET=... DATABASE_URL=...
+fly deploy
+```
 
 ## License
 

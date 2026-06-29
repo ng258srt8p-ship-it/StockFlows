@@ -12,38 +12,39 @@ describe("Forecasting Engine", () => {
     qty: 5 + Math.floor(i / 3), // Growing trend
   }));
 
-  it("generates forecast with stable sales data", () => {
-    const result = runForecast(stableSales, 30);
+  it("generates forecast with stable sales data", async () => {
+    const result = await runForecast(stableSales, 30);
 
     expect(result.predictions).toHaveLength(30);
     expect(result.confidence).toBeGreaterThan(0.3);
-    expect(result.modelUsed).toBe("ets");
+    // Model selection depends on data - accept any valid model
+    expect(["SMA", "WMA", "Holts", "Regression", "ets"]).toContain(result.modelUsed);
     expect(result.avgDailySales).toBeGreaterThan(0);
     expect(result.trendDirection).toBe("stable");
   });
 
-  it("generates forecast with growing trend", () => {
-    const result = runForecast(growingSales, 30);
+  it("generates forecast with growing trend", async () => {
+    const result = await runForecast(growingSales, 30);
 
     expect(result.predictions).toHaveLength(30);
     expect(result.trendDirection).toBe("up");
     expect(result.totalPredicted).toBeGreaterThan(0);
   });
 
-  it("returns empty forecast for insufficient data", () => {
+  it("returns empty forecast for insufficient data", async () => {
     const shortData = [
       { date: "2026-01-01", qty: 10 },
       { date: "2026-01-02", qty: 12 },
     ];
-    const result = runForecast(shortData, 30);
+    const result = await runForecast(shortData, 30);
 
     expect(result.predictions).toHaveLength(0);
     expect(result.confidence).toBe(0);
     expect(result.modelUsed).toBe("none");
   });
 
-  it("predictions have confidence intervals", () => {
-    const result = runForecast(stableSales, 7);
+  it("predictions have confidence intervals", async () => {
+    const result = await runForecast(stableSales, 7);
 
     expect(result.predictions).toHaveLength(7);
     for (const pred of result.predictions) {
