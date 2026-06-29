@@ -665,65 +665,244 @@ return `<div class="ios-row"><span class="ios-row-label">${label}</span><div sty
 function iosSelectRow(label,value,options){
 return `<div class="ios-row"><span class="ios-row-label">${label}</span><div style="display:flex;align-items:center;gap:8px"><select onchange="SETTINGS.currency=this.value;toast('Setting saved')" style="background:transparent;border:none;outline:none;font-size:.9375rem;color:#6d6d72;font-family:inherit;appearance:none;cursor:pointer">${options.map(o=>`<option value="${o.v}" ${o.v===value?'selected':''}>${o.l}</option>`).join('')}</select><span class="ios-chevron"></span></div></div>`;
 }
-function renderSettings(){
-const emailOn=SETTINGS.emailAlerts!==false;
-const slackOn=!!SETTINGS.slackEnabled;
-const smsOn=!!SETTINGS.smsEnabled;
-const aiOn=!!SETTINGS.aiInsights;
-const fxOn=!!SETTINGS.forecastExplanations;
-document.getElementById('page-settings').innerHTML=`
-<div class="ios-settings">
-<p class="ios-section-header">Notifications</p>
-<div class="ios-section">
-${iosToggle('emailAlerts','Email Alerts','mail','#008060',emailOn,"SETTINGS.emailAlerts=this.checked;toast(this.checked?'Email alerts enabled':'Email alerts disabled')")}
-${iosToggle('slackEnabled','Slack Alerts','chat','#36a64f',slackOn,"SETTINGS.slackEnabled=this.checked;toast(this.checked?'Slack alerts enabled':'Slack alerts disabled')")}
-${iosToggle('smsEnabled','SMS Alerts','smartphone','#af52de',smsOn,"SETTINGS.smsEnabled=this.checked;toast(this.checked?'SMS alerts enabled':'SMS alerts disabled')")}
-</div>
+function renderSettings() {
+  const emailOn = SETTINGS.emailAlerts !== false;
+  const slackOn = !!SETTINGS.slackEnabled;
+  const smsOn = !!SETTINGS.smsEnabled;
+  const aiOn = !!SETTINGS.aiInsights;
+  const fxOn = !!SETTINGS.forecastExplanations;
 
-<p class="ios-section-header">Alert Thresholds</p>
-<div class="ios-section">
-${iosInput('lowStockThreshold','Low Stock',SETTINGS.lowStockThreshold,"SETTINGS.lowStockThreshold=parseInt(this.value);toast('Setting saved')")}
-${iosInput('criticalStockThreshold','Critical Stock',SETTINGS.criticalThreshold,"SETTINGS.criticalThreshold=parseInt(this.value);toast('Setting saved')")}
-</div>
+  document.getElementById('page-settings').innerHTML = `
+    <div class="polaris-page" id="settings-page">
+      <header class="polaris-page-header">
+        <h1 class="polaris-page-title">Settings</h1>
+        <p class="polaris-page-subtitle">Manage your preferences</p>
+      </header>
 
-<p class="ios-section-header">Forecasting</p>
-<div class="ios-section">
-${iosInput('forecastHorizon','Forecast Horizon',SETTINGS.forecastHorizon,"SETTINGS.forecastHorizon=parseInt(this.value);toast('Setting saved')")}
-</div>
+      <div id="success-banner" class="polaris-banner polaris-success" style="display:none;"></div>
 
-<p class="ios-section-header">AI Features</p>
-<div class="ios-section">
-${iosToggle('aiInsights','AI Insights','auto_awesome','#ff9500',aiOn,"SETTINGS.aiInsights=this.checked;toast(this.checked?'AI insights enabled':'AI insights disabled')")}
-<p style="font-size:.8125rem;color:#6d6d72;padding:0 16px 12px">Uses OpenCode API to analyze inventory data. Statistical forecasting still works when AI is disabled.</p>
-${iosToggle('forecastExplanations','Forecast Explanations','auto_stories','#5856d6',fxOn,"SETTINGS.forecastExplanations=this.checked;toast(this.checked?'Forecast explanations enabled':'Forecast explanations disabled')")}
-<p style="font-size:.8125rem;color:#6d6d72;padding:0 16px 12px">Shows AI-generated natural language explanations of forecast data.</p>
-</div>
+      <div class="polaris-layout">
+        <div class="polaris-grid">
+          <!-- Notifications Card -->
+          <div class="polaris-card">
+            <div class="polaris-card-inner">
+              <div class="polaris-card-header">Notifications</div>
+              <div class="polaris-row">
+                <span class="polaris-row-label">Email Alerts</span>
+                <label class="polaris-checkbox">
+                  <input type="checkbox" name="emailAlerts" ${emailOn ? 'checked' : ''} onchange="SETTINGS.emailAlerts=this.checked;toast(this.checked?'Email alerts enabled':'Email alerts disabled')">
+                  <span class="polaris-checkbox-visual"></span>
+                </label>
+              </div>
 
-<p class="ios-section-header">General</p>
-<div class="ios-section">
-${iosSelectRow('Currency',SETTINGS.currency,[{v:'USD',l:'USD ($)'},{v:'EUR',l:'EUR (€)'},{v:'GBP',l:'GBP (£)'},{v:'CAD',l:'CAD (C$)'},{v:'AUD',l:'AUD (A$)'}])}
-</div>
+              <div class="polaris-row">
+                <span class="polaris-row-label">Slack Alerts</span>
+                <label class="polaris-checkbox">
+                  <input type="checkbox" id="slackToggle" ${slackOn ? 'checked' : ''} onchange="document.getElementById('slackFields').style.display = this.checked ? 'block' : 'none'; SETTINGS.slackEnabled=this.checked;toast(this.checked?'Slack alerts enabled':'Slack alerts disabled')">
+                  <span class="polaris-checkbox-visual"></span>
+                </label>
+              </div>
+              <div id="slackFields" class="polaris-conditional" style="display:${slackOn ? 'block' : 'none'};">
+                <div class="polaris-field">
+                  <label class="polaris-field-label">Slack Webhook URL</label>
+                  <input class="polaris-field-input" type="url" name="slackWebhookUrl" value="${SETTINGS.slackWebhookUrl || ''}" placeholder="https://hooks.slack.com/services/..." autocomplete="off" onchange="SETTINGS.slackWebhookUrl=this.value">
+                  <p class="polaris-field-help">Create one at Settings > Apps > Incoming Webhooks</p>
+                </div>
+              </div>
 
-<p class="ios-section-header">Store</p>
-<div class="ios-section">
-<div class="ios-row"><span class="ios-row-label">Shopify Domain</span><span class="ios-row-value">demo-store.myshopify.com</span></div>
-<div class="ios-row"><span class="ios-row-label">Plan</span><span class="ios-row-value">Starter ($19/mo)</span></div>
-<div class="ios-row"><span class="ios-row-label">App Version</span><span class="ios-row-value">1.0.0</span></div>
-</div>
+              <div class="polaris-row">
+                <span class="polaris-row-label">SMS Alerts</span>
+                <label class="polaris-checkbox">
+                  <input type="checkbox" id="smsToggle" ${smsOn ? 'checked' : ''} onchange="document.getElementById('smsFields').style.display = this.checked ? 'block' : 'none'; SETTINGS.smsEnabled=this.checked;toast(this.checked?'SMS alerts enabled':'SMS alerts disabled')">
+                  <span class="polaris-checkbox-visual"></span>
+                </label>
+              </div>
+              <div id="smsFields" class="polaris-conditional" style="display:${smsOn ? 'block' : 'none'};">
+                <div class="polaris-field">
+                  <label class="polaris-field-label">Phone Numbers</label>
+                  <input class="polaris-field-input" type="text" name="smsPhoneNumbers" value="${(SETTINGS.smsPhoneNumbers||[]).join(', ')}" placeholder="+155****4567, +155****6543" autocomplete="off" onchange="SETTINGS.smsPhoneNumbers=this.value.split(',').map(s=>s.trim()).filter(Boolean)">
+                  <p class="polaris-field-help">Comma-separated phone numbers for critical stock alerts</p>
+                </div>
+              </div>
+            </div>
+          </div>
 
-<p class="ios-section-header">Import from Stocky</p>
-<div class="ios-section">
-<div class="ios-row" style="cursor:pointer" onclick="openStockyImport()"><span class="ios-icon" style="background:#007aff"><span class="material-symbols-outlined" style="font-size:18px">upload_file</span></span><span class="ios-row-label">Import Stocky Data</span><span class="ios-chevron"></span></div>
-<div class="ios-row" style="cursor:pointer" onclick="downloadSampleCSV()"><span class="ios-icon" style="background:#5856d6"><span class="material-symbols-outlined" style="font-size:18px">download</span></span><span class="ios-row-label">Download Sample CSV</span><span class="ios-chevron"></span></div>
-</div>
+          <!-- Alert Thresholds Card -->
+          <div class="polaris-card">
+            <div class="polaris-card-inner">
+              <div class="polaris-card-header">Alert Thresholds</div>
+              <div class="polaris-field">
+                <label class="polaris-field-label">Low Stock Threshold</label>
+                <div class="polaris-field-suffix">
+                  <input class="polaris-field-input" type="number" name="lowStockThreshold" value="${SETTINGS.lowStockThreshold || 10}" autocomplete="off" onchange="SETTINGS.lowStockThreshold=parseInt(this.value)||10;toast('Setting saved')">
+                  <span class="polaris-field-suffix-text">units</span>
+                </div>
+              </div>
+              <div class="polaris-field">
+                <label class="polaris-field-label">Critical Stock</label>
+                <div class="polaris-field-suffix">
+                  <input class="polaris-field-input" type="number" name="criticalStockThreshold" value="${SETTINGS.criticalThreshold || 3}" autocomplete="off" onchange="SETTINGS.criticalThreshold=parseInt(this.value)||3;toast('Setting saved')">
+                  <span class="polaris-field-suffix-text">units</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-<p class="ios-section-header">Danger Zone</p>
-<div class="ios-section">
-<div class="ios-row" style="cursor:pointer" onclick="if(confirm('Reset all data?')){PRODUCTS.forEach(p=>{const orig=PRODUCTS.find(x=>x.id===p.id);if(orig){/* would reset */}});toast('Data reset to defaults');render()}"><span class="ios-icon" style="background:#ff3b30"><span class="material-symbols-outlined" style="font-size:18px">restart_alt</span></span><span class="ios-row-label" style="color:#ff3b30">Reset Demo Data</span><span class="ios-chevron"></span></div>
-</div>
-</div>`;
+          <!-- Forecasting Card -->
+          <div class="polaris-card">
+            <div class="polaris-card-inner">
+              <div class="polaris-card-header">Forecasting</div>
+              <div class="polaris-field">
+                <label class="polaris-field-label">Forecast Horizon</label>
+                <div class="polaris-field-suffix">
+                  <input class="polaris-field-input" type="number" name="forecastHorizon" value="${SETTINGS.forecastHorizon || 30}" autocomplete="off" onchange="SETTINGS.forecastHorizon=parseInt(this.value)||30;toast('Setting saved')">
+                  <span class="polaris-field-suffix-text">days</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- AI Features Card -->
+          <div class="polaris-card">
+            <div class="polaris-card-inner">
+              <div class="polaris-card-header">AI Features</div>
+              <div class="polaris-row">
+                <span class="polaris-row-label">AI Insights</span>
+                <label class="polaris-checkbox">
+                  <input type="checkbox" name="aiInsights" ${aiOn ? 'checked' : ''} onchange="SETTINGS.aiInsights=this.checked;toast(this.checked?'AI insights enabled':'AI insights disabled')">
+                  <span class="polaris-checkbox-visual"></span>
+                </label>
+              </div>
+              <p class="polaris-section-text">Uses OpenCode API to analyze inventory data and generate insights. Statistical forecasting still works when AI is disabled.</p>
+
+              <div class="polaris-row" style="margin-top: 8px;">
+                <span class="polaris-row-label">Forecast Explanations</span>
+                <label class="polaris-checkbox">
+                  <input type="checkbox" name="forecastExplanations" ${fxOn ? 'checked' : ''} onchange="SETTINGS.forecastExplanations=this.checked;toast(this.checked?'Forecast explanations enabled':'Forecast explanations disabled')">
+                  <span class="polaris-checkbox-visual"></span>
+                </label>
+              </div>
+              <p class="polaris-section-text">Shows AI-generated natural language explanations of forecast data.</p>
+            </div>
+          </div>
+
+          <!-- General Card -->
+          <div class="polaris-card">
+            <div class="polaris-card-inner">
+              <div class="polaris-card-header">General</div>
+              <div class="polaris-field">
+                <label class="polaris-field-label">Currency</label>
+                <select class="polaris-select" name="currency" onchange="SETTINGS.currency=this.value;toast('Currency updated')">
+                  <option value="USD" ${SETTINGS.currency==='USD'?'selected':''}>USD ($)</option>
+                  <option value="EUR" ${SETTINGS.currency==='EUR'?'selected':''}>EUR (€)</option>
+                  <option value="GBP" ${SETTINGS.currency==='GBP'?'selected':''}>GBP (£)</option>
+                  <option value="CAD" ${SETTINGS.currency==='CAD'?'selected':''}>CAD (C$)</option>
+                  <option value="AUD" ${SETTINGS.currency==='AUD'?'selected':''}>AUD (A$)</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Save Button -->
+      <div class="save-row">
+        <button id="saveBtn" type="button" class="polaris-btn polaris-btn-primary" onclick="handleSettingsSave()">
+          Save Settings
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Attach event delegation for dynamic elements
+  attachSettingsEvents();
 }
-// ══════════════════════════════════════════════════════
+
+function attachSettingsEvents() {
+  const settingsPage = document.getElementById('page-settings');
+
+  // Slack toggle
+  const slackToggle = document.getElementById('slackToggle');
+  if (slackToggle) {
+    slackToggle.addEventListener('change', function() {
+      const fields = document.getElementById('slackFields');
+      if (fields) fields.style.display = this.checked ? 'block' : 'none';
+      SETTINGS.slackEnabled = this.checked;
+      toast(this.checked ? 'Slack alerts enabled' : 'Slack alerts disabled');
+    });
+  }
+
+  // SMS toggle
+  const smsToggle = document.getElementById('smsToggle');
+  if (smsToggle) {
+    smsToggle.addEventListener('change', function() {
+      const fields = document.getElementById('smsFields');
+      if (fields) fields.style.display = this.checked ? 'block' : 'none';
+      SETTINGS.smsEnabled = this.checked;
+      toast(this.checked ? 'SMS alerts enabled' : 'SMS alerts disabled');
+    });
+  }
+
+  // Save button
+  const saveBtn = document.getElementById('saveBtn');
+  if (saveBtn) {
+    saveBtn.addEventListener('click', handleSettingsSave);
+  }
+
+  // Form inputs - update SETTINGS on change
+  const inputs = document.querySelectorAll('#page-settings input, #page-settings select');
+  inputs.forEach(input => {
+    input.addEventListener('change', function() {
+      if (this.name) {
+        if (this.type === 'checkbox') {
+          SETTINGS[this.name] = this.checked;
+        } else if (this.type === 'number') {
+          SETTINGS[this.name] = parseInt(this.value) || 0;
+        } else {
+          SETTINGS[this.name] = this.value;
+        }
+      }
+    });
+  });
+}
+
+function handleSettingsSave() {
+  const btn = document.getElementById('saveBtn');
+  if (!btn) return;
+
+  btn.classList.add('polaris-btn-loading');
+  btn.disabled = true;
+
+  // Collect all form values
+  const inputs = document.querySelectorAll('#page-settings input, #page-settings select');
+  inputs.forEach(input => {
+    if (input.name) {
+      if (input.type === 'checkbox') {
+        SETTINGS[input.name] = input.checked;
+      } else if (input.type === 'number') {
+        SETTINGS[input.name] = parseInt(input.value) || 0;
+      } else {
+        SETTINGS[input.name] = input.value;
+      }
+    }
+  });
+
+  // Handle SMS phone numbers array
+  const smsPhones = document.querySelector('input[name="smsPhoneNumbers"]');
+  if (smsPhones) {
+    SETTINGS.smsPhoneNumbers = smsPhones.value.split(',').map(s => s.trim()).filter(Boolean);
+  }
+
+  // Simulate save delay
+  setTimeout(() => {
+    const btn = document.getElementById('saveBtn');
+    if (btn) {
+      btn.classList.remove('polaris-btn-loading');
+      btn.disabled = false;
+    }
+    toast('Settings saved successfully!');
+  }, 600);
+}// ══════════════════════════════════════════════════════
 //  IN-APP GUIDED TOUR - walks through each app page
 // ══════════════════════════════════════════════════════
 let inAppTourStep=0;
