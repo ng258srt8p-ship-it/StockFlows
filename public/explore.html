@@ -29,8 +29,7 @@
 <a data-page="reports" onclick="go('reports')"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg><span>Reports</span></a>
 <a data-page="settings" onclick="go('settings')"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg><span>Settings</span></a>
 </nav>
-<a href="demo.html" class="tour-btn" style="text-decoration:none;display:flex;align-items:center;gap:6px"><span class="material-symbols-outlined">play_circle</span> Watch Demo</a>
-<button class="tour-btn" onclick="startInAppTour()"><span class="material-symbols-outlined">tour</span> Take Tour</button>
+
 </aside>
 <main class="content">
 <!-- Dashboard -->
@@ -51,10 +50,7 @@
 <div class="modal-overlay" id="modal"><div class="modal" id="modal-content"></div></div>
 <!-- Toast -->
 <div class="toast" id="toast"></div>
-<!-- Tour Overlay -->
-<div class="tour-overlay" id="tour-overlay"></div>
-<div class="tour-tooltip" id="tour-tooltip" style="display:none"></div>
-<div class="tour-progress" id="tour-progress"></div>
+
 <script>
 // ══════════════════════════════════════════════════════
 //  DATA
@@ -902,50 +898,6 @@ function handleSettingsSave() {
     }
     toast('Settings saved successfully!');
   }, 600);
-}// ══════════════════════════════════════════════════════
-//  IN-APP GUIDED TOUR - walks through each app page
-// ══════════════════════════════════════════════════════
-let inAppTourStep=0;
-const inAppTourSteps=[
-{page:'dashboard',title:'Dashboard',text:'Your command center. See SKU counts, low stock alerts, and AI-powered insights at a glance. The bar chart shows inventory health across all products.'},
-{page:'inventory',title:'Inventory',text:'Search, filter, and adjust stock for every product. Scan barcodes, transfer between locations, and track stock levels with color-coded status badges.'},
-{page:'purchasing',title:'Purchasing',text:'Create and manage purchase orders. Track expected deliveries, receive items partially, and evaluate vendor reliability scores.'},
-{page:'forecasting',title:'Forecasting',text:'30-day demand predictions per SKU using Exponential Smoothing. Click any product to see its forecast chart and stockout risk.'},
-{page:'reports',title:'Reports',text:'Inventory valuations, stock status breakdowns, and one-click CSV/PDF exports. See your data by location with a donut chart of stock health.'},
-{page:'settings',title:'Settings',text:'Configure stock thresholds, notification channels (email/Slack/SMS), and AI features. Import from Stocky or reset demo data.'},
-];
-function startInAppTour(){
-  inAppTourStep=0;
-  renderInAppTour();
-}
-function renderInAppTour(){
-  if(inAppTourStep>=inAppTourSteps.length){endInAppTour();return}
-  const s=inAppTourSteps[inAppTourStep];
-  // Navigate to the page first
-  go(s.page);
-  setTimeout(()=>{
-    document.getElementById('tour-overlay').classList.add('active');
-    const tooltip=document.getElementById('tour-tooltip');
-    const prog=document.getElementById('tour-progress');
-    tooltip.style.display='block';
-    prog.style.display='flex';
-    tooltip.innerHTML='<h4>'+s.title+'</h4><p>'+s.text+'</p><div class="actions"><span style="font-size:.8rem;color:#666">'+(inAppTourStep+1)+' / '+inAppTourSteps.length+'</span><div style="display:flex;gap:8px"><button class="btn-sm btn-ghost" onclick="endInAppTour()">Skip</button><button class="btn-sm btn-brand" onclick="nextInAppTour()">Next</button></div></div>';
-    prog.innerHTML=inAppTourSteps.map((_,i)=>'<div class="tour-dot '+(i===inAppTourStep?'active':'')+'" onclick="inAppTourStep='+i+';renderInAppTour()"></div>').join('');
-    const tooltipW=Math.min(380,window.innerWidth-32);
-    tooltip.style.width=tooltipW+'px';
-    tooltip.style.transform='none';
-    tooltip.style.top='50%';
-    tooltip.style.left='auto';
-    tooltip.style.right='24px';
-    tooltip.style.transform='translateY(-50%)';
-  },200);
-}
-function nextInAppTour(){inAppTourStep++;renderInAppTour()}
-function endInAppTour(){
-  document.getElementById('tour-overlay').classList.remove('active');
-  document.getElementById('tour-tooltip').style.display='none';
-  document.getElementById('tour-progress').style.display='none';
-  toast('Explore complete! Try clicking around the app.');
 }
 // ══════════════════════════════════════════════════════
 //  INIT
@@ -953,11 +905,7 @@ function endInAppTour(){
 poItemCount=POS[0]?.items.length||0;
 // Initialize the app
 enterApp();
-// Check if ?tour=true is in the URL to auto-start the tour
-const urlParams=new URLSearchParams(window.location.search);
-if(urlParams.get('tour')==='true'){
-  setTimeout(()=>startInAppTour(),600);
-}
+
 </script>
 </body>
 </html>
