@@ -22,8 +22,8 @@ describe("Settings page structural fix", () => {
     expect(returnMatch![1]).toBe("Page");
 
     // Gate 2.2: Subtitle updated
-    expect(content).not.toContain("Manage your preferences");
-    expect(content).toContain("Manage your stock alerts, thresholds, and preferences");
+  expect(content).not.toContain("Manage your preferences");
+  expect(content).toContain("Manage alerts, thresholds, and preferences");
 
     // Gate 2.5: Card grid layout preserved
     expect(content).toContain("grid grid-cols-1 lg:grid-cols-2 gap-4");

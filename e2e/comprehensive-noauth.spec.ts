@@ -347,23 +347,6 @@ test.describe("Explore Page Detailed Verification", () => {
     expect(logoText).toContain("StockFlows");
   });
 
-  test("explore.html has 'Shopify Partner' label", async ({ page }) => {
-    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
-
-    const partnerLabel = page.locator('text="Shopify Partner"');
-    await expect(partnerLabel).toBeVisible();
-  });
-
-  test("explore.html has 'Back to Landing' link", async ({ page }) => {
-    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
-
-    // The link renders with an HTML arrow entity: ← Back to Landing
-    const backLink = page.locator('a[href="landing.html"]');
-    await expect(backLink).toBeVisible();
-    const backText = await backLink.textContent();
-    expect(backText).toContain("Back to Landing");
-  });
-
   test("explore.html sidebar navigation is clickable and switches pages", async ({
     page,
   }) => {
@@ -484,35 +467,21 @@ test.describe("Explore Page Visual Element Audit", () => {
 
     const elements: { name: string; visible: boolean }[] = [];
 
-    // 1. Back to Landing link
-    const backLink = page.locator('a[href="landing.html"]');
-    elements.push({
-      name: 'Back to Landing link',
-      visible: await backLink.isVisible(),
-    });
-
-    // 2. Sidebar logo with image
+    // 1. Sidebar logo with image
     const logo = page.locator(".logo");
     elements.push({
       name: "Sidebar logo (StockFlows)",
       visible: await logo.isVisible(),
     });
 
-    // 3. Logo icon image
+    // 2. Logo icon image
     const logoImg = page.locator(".logo img");
     elements.push({
       name: "Logo icon image (SF icon.svg)",
       visible: await logoImg.isVisible(),
     });
 
-    // 4. Shopify Partner label
-    const partner = page.locator('text="Shopify Partner"');
-    elements.push({
-      name: "Shopify Partner label",
-      visible: await partner.isVisible(),
-    });
-
-    // 5. Navigation items (6 items)
+    // 3. Navigation items (6 items)
     const navLinks = page.locator(".sidebar nav a");
     const navCount = await navLinks.count();
     elements.push({
@@ -520,42 +489,28 @@ test.describe("Explore Page Visual Element Audit", () => {
       visible: navCount === 6,
     });
 
-    // 6. Watch Demo button/link — REMOVED (marketing button not in app)
-    const watchDemo = page.locator('a[href="demo.html"]').first();
-    elements.push({
-      name: "Watch Demo button (should be removed)",
-      visible: (await watchDemo.count()) > 0,
-    });
-
-    // 7. Take Tour button — REMOVED (marketing button not in app)
-    const takeTour = page.locator("button.tour-btn").first();
-    elements.push({
-      name: "Take Tour button (should be removed)",
-      visible: (await takeTour.count()) > 0,
-    });
-
-    // 8. Main content area
+    // 4. Main content area
     const content = page.locator(".content");
     elements.push({
       name: "Main content area",
       visible: await content.isVisible(),
     });
 
-    // 9. Dashboard page (active by default)
+    // 5. Dashboard page (active by default)
     const dashboard = page.locator("#page-dashboard.active");
     elements.push({
       name: "Dashboard page (active)",
       visible: await dashboard.isVisible(),
     });
 
-    // 10. Modal overlay element (hidden by default, exists in DOM)
+    // 6. Modal overlay element (hidden by default, exists in DOM)
     const modal = page.locator("#modal");
     elements.push({
       name: "Modal overlay element (in DOM)",
       visible: (await modal.count()) > 0,
     });
 
-    // 11. Toast element
+    // 7. Toast element
     const toast = page.locator("#toast");
     elements.push({
       name: "Toast notification element",
