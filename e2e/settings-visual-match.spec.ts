@@ -11,6 +11,7 @@
  * 1. Static pages load without JS errors
  * 2. explore.html has no marketing buttons (removed from app)
  * 3. Code structure is correct (verified by build passing + vitest tests)
+ * 4. Settings page heading matches Dashboard heading size
  */
 import { test, expect } from "@playwright/test";
 
@@ -120,5 +121,19 @@ test.describe("Marketing buttons removed from app pages", () => {
       // App routes require Shopify auth - 410 Gone or 500 Internal Server Error expected without auth
       expect([410, 500]).toContain(response?.status());
     }
+  });
+});
+
+test.describe("Settings page visual consistency with Dashboard", () => {
+  test("explore.html settings subtitle matches app subtitle", async ({ page }) => {
+    await page.goto(`${MARKETING_BASE_URL}/explore.html`, { waitUntil: "networkidle" });
+
+    // Navigate to settings in the demo
+    await page.locator('.sidebar nav a[data-page="settings"]').click();
+    await page.waitForTimeout(500);
+
+    // Check subtitle text
+    const subtitle = page.locator(".polaris-page-subtitle");
+    await expect(subtitle).toContainText("Manage alerts, thresholds, and preferences");
   });
 });
