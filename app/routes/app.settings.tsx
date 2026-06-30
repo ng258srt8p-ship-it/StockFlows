@@ -94,7 +94,7 @@ export default function Settings() {
   const [forecastExplOn, setForecastExplOn] = useState(settings?.enableForecastExplanations ?? false);
 
   return (
-    <Page title="Settings" subtitle="Manage your stock alerts, thresholds, and preferences">
+    <Page title="Settings" subtitle="Manage alerts, thresholds, and preferences">
       <Layout>
         <Layout.Section>
           <Form method="post">
