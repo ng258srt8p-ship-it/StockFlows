@@ -4,14 +4,19 @@ const GLOBAL_DB_PROPERTY = "__prisma__stockflows__" as const;
 
 function createPrismaClient(): PrismaClient {
   const dbUrl = process.env.DATABASE_URL;
-  console.log("[Prisma] Initializing with DATABASE_URL:", dbUrl ? dbUrl.replace(/:[^:@]+@/, ":****@") : "NOT SET");
+  const initMsg = `[Prisma Client Init] NODE_ENV=${process.env.NODE_ENV} | DATABASE_URL=${dbUrl ? dbUrl.replace(/:[^:@]+@/, ":****@") : "NOT SET"} | directUrl=${process.env.DIRECT_URL ? "SET" : "NOT SET"}`;
+  console.error(initMsg);
 
-  return new PrismaClient({
-    log:
-      process.env.NODE_ENV === "development"
-        ? ["query", "error", "warn"]
-        : ["error"],
-  });
+  try {
+    const client = new PrismaClient({
+      log: process.env.NODE_ENV === "development" ? ["query", "error", "warn"] : ["error"],
+    });
+    console.error(`[Prisma Client Init] SUCCESS - Client created`);
+    return client;
+  } catch (e: any) {
+    console.error(`[Prisma Client Init] FAILED:`, e?.message ?? e);
+    throw e;
+  }
 }
 
 // @ts-ignore - globalThis extension
