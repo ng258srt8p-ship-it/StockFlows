@@ -13,7 +13,9 @@ export const loader = async () => {
     healthy = false;
   }
 
-  // Redis check — only attempt when configured
+  // Redis check — only attempt when REDIS_HOST or REDIS_URL is explicitly set
+  // Note: Railway's internal Redis services are not exposed as REDIS_HOST/REDIS_URL
+  // so this will be skipped unless explicitly configured
   const hasRedis = Boolean(process.env.REDIS_HOST || process.env.REDIS_URL);
   if (hasRedis) {
     try {
@@ -27,7 +29,7 @@ export const loader = async () => {
       });
       await redis.connect();
       await redis.ping();
-      redis.disconnect();
+      await redis.quit();
       checks.redis = "ok";
     } catch {
       checks.redis = "error";
