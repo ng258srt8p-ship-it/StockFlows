@@ -46,9 +46,9 @@ function main() {
     console.log('⏭️  eslint not found — skipped');
   }
 
-  // 3. Production build (Remix - builds both client and server)
+  // 3. Production build (Remix Vite - builds both client and SSR)
   if (hasBin('vite')) {
-    run('Build', 'npx remix build');
+    run('Build', 'npx remix vite:build');
   } else {
     console.log('\n━━━ Build ━━━');
     console.log('⏭️  remix not found — skipped');

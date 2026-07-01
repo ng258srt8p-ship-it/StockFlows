@@ -42,6 +42,18 @@ export default defineConfig({
         browserName: "chromium",
       },
     },
+    {
+      name: "firefox",
+      use: {
+        browserName: "firefox",
+      },
+    },
+    {
+      name: "webkit",
+      use: {
+        browserName: "webkit",
+      },
+    },
   ],
 
   // Visual regression: expect settings for detecting display inconsistencies
