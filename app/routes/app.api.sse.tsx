@@ -4,8 +4,10 @@ import { addSSEConnection, removeSSEConnection } from "~/lib/sse/manager.server"
 import { logger } from "~/lib/logger";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request) as any;
-  const shop = session.shop;
+  // For development mode - use session.shop or provided shop domain for testing
+  const shop = process.env.NODE_ENV === 'development'
+    ? (new URL(request.url).searchParams.get('shop') || 'dev-shop.local')
+    : (await authenticate.admin(request) as any).session.shop;
 
   const encoder = new TextEncoder();
   let client: ReturnType<typeof addSSEConnection>;

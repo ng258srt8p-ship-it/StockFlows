@@ -21,8 +21,8 @@ import type { InventoryItem, Location } from "@prisma/client";
 type InventoryWithLocation = InventoryItem & { location: Location };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await requirePermission(request, "inventory:read");
-  const { session } = await authenticate.admin(request);
+  // requirePermission authenticates via Shopify and provides the session
+  const { session } = await requirePermission(request, "inventory:read");
 
   const shop = await prisma.shop.findUnique({
     where: { shopifyDomain: session.shop },

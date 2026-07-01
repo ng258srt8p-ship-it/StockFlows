@@ -421,3 +421,56 @@ model ProcessedWebhook {
   @@index([processedAt])
   @@map("processed_webhooks")
 }
+
+model Subscription {
+  id                String   @id @default(cuid())
+  shopId            String
+  plan              String
+  status            String
+  currentPeriodEnd  DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([shopId])
+  @@map("subscriptions")
+}
+
+model BillingSubscription {
+  id                String   @id @default(cuid())
+  shopId            String
+  name              String
+  status            String
+  test              Boolean  @default(false)
+  trialDays         Int?
+  currentPeriodEnd  DateTime
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@unique([shopId])
+  @@map("billing_subscriptions")
+}
+
+model UsageRecord {
+  id                String   @id @default(cuid())
+  billingSubscriptionId String
+  billingSubscription BillingSubscription @relation(fields: [billingSubscriptionId], references: [id], onDelete: Cascade)
+  date              DateTime @default(now())
+  quantity          Int
+  createdAt         DateTime @default(now())
+
+  @@map("usage_records")
+}
+
+model BillingEvent {
+  id                String   @id @default(cuid())
+  shopId            String
+  type              String
+  amount            Decimal? @db.Decimal(10, 2)
+  currency          String   @default("USD")
+  details           Json?
+  createdAt         DateTime @default(now())
+
+  @@index([shopId])
+  @@index([type])
+  @@map("billing_events")
+}

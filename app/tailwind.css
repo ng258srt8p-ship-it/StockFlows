@@ -8,5 +8,48 @@
   --color-warning: #f49342;
   --color-success: #008060;
   --color-info: #5bcdd3;
-  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', 'Courier New', serif;
+  --font-serif: "Instrument Serif", Georgia, "Times New Roman", "Courier New", serif;
+
+  /* Core design tokens */
+  --background-primary: #ffffff;
+  --background-secondary: #f8f9fa;
+  --background-tertiary: #f0f2f5;
+  --border-primary: #e1e4e8;
+  --border-hover: #d0d7de;
+  --text-primary: #1f2328;
+  --text-secondary: #57606a;
+  --text-muted: #6e7781;
+}
+
+/* Ensure utility classes are generated */
+@utility bg-background-secondary {
+  background-color: var(--background-secondary);
+}
+
+@utility bg-background-primary {
+  background-color: var(--background-primary);
+}
+
+@utility bg-background-tertiary {
+  background-color: var(--background-tertiary);
+}
+
+@utility border-border-primary {
+  border-color: var(--border-primary);
+}
+
+@utility border-border-hover {
+  border-color: var(--border-hover);
+}
+
+@utility text-text-primary {
+  color: var(--text-primary);
+}
+
+@utility text-text-secondary {
+  color: var(--text-secondary);
+}
+
+@utility text-text-muted {
+  color: var(--text-muted);
 }

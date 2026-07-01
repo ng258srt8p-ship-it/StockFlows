@@ -35,10 +35,14 @@ export function useSSE(): SSEHookResult {
 
     cleanup();
 
-    const eventSource = new EventSource("/app/api/sse");
+    const shopDomain = typeof document !== 'undefined'
+      ? new URLSearchParams(window.location.search).get('shop') || null
+      : null;
+    const url = shopDomain ? `/app/api/sse?shop=${encodeURIComponent(shopDomain)}` : "/app/api/sse";
+    const eventSource = new EventSource(url);
     eventSourceRef.current = eventSource;
 
-    eventSource.addEventListener("connected", () => {
+    eventSource.addEventListener("connected", (event: MessageEvent) => {
       setIsConnected(true);
       setReconnectCount(0);
     });

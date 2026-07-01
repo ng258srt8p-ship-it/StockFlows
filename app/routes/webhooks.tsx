@@ -107,8 +107,8 @@ const inventoryLevelsUpdateHandler: WebhookHandler = async (shop, payload, log) 
   log.debug("inventory_levels/update queued");
 };
 
-const passThroughHandler: WebhookHandler = async () => {
-  // Logged at the action level; no further processing needed.
+const passThroughHandler: WebhookHandler = async (shop, payload, log) => {
+  log.info({ topic: "pass-through" }, "Webhook received (pass-through handler — no further processing)");
 };
 
 // --- Inventory items ---

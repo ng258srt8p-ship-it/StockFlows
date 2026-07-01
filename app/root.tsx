@@ -14,9 +14,11 @@ import { AppProvider, Page, Layout, Card, Text, Button } from "@shopify/polaris"
 import { authenticate } from "~/lib/shopify/server";
 
 import tailwindStylesHref from "./tailwind.css?url";
+import polarisStylesHref from "@shopify/polaris/build/esm/styles.css?url";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: tailwindStylesHref },
+  { rel: "stylesheet", href: polarisStylesHref },
   {
     rel: "stylesheet",
     href: "https://cdn.shopify.com/shopifycloud/app-bridge-styles.css",
@@ -39,10 +41,28 @@ const i18n: Record<string, any> = {
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // For root path, if already authenticated, redirect to /app
-  const { session } = await authenticate.admin(request);
-  if (session) {
-    return redirect("/app");
+  const url = new URL(request.url);
+
+  // Skip auth for local preview routes (dev only)
+  if (url.pathname.startsWith("/preview") || url.pathname.startsWith("/_preview")) {
+    return null;
+  }
+
+  // Skip auth for auth-related routes (handled by their own loaders)
+  if (url.pathname.startsWith("/auth")) {
+    return null;
+  }
+
+  // Try to authenticate — if no session exists, just continue (child routes
+  // will handle their own auth requirements).  This prevents the root layout
+  // from crashing the entire app when there is no Shopify session.
+  try {
+    const { session } = await authenticate.admin(request);
+    if (session && url.pathname === "/") {
+      return redirect("/app");
+    }
+  } catch {
+    // No valid session — let child routes decide what to do.
   }
   return null;
 };

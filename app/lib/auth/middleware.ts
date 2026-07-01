@@ -37,6 +37,7 @@ export interface AuthenticatedUser {
 
 export interface AuthenticatedContext {
   admin: any;
+  session: any;
   user: AuthenticatedUser;
   shopId: string;
 }
@@ -80,7 +81,32 @@ export async function requirePermission(
   permission: Permission,
 ): Promise<AuthenticatedContext> {
   // Step 1 -- Shopify authentication.
-  const { admin, session } = await authenticate.admin(request);
+  // authenticate.admin may redirect (302) when the session is missing.
+  // Catch any redirect throws so that callers can handle auth failure
+  // gracefully (useful during Playwright testing or embedded-app loading).
+  let admin: any;
+  let session: any;
+
+  try {
+    const result = await authenticate.admin(request);
+    admin = result.admin;
+    session = result.session;
+  } catch (err: any) {
+    // If the thrown response is a redirect (302), return a 401 JSON instead.
+    // This lets callers render error boundaries rather than losing the page.
+    if (err instanceof Response && err.status === 302) {
+      throw json(
+        {
+          error: "Unauthorized",
+          message:
+            "Authentication required. Please authenticate with Shopify.",
+        },
+        { status: 401 },
+      );
+    }
+    // Re-throw any other errors (e.g. 403, 500 from the Shopify lib).
+    throw err;
+  }
 
   // Step 2 -- Resolve the StockFlows user.
   // When using online tokens the session's `onlineAccessInfo` contains the
@@ -145,6 +171,7 @@ export async function requirePermission(
 
   return {
     admin,
+    session,
     user: {
       id: user.id,
       shopId: user.shopId,

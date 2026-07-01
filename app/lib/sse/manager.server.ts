@@ -22,6 +22,25 @@ export function broadcastSSE(shopDomain: string, event: string, data: unknown) {
   }
 }
 
+/**
+ * Broadcast to ALL connected clients (dev/testing convenience).
+ */
+export function broadcastAllSSE(event: string, data: unknown) {
+  const message = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
+  const encoder = new TextEncoder();
+  const encoded = encoder.encode(message);
+
+  for (const [, clients] of connections) {
+    for (const client of clients) {
+      try {
+        client.controller.enqueue(encoded);
+      } catch {
+        clients.delete(client);
+      }
+    }
+  }
+}
+
 export function addSSEConnection(
   shopDomain: string,
   controller: ReadableStreamDefaultController
@@ -48,4 +67,12 @@ export function removeSSEConnection(client: SSEClient) {
 
 export function getConnectionCount(shopDomain: string): number {
   return connections.get(shopDomain)?.size ?? 0;
+}
+
+export function getAllConnectionCount(): number {
+  let count = 0;
+  for (const clients of connections.values()) {
+    count += clients.size;
+  }
+  return count;
 }

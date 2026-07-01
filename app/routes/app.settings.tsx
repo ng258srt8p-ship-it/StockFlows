@@ -1,66 +1,150 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useLoaderData, Form, useNavigation, useActionData } from "@remix-run/react";
-import { authenticate } from "~/lib/shopify/server";
+import { json, redirect } from "@remix-run/node";
+import { useLoaderData, Form, useNavigation, useActionData, useNavigate } from "@remix-run/react";
+import { Prisma } from "@prisma/client";
 import { prisma } from "~/lib/db/client";
 import { requirePermission } from "~/lib/auth/middleware";
+import { logger } from "~/lib/logger";
+import { shopSettingsRateLimit, rateLimitResponse } from "~/lib/middleware/rate-limit";
+import { SettingsFormSchema } from "~/lib/schemas/settings";
 import { useState } from "react";
 import {
   Page,
   Layout,
-  Card,
-  Text,
-  Checkbox,
   TextField,
   Select,
   Button,
   Banner,
+  Text,
 } from "@shopify/polaris";
+import { SettingsCard } from "~/components/settings/SettingsCard";
+import { NotificationToggle } from "~/components/settings/NotificationToggle";
 
 // ---------------------------------------------------------------------------
 // Server
 // ---------------------------------------------------------------------------
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  await requirePermission(request, "settings:read");
-  const { session } = await authenticate.admin(request);
+  // Use requirePermission which catches auth failures gracefully
+  const { session } = await requirePermission(request, "settings:read");
 
   const shop = await prisma.shop.findUnique({
     where: { shopifyDomain: session.shop },
     include: { settings: true, locations: true },
   });
 
+  if (!shop) {
+    return json(
+      { error: "Not Found", message: "Shop not found." },
+      { status: 404 }
+    );
+  }
+
   return json({ settings: shop?.settings, locations: shop?.locations || [] });
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
+  // Rate limiting: 10 requests per minute per shop
+  const rateLimitResult = await shopSettingsRateLimit(request);
+  if (rateLimitResult.limited) {
+    return rateLimitResponse(request, rateLimitResult);
+  }
+
   const { shopId } = await requirePermission(request, "settings:write");
-  await authenticate.admin(request);
 
   const formData = await request.formData();
+  
+  // Parse form data into object for Zod validation
+  const formDataObj: Record<string, any> = {};
+  for (const [key, value] of formData.entries()) {
+    // Handle multiple values (e.g., checkboxes)
+    if (formDataObj[key]) {
+      if (Array.isArray(formDataObj[key])) {
+        formDataObj[key].push(value);
+      } else {
+        formDataObj[key] = [formDataObj[key], value];
+      }
+    } else {
+      formDataObj[key] = value;
+    }
+  }
 
-  const smsRaw = (formData.get("smsPhoneNumbers") as string || "").trim();
-  const smsPhoneNumbers = smsRaw
-    ? smsRaw.split(",").map((n: string) => n.trim()).filter(Boolean)
-    : null;
+  // Convert checkbox values ("on" -> true, missing -> false)
+  const booleanFields = [
+    "emailAlerts",
+    "slackEnabled",
+    "smsEnabled",
+    "enableAiInsights",
+    "enableForecastExplanations",
+  ];
+  
+  for (const field of booleanFields) {
+    formDataObj[field] = formDataObj[field] === "on";
+  }
 
-  const data = {
-    lowStockThreshold: Number(formData.get("lowStockThreshold")) || 10,
-    criticalStockThreshold: Number(formData.get("criticalStockThreshold")) || 3,
-    safetyStockMultiplier: Number(formData.get("safetyStockMultiplier")) || 1.5,
-    forecastHorizonDays: Number(formData.get("forecastHorizonDays")) || 30,
-    emailAlerts: formData.get("emailAlerts") === "on",
-    slackWebhookUrl: formData.get("slackWebhookUrl") as string || null,
-    smsPhoneNumbers: smsPhoneNumbers as any,
-    currency: formData.get("currency") as string || "USD",
-    enableAiInsights: formData.get("enableAiInsights") === "on",
-    enableForecastExplanations: formData.get("enableForecastExplanations") === "on",
+  // Transform slackEnabled -> slackWebhookUrl handling
+  if (!formDataObj.slackEnabled) {
+    formDataObj.slackWebhookUrl = null;
+  } else if (!formDataObj.slackWebhookUrl) {
+    // Slack is enabled but no URL provided -- slack events will be enabled
+    // without a URL which is fine (the backend just won't send Slack alerts)
+    formDataObj.slackWebhookUrl = null;
+  }
+
+  // Transform smsEnabled -> smsPhoneNumbers handling
+  if (!formDataObj.smsEnabled) {
+    formDataObj.smsPhoneNumbers = null;
+  }
+
+  // Ensure smsPhoneNumbers is always a string before Zod validation
+  if (formDataObj.smsPhoneNumbers && typeof formDataObj.smsPhoneNumbers !== "string") {
+    formDataObj.smsPhoneNumbers = String(formDataObj.smsPhoneNumbers);
+  }
+
+  // Validate with Zod schema
+  const validationResult = SettingsFormSchema.safeParse(formDataObj);
+
+  if (!validationResult.success) {
+    const errors = validationResult.error.flatten();
+    logger.warn({ errors, formData: formDataObj }, "Settings validation failed");
+    return json(
+      {
+        error: "Validation Failed",
+        message: "Please check your input and try again.",
+        fieldErrors: errors.fieldErrors,
+        formErrors: errors.formErrors,
+      },
+      { status: 400 }
+    );
+  }
+
+  const validatedData = validationResult.data;
+
+  // Prisma requires Prisma.JsonNull instead of null for JSON fields.
+  // The smsPhoneNumbers field comes from a Zod transformer that returns
+  // either null, a string[], or a string[]. We normalize it here.
+  let smsPhoneNumbersJson: any = Prisma.JsonNull;
+  if (validatedData.smsPhoneNumbers && Array.isArray(validatedData.smsPhoneNumbers) && validatedData.smsPhoneNumbers.length > 0) {
+    smsPhoneNumbersJson = validatedData.smsPhoneNumbers;
+  }
+
+  const dbData = {
+    lowStockThreshold: validatedData.lowStockThreshold,
+    criticalStockThreshold: validatedData.criticalStockThreshold,
+    safetyStockMultiplier: validatedData.safetyStockMultiplier,
+    forecastHorizonDays: validatedData.forecastHorizonDays,
+    emailAlerts: validatedData.emailAlerts,
+    slackWebhookUrl: validatedData.slackWebhookUrl ?? null,
+    smsPhoneNumbers: smsPhoneNumbersJson,
+    currency: validatedData.currency,
+    enableAiInsights: validatedData.enableAiInsights,
+    enableForecastExplanations: validatedData.enableForecastExplanations,
   };
 
   await prisma.shopSetting.upsert({
     where: { shopId },
-    create: { shopId, ...data },
-    update: data,
+    create: { shopId, ...dbData },
+    update: dbData,
   });
 
   return json({ success: true });
@@ -71,8 +155,21 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 // ---------------------------------------------------------------------------
 
 export default function Settings() {
-  const { settings } = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
+
+  // Handle error case from loader
+  if ("error" in data) {
+    return (
+      <Page title="Settings">
+        <Banner tone="critical">
+          <p>{data.error}: {data.message}</p>
+        </Banner>
+      </Page>
+    );
+  }
+
+  const { settings, locations } = data;
   const navigation = useNavigation();
   const isSubmitting = navigation.state === "submitting";
 
@@ -84,7 +181,13 @@ export default function Settings() {
   const [smsPhones, setSmsPhones] = useState(
     Array.isArray(settings?.smsPhoneNumbers)
       ? (settings.smsPhoneNumbers as string[]).join(", ")
-      : ""
+      : settings?.smsPhoneNumbers
+        ? (typeof settings.smsPhoneNumbers === "string"
+            ? settings.smsPhoneNumbers
+            : Array.isArray(settings.smsPhoneNumbers)
+            ? (settings.smsPhoneNumbers as string[]).join(", ")
+            : "")
+        : ""
   );
 
   const [emailOn, setEmailOn] = useState(settings?.emailAlerts ?? true);
@@ -96,88 +199,75 @@ export default function Settings() {
   return (
     <Page title="Settings" subtitle="Manage alerts, thresholds, and preferences">
       <Layout>
-        <Layout.Section>
-          <Form method="post">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {/* ── Notifications Card ─────────────────────────── */}
-              <Card>
-                <div className="p-4">
-                  <Text variant="headingMd" as="h2">
-                    Notifications
-                  </Text>
-                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
-                    Configure how StockFlows alerts your team about low stock levels.
-                  </Text>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">Email Alerts</Text>
-                      <div>
-                        <Checkbox label="Email Alerts" labelHidden checked={emailOn} onChange={setEmailOn} />
-                        <input type="hidden" name="emailAlerts" value={emailOn ? "on" : ""} />
-                      </div>
-                    </div>
+        <div className="bg-background-secondary min-h-screen">
+          <Layout.Section>
+            <div className="px-4 py-6">
+              <Form method="post">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  {/* ── Notifications Card ─────────────────────────── */}
+                  <SettingsCard
+                    title="Notifications"
+                    description="Configure how StockFlows alerts your team about low stock levels."
+                  >
+                    <NotificationToggle
+                      label="Email Alerts"
+                      enabled={emailOn}
+                      onChange={setEmailOn}
+                      hiddenName="emailAlerts"
+                    />
 
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">Slack Alerts</Text>
-                      <div>
-                        <Checkbox label="Slack Alerts" labelHidden checked={slackOn} onChange={setSlackOn} />
-                        <input type="hidden" name="slackEnabled" value={slackOn ? "on" : ""} />
-                      </div>
-                    </div>
-                    {slackOn && (
-                      <div className="mt-2 ml-0">
-                        <TextField
-                          label="Slack Webhook URL"
-                          type="url"
-                          name="slackWebhookUrl"
-                          value={slackUrl}
-                          onChange={setSlackUrl}
-                          placeholder="https://hooks.slack.com/services/..."
-                          autoComplete="off"
-                        />
-                        <Text variant="bodySm" as="p" tone="subdued">
-                          Create one at Settings → Apps → Incoming Webhooks
-                        </Text>
-                      </div>
-                    )}
+                    <NotificationToggle
+                      label="Slack Alerts"
+                      enabled={slackOn}
+                      onChange={setSlackOn}
+                      hiddenName="slackEnabled"
+                      additionalFields={
+                        <>
+                          <TextField
+                            label="Slack Webhook URL"
+                            type="url"
+                            name="slackWebhookUrl"
+                            value={slackUrl}
+                            onChange={setSlackUrl}
+                            placeholder="https://hooks.slack.com/services/..."
+                            autoComplete="off"
+                          />
+                          <Text variant="bodySm" as="p" tone="subdued">
+                            Create one at Settings → Apps → Incoming Webhooks
+                          </Text>
+                        </>
+                      }
+                    />
 
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">SMS Alerts</Text>
-                      <div>
-                        <Checkbox label="SMS Alerts" labelHidden checked={smsOn} onChange={setSmsOn} />
-                        <input type="hidden" name="smsEnabled" value={smsOn ? "on" : ""} />
-                      </div>
-                    </div>
-                    {smsOn && (
-                      <div className="mt-2 ml-0">
-                        <TextField
-                          label="Phone Numbers"
-                          type="text"
-                          name="smsPhoneNumbers"
-                          value={smsPhones}
-                          onChange={setSmsPhones}
-                          placeholder="+15558675310, +15558675311"
-                          autoComplete="off"
-                        />
-                        <Text variant="bodySm" as="p" tone="subdued">
-                          Comma-separated phone numbers for critical stock alerts
-                        </Text>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </Card>
+                    <NotificationToggle
+                      label="SMS Alerts"
+                      enabled={smsOn}
+                      onChange={setSmsOn}
+                      hiddenName="smsEnabled"
+                      additionalFields={
+                        <>
+                          <TextField
+                            label="Phone Numbers"
+                            type="text"
+                            name="smsPhoneNumbers"
+                            value={smsPhones}
+                            onChange={setSmsPhones}
+                            placeholder="+155****5310, +155****5311"
+                            autoComplete="off"
+                          />
+                          <Text variant="bodySm" as="p" tone="subdued">
+                            Comma-separated phone numbers for critical stock alerts
+                          </Text>
+                        </>
+                      }
+                    />
+                  </SettingsCard>
 
-              {/* ── Alert Thresholds Card ──────────────────────── */}
-              <Card>
-                <div className="p-4">
-                  <Text variant="headingMd" as="h2">
-                    Alert Thresholds
-                  </Text>
-                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
-                    Set stock levels that trigger reorder alerts. Critical must be lower than Low.
-                  </Text>
-                  <div className="space-y-4">
+                  {/* ── Alert Thresholds Card ──────────────────────── */}
+                  <SettingsCard
+                    title="Alert Thresholds"
+                    description="Set stock levels that trigger reorder alerts. Critical must be lower than Low."
+                  >
                     <TextField
                       label="Low Stock Threshold"
                       type="number"
@@ -206,20 +296,13 @@ export default function Settings() {
                       suffix="×"
                       autoComplete="off"
                     />
-                  </div>
-                </div>
-              </Card>
+                  </SettingsCard>
 
-              {/* ── Forecasting Card ───────────────────────────── */}
-              <Card>
-                <div className="p-4">
-                  <Text variant="headingMd" as="h2">
-                    Forecasting
-                  </Text>
-                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
-                    Configure how far ahead the demand forecast predicts future sales.
-                  </Text>
-                  <div className="space-y-4">
+                  {/* ── Forecasting Card ───────────────────────────── */}
+                  <SettingsCard
+                    title="Forecasting"
+                    description="Configure how far ahead the demand forecast predicts future sales."
+                  >
                     <TextField
                       label="Forecast Horizon"
                       type="number"
@@ -229,56 +312,40 @@ export default function Settings() {
                       suffix="days"
                       autoComplete="off"
                     />
-                  </div>
-                </div>
-              </Card>
+                  </SettingsCard>
 
-              {/* ── AI Features Card ───────────────────────────── */}
-              <Card>
-                <div className="p-4">
-                  <Text variant="headingMd" as="h2">
-                    AI Features
-                  </Text>
-                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
-                    Enable AI-powered insights and natural language explanations for your inventory data.
-                  </Text>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">AI Insights</Text>
-                      <div>
-                        <Checkbox label="AI Insights" labelHidden checked={aiInsightsOn} onChange={setAiInsightsOn} />
-                        <input type="hidden" name="enableAiInsights" value={aiInsightsOn ? "on" : ""} />
-                      </div>
-                    </div>
+                  {/* ── AI Features Card ───────────────────────────── */}
+                  <SettingsCard
+                    title="AI Features"
+                    description="Enable AI-powered insights and natural language explanations for your inventory data."
+                  >
+                    <NotificationToggle
+                      label="AI Insights"
+                      enabled={aiInsightsOn}
+                      onChange={setAiInsightsOn}
+                      hiddenName="enableAiInsights"
+                    />
                     <Text variant="bodySm" as="p" tone="subdued">
                       Uses OpenCode API to analyze inventory data and generate insights.
                       Statistical forecasting still works when AI is disabled.
                     </Text>
 
-                    <div className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-                      <Text variant="bodyMd" as="p">Forecast Explanations</Text>
-                      <div>
-                        <Checkbox label="Forecast Explanations" labelHidden checked={forecastExplOn} onChange={setForecastExplOn} />
-                        <input type="hidden" name="enableForecastExplanations" value={forecastExplOn ? "on" : ""} />
-                      </div>
-                    </div>
+                    <NotificationToggle
+                      label="Forecast Explanations"
+                      enabled={forecastExplOn}
+                      onChange={setForecastExplOn}
+                      hiddenName="enableForecastExplanations"
+                    />
                     <Text variant="bodySm" as="p" tone="subdued">
                       Shows AI-generated natural language explanations of forecast data.
                     </Text>
-                  </div>
-                </div>
-              </Card>
+                  </SettingsCard>
 
-              {/* ── General Card ───────────────────────────────── */}
-              <Card>
-                <div className="p-4">
-                  <Text variant="headingMd" as="h2">
-                    General
-                  </Text>
-                  <Text variant="bodySm" as="p" tone="subdued" className="mb-3">
-                    Configure general settings for your StockFlows account.
-                  </Text>
-                  <div className="space-y-4">
+                  {/* ── General Card ───────────────────────────────── */}
+                  <SettingsCard
+                    title="General"
+                    description="Configure general settings for your StockFlows account."
+                  >
                     <Select
                       label="Currency"
                       name="currency"
@@ -291,28 +358,28 @@ export default function Settings() {
                         { label: "AUD (A$)", value: "AUD" },
                       ]}
                     />
-                  </div>
+                  </SettingsCard>
                 </div>
-              </Card>
-            </div>
 
-            {/* ── Save Button ─────────────────────────────────────── */}
-            <div className="flex justify-end">
-              <Button primary submit loading={isSubmitting}>
-                Save Settings
-              </Button>
-            </div>
-          </Form>
-        </Layout.Section>
+                {/* ── Save Button ─────────────────────────────────────── */}
+                <div className="flex justify-end pt-4 border-t border-gray-200 mt-4">
+                  <Button primary submit loading={isSubmitting}>
+                    Save Settings
+                  </Button>
+                </div>
+              </Form>
 
-        {/* ── Success Banner ──────────────────────────────────── */}
-        {actionData?.success && (
-          <Layout.Section>
-            <Banner tone="success">
-              <p>Settings saved successfully.</p>
-            </Banner>
+              {/* ── Success Banner ──────────────────────────────────── */}
+              {actionData?.success && (
+                <div className="pt-4">
+                  <Banner tone="success">
+                    <p>Settings saved successfully.</p>
+                  </Banner>
+                </div>
+              )}
+            </div>
           </Layout.Section>
-        )}
+        </div>
       </Layout>
     </Page>
   );

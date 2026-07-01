@@ -32,6 +32,7 @@ interface InventoryState {
   setItems: (items: InventoryItem[]) => void;
   updateItemQuantity: (itemId: string, newQty: number) => void;
   selectLocation: (locationId: string | null) => void;
+  setAlerts: (alerts: ReorderAlert[]) => void;
   addAlert: (alert: ReorderAlert) => void;
   dismissAlert: (alertId: string) => void;
   toggleSidebar: () => void;
@@ -64,7 +65,18 @@ export const useInventoryStore = create<InventoryState>()(
 
         addAlert: (alert) =>
           set((state) => {
-            state.alerts.unshift(alert);
+            // Deduplicate: replace if same ID exists, else add to front
+            const existingIdx = state.alerts.findIndex((a) => a.id === alert.id);
+            if (existingIdx >= 0) {
+              state.alerts[existingIdx] = alert;
+            } else {
+              state.alerts.unshift(alert);
+            }
+          }),
+
+        setAlerts: (alerts) =>
+          set((state) => {
+            state.alerts = alerts;
           }),
 
         dismissAlert: (alertId) =>

@@ -14,6 +14,7 @@
 
 import crypto from "node:crypto";
 import type { Session } from "@shopify/shopify-api";
+import { LATEST_API_VERSION } from "@shopify/shopify-api";
 import { prisma } from "~/lib/db/client";
 import { logger } from "~/lib/logger";
 
@@ -59,7 +60,7 @@ export const ALL_TOPICS = [...REGISTERED_TOPICS, ...COMPLIANCE_TOPICS];
 const WEBHOOK_CALLBACK_BASE = process.env.SHOPIFY_APP_URL ?? "https://stockflows.app";
 
 /** The API version used for webhook registration. */
-const API_VERSION = "2026-04";
+const API_VERSION = LATEST_API_VERSION;
 
 // ---------------------------------------------------------------------------
 // Types

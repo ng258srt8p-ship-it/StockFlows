@@ -19,9 +19,9 @@ interface AlertsListProps {
   alerts: AlertWithRelations[];
 }
 
-const urgencyBadgeStatus: Record<string, "critical" | "warning" | "info"> = {
+const urgencyBadgeStatus: Record<string, "critical" | "attention" | "info"> = {
   CRITICAL: "critical",
-  WARNING: "warning",
+  WARNING: "attention",
   INFO: "info",
 };
 

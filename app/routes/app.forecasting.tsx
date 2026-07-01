@@ -1,8 +1,8 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData, useSearchParams } from "@remix-run/react";
-import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
+import { requirePermission } from "~/lib/auth/middleware";
 import {
   Page,
   Layout,
@@ -36,12 +36,13 @@ interface ForecastItem {
 }
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  // requirePermission authenticates and returns the session
+  const { session } = await requirePermission(request, "reports:read");
 
   const shop = await prisma.shop.findUnique({
     where: { shopifyDomain: session.shop },
   });
-  if (!shop) return json({ forecasts: [], accuracy: 0, reorderAlerts: [] });
+  if (!shop) return json({ forecasts: [], accuracy: 0, reorderAlerts: [], abcSummary: { categories: [], totals: { A: { count: 0, percentRevenue: 0 }, B: { count: 0, percentRevenue: 0 }, C: { count: 0, percentRevenue: 0 } } } });
 
   const forecasts = await prisma.forecastResult.findMany({
     where: { inventoryItem: { shopId: shop.id } },

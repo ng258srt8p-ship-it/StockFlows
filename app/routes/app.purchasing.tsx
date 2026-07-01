@@ -26,7 +26,8 @@ const statusBadge: Record<string, "info" | "success" | "warning" | "critical"> =
 };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  // requirePermission authenticates and returns the session
+  const { session } = await requirePermission(request, "purchasing:read");
 
   const shop = await prisma.shop.findUnique({
     where: { shopifyDomain: session.shop },
@@ -50,7 +51,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { shopId } = await requirePermission(request, "purchasing:write");
-  const { session } = await authenticate.admin(request);
   const formData = await request.formData();
   const intent = formData.get("intent");
 

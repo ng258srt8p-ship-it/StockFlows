@@ -3,11 +3,13 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
+import { requirePermission } from "~/lib/auth/middleware";
 import { stringify } from "csv-stringify/sync";
 import { Page, Layout, Card, Button, Text } from "@shopify/polaris";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const { session } = await authenticate.admin(request);
+  // requirePermission authenticates and returns the session
+  const { session } = await requirePermission(request, "reports:read");
   const shop = await prisma.shop.findUnique({
     where: { shopifyDomain: session.shop },
   });

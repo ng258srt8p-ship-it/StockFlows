@@ -12,6 +12,7 @@
  */
 
 import type { Session } from "@shopify/shopify-api";
+import { LATEST_API_VERSION } from "@shopify/shopify-api";
 import { logger } from "~/lib/logger";
 
 // ---------------------------------------------------------------------------
@@ -155,7 +156,7 @@ export async function shopifyGraphQL<T = Record<string, unknown>>(
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const url = `https://${shop}/admin/api/2026-04/graphql.json`;
+      const url = `https://${shop}/admin/api/${LATEST_API_VERSION}/graphql.json`;
 
       const response = await fetch(url, {
         method: "POST",
