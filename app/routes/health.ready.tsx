@@ -1,21 +1,18 @@
-import { prisma } from "~/lib/db/client";
-
 export const loader = async () => {
   const checks: Record<string, string> = {};
   let healthy = true;
 
   // Database check
   try {
+    const { prisma } = await import("~/lib/db/client");
     await prisma.$queryRaw`SELECT 1`;
     checks.postgres = "ok";
-  } catch {
-    checks.postgres = "error";
+  } catch (error: any) {
+    checks.postgres = `error: ${error?.message ?? "unknown"}`;
     healthy = false;
   }
 
   // Redis check — only attempt when REDIS_HOST or REDIS_URL is explicitly set
-  // Note: Railway's internal Redis services are not exposed as REDIS_HOST/REDIS_URL
-  // so this will be skipped unless explicitly configured
   const hasRedis = Boolean(process.env.REDIS_HOST || process.env.REDIS_URL);
   if (hasRedis) {
     try {
@@ -39,11 +36,16 @@ export const loader = async () => {
     checks.redis = "skipped (not configured)";
   }
 
-  return new Response(
-    JSON.stringify({ status: healthy ? "ready" : "not ready", checks, timestamp: new Date().toISOString() }),
-    {
-      status: healthy ? 200 : 503,
-      headers: { "Content-Type": "application/json" },
-    }
-  );
+  // Always return a Response — never throw
+  const status = healthy ? 200 : 503;
+  const body = JSON.stringify({
+    status: healthy ? "ready" : "not ready",
+    checks,
+    timestamp: new Date().toISOString(),
+  });
+
+  return new Response(body, {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
 };
