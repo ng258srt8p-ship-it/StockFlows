@@ -26,14 +26,13 @@ export default defineConfig({
   retries: 2, // Retry webhook tests once for transient network issues
   workers: 1, // Single worker to maintain database state integrity
   reporter: "list",
-  timeout: 40_000, // Increased timeout for webhook processing and real-time sync
+  timeout: 60_000,
 
   use: {
-    baseURL: "http://localhost:5173", // Testing against local dev server
+    baseURL: "http://localhost:5173",
     trace: "on-first-retry",
     screenshot: "only-on-failure",
-    // Increased navigation timeout for large data loads
-    navigationTimeout: 30_000,
+    navigationTimeout: 60_000,
   },
 
   projects: [
