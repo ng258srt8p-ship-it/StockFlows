@@ -29,7 +29,7 @@ export default defineConfig({
   timeout: 40_000, // Increased timeout for webhook processing and real-time sync
 
   use: {
-    baseURL: "https://stockflows.app", // Testing against Shopify Dev environment
+    baseURL: "http://localhost:5173", // Testing against local dev server
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     // Increased navigation timeout for large data loads

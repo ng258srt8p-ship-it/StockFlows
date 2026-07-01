@@ -7,6 +7,17 @@ import { isbot } from "isbot";
 import { renderToPipeableStream } from "react-dom/server";
 import * as Sentry from "@sentry/remix";
 
+// Global uncaughtException handler for ioredis connection errors
+// These are non-fatal when Redis is not configured (workers gracefully degrade)
+process.on("uncaughtException", (error) => {
+  if (error?.message?.includes("ioredis") || error?.constructor?.name === "AggregateError") {
+    // Silently ignore ioredis connection errors
+    return;
+  }
+  // Re-throw for all other uncaught exceptions
+  throw error;
+});
+
 // Import job workers — they start listening when Redis is configured
 import "~/lib/jobs/index.server";
 
