@@ -9,8 +9,12 @@ RUN npm ci
 COPY prisma ./prisma
 RUN npx prisma generate
 
-# Build the app
+# Copy source files (exclude .env - Railway provides env vars)
 COPY . .
+# Remove .env if it was copied (Railway provides env vars)
+RUN rm -f .env
+
+# Build the app
 RUN npm run build
 
 ENV NODE_ENV=production
