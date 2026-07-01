@@ -1,10 +1,10 @@
 import { prisma } from "~/lib/db/client";
 
 export const loader = async () => {
-  const checks: Record<string, string> = {};
-  let healthy = true;
-
   try {
+    const checks: Record<string, string> = {};
+    let healthy = true;
+
     // Database check
     try {
       await prisma.$queryRaw`SELECT 1`;
@@ -61,6 +61,26 @@ export const loader = async () => {
       error: error?.message ?? "unknown",
     }), {
       status: 503,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+};
+
+export const action = async () => {
+  try {
+    return new Response(JSON.stringify({
+      dbUrl: process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:[^:@]+@/, ":****@") : "NOT SET",
+      nodeEnv: process.env.NODE_ENV,
+      directUrl: process.env.DIRECT_URL ? "SET" : "NOT SET",
+    }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error: any) {
+    return new Response(JSON.stringify({
+      error: error?.message ?? "unknown",
+    }), {
+      status: 500,
       headers: { "Content-Type": "application/json" },
     });
   }
