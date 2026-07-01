@@ -1,6 +1,6 @@
 name = "StockFlows"
 client_id = "9563680320c6d9dd9fbf24b206166eec"
-application_url = "https://stockflows.app"
+application_url = "https://stockflows.fly.dev"
 embedded = true
 handle = "stockflows-app"
 
@@ -26,8 +26,8 @@ embedded_app_direct_api_access = true
 
 [auth]
 redirect_urls = [
-  "https://stockflows.app/auth/callback",
-  "https://stockflows.app/auth/shopify/callback"
+  "https://stockflows.fly.dev/auth/callback",
+  "https://stockflows.fly.dev/auth/shopify/callback"
 ]
 
 [webhooks]
@@ -55,10 +55,10 @@ compliance_topics = [
   "customers/redact",
   "shop/redact",
 ]
-uri = "https://stockflows.app/webhooks"
+uri = "https://stockflows.fly.dev/webhooks"
 
 [app_proxy]
-url = "https://stockflows.app/proxy"
+url = "https://stockflows.fly.dev/proxy"
 subpath = "stockflows"
 prefix = "apps"
 
@@ -66,7 +66,7 @@ prefix = "apps"
 embedded = true
 
 [app_preferences]
-url = "https://stockflows.app/app/settings"
+url = "https://stockflows.fly.dev/app/settings"
 
 [build]
 automatically_update_urls_on_dev = false
