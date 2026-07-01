@@ -9,10 +9,8 @@ RUN npm ci
 COPY prisma ./prisma
 RUN npx prisma generate
 
-# Copy source files (exclude .env - Railway provides env vars)
+# Copy source files (.env excluded by .dockerignore)
 COPY . .
-# Remove .env if it was copied (Railway provides env vars)
-RUN rm -f .env
 
 # Build the app
 RUN npm run build
