@@ -1,5 +1,4 @@
 import { prisma } from "~/lib/db/client";
-import IORedis from "ioredis";
 
 export const loader = async () => {
   const checks: Record<string, string> = {};
@@ -14,18 +13,26 @@ export const loader = async () => {
     healthy = false;
   }
 
-  // Redis check
-  try {
-    const redis = new IORedis(process.env.REDIS_URL ?? "redis://localhost:6379", {
-      maxRetriesPerRequest: 1,
-      connectTimeout: 2000,
-    });
-    await redis.ping();
-    await redis.quit();
-    checks.redis = "ok";
-  } catch {
-    checks.redis = "error";
-    healthy = false;
+  // Redis check — only if REDIS_HOST or REDIS_URL is configured
+  const hasRedis = Boolean(process.env.REDIS_HOST || process.env.REDIS_URL);
+  if (hasRedis) {
+    try {
+      const IORedis = (await import("ioredis")).default;
+      const redis = new IORedis(process.env.REDIS_URL ?? `redis://${process.env.REDIS_HOST ?? "localhost"}:${process.env.REDIS_PORT ?? 6379}`, {
+        maxRetriesPerRequest: 1,
+        connectTimeout: 2000,
+        lazyConnect: true,
+      });
+      await redis.connect();
+      await redis.ping();
+      await redis.quit();
+      checks.redis = "ok";
+    } catch {
+      checks.redis = "error";
+      healthy = false;
+    }
+  } else {
+    checks.redis = "skipped (not configured)";
   }
 
   return Response.json(
