@@ -43,10 +43,12 @@ type WebhookHandler = (
 ) => Promise<void>;
 
 // ---------------------------------------------------------------------------
-// Loader — reject GET requests (webhooks are POST-only)
+// Loader — explicitly reject GET requests (webhooks are POST-only)
+// This function handles GET requests to /webhooks by returning 405
 // ---------------------------------------------------------------------------
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  // Reject GET requests (webhooks are POST-only)
   return new Response("Method Not Allowed", { status: 405 });
 };
 

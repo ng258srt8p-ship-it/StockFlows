@@ -4,6 +4,12 @@ import { logger } from "~/lib/logger";
 export async function registerScheduledJobs() {
   const log = logger.child({ module: "scheduler" });
 
+  // Only register scheduled jobs if Redis is configured (queues are available)
+  if (!forecastQueue || !staffSyncQueue || !reportQueue) {
+    log.info("Redis not configured — skipping scheduled job registration");
+    return;
+  }
+
   // Nightly forecast at 2:00 AM
   await forecastQueue.add(
     "nightly-forecast",

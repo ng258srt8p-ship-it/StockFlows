@@ -22,6 +22,9 @@ vi.mock("~/lib/db/client", () => ({
 vi.mock("~/lib/jobs/queue.server", () => ({
   inventorySyncQueue: { add: vi.fn().mockResolvedValue({}) },
   alertQueue: { add: vi.fn().mockResolvedValue({}) },
+  forecastQueue: { add: vi.fn().mockResolvedValue({}) },
+  staffSyncQueue: { add: vi.fn().mockResolvedValue({}) },
+  reportQueue: { add: vi.fn().mockResolvedValue({}) },
 }));
 
 // Ensure REDIS_HOST is set so dynamic imports of queue.server resolve
@@ -52,7 +55,7 @@ describe("Webhook Handlers (Integration)", () => {
   describe("inventory_levels/update webhook", () => {
     it("queues inventory update to BullMQ", async () => {
       const { authenticate } = await import("~/lib/shopify/server");
-      const { inventorySyncQueue } = await import("~/lib/jobs/queue.server");
+      const { inventorySyncQueue } = await import("~/lib/jobs/queue.server") as any;
 
       (authenticate.webhook as any).mockResolvedValue({
         shop: "test-store.myshopify.com",
@@ -79,7 +82,7 @@ describe("Webhook Handlers (Integration)", () => {
       } as any);
 
       expect(response.status).toBe(200);
-      expect(inventorySyncQueue.add).toHaveBeenCalledWith(
+      expect(inventorySyncQueue!.add).toHaveBeenCalledWith(
         "webhook-inventory-update",
         expect.objectContaining({
           shopDomain: "test-store.myshopify.com",
