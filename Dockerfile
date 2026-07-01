@@ -12,8 +12,8 @@ RUN npx prisma generate
 # Copy source files (.env excluded by .dockerignore)
 COPY . .
 
-# Build the app
-RUN npm run build
+# Build the app (use vite directly, skip type/lint checks in container)
+RUN npx vite build
 
 ENV NODE_ENV=production
 

@@ -448,6 +448,7 @@ model BillingSubscription {
 
   @@unique([shopId])
   @@map("billing_subscriptions")
+  usageRecords      UsageRecord[]
 }
 
 model UsageRecord {
