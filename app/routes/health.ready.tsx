@@ -1,10 +1,11 @@
+import { prisma } from "~/lib/db/client";
+
 export const loader = async () => {
   const checks: Record<string, string> = {};
   let healthy = true;
 
   // Database check
   try {
-    const { prisma } = await import("~/lib/db/client");
     await prisma.$queryRaw`SELECT 1`;
     checks.postgres = "ok";
   } catch (error: any) {
@@ -28,8 +29,8 @@ export const loader = async () => {
       await redis.ping();
       await redis.quit();
       checks.redis = "ok";
-    } catch {
-      checks.redis = "error";
+    } catch (error: any) {
+      checks.redis = `error: ${error?.message ?? "unknown"}`;
       healthy = false;
     }
   } else {
@@ -42,6 +43,8 @@ export const loader = async () => {
     status: healthy ? "ready" : "not ready",
     checks,
     timestamp: new Date().toISOString(),
+    nodeEnv: process.env.NODE_ENV,
+    dbUrl: process.env.DATABASE_URL ? process.env.DATABASE_URL.replace(/:[^:@]+@/, ":****@") : "NOT SET",
   });
 
   return new Response(body, {
