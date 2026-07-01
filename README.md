@@ -247,30 +247,22 @@ read_report_analytics, write_content
 
 See [DEPLOY.md](DEPLOY.md) for full deployment instructions.
 
-### Quick Deploy (Railway)
-
-```bash
-# Install Railway CLI
-npm install -g @railway/cli
-
-# Login and deploy
-railway login
-railway up --service <service-name>
-
-# Set environment variables
-railway variable set "SHOPIFY_API_KEY=..." --service <service-name>
-railway variable set "SHOPIFY_API_SECRET=..." --service <service-name>
-railway variable set "DATABASE_URL=..." --service <service-name>
-railway variable set "SHOPIFY_APP_URL=https://stockflows.app" --service <service-name>
-```
-
 ### Quick Deploy (Fly.io)
 
 ```bash
+# Install Fly CLI
+curl -L https://fly.io/install.sh | sh
+
+# Login and deploy
 fly auth login
 fly launch --no-deploy
 fly postgres create   # Creates free 3GB Postgres
+fly redis create      # Optional: creates Redis for background jobs
 fly secrets set SHOPIFY_API_KEY=... SHOPIFY_API_SECRET=... DATABASE_URL=...
+
+# For background jobs, also set Redis host
+fly secrets set REDIS_HOST=... REDIS_PORT=6379
+
 fly deploy
 ```
 

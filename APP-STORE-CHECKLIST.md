@@ -9,7 +9,7 @@
 - E2E tests: DONE (41 passing)
 - Tour page: DONE (public/tour.html)
 - Webhook HMAC verification: DONE (POST /webhooks returns 401 on invalid HMAC)
-- Production deployment: DONE (Railway — Remix app + PostgreSQL)
+- Production deployment: DONE (Fly.io — Remix app + PostgreSQL)
 - Static site deployment: DONE (Cloudflare Pages — tour, landing, privacy)
 
 ## What Needs to Be Done
@@ -43,8 +43,8 @@ Ensure everything is committed and pushed.
 The `orders/create` and `orders/updated` webhooks require PCD approval from Shopify. Apply in the Partner Dashboard before app submission. Once approved, re-add these topics to `shopify.app.toml` and `REGISTERED_TOPICS`.
 
 ### 8. Configure custom domain
-Point `stockflows.app` DNS to the Railway deployment:
-- CNAME record: `@ → <service>.up.railway.app`
+Point `stockflows.app` DNS to the Fly.io deployment:
+- CNAME record: `@ → <service>.fly.dev`
 - Update `SHOPIFY_APP_URL` to `https://stockflows.app`
 
 ## What We Can Do Now (No Partner Account Needed)

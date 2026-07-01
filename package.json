@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "build": "python3 build.py",
+    "build": "node build.js",
     "start": "remix-serve ./build/server/index.js",
     "test": "vitest run",
     "test:watch": "vitest",

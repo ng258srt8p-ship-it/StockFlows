@@ -16,9 +16,11 @@ import {
   Button,
   Banner,
   Text,
+  Card,
+  Checkbox,
 } from "@shopify/polaris";
-import { SettingsCard } from "~/components/settings/SettingsCard";
-import { NotificationToggle } from "~/components/settings/NotificationToggle";
+import { SettingsCard, SettingsSection } from "~/components/settings";
+import { NotificationToggle } from "~/components/settings";
 
 // ---------------------------------------------------------------------------
 // Server
@@ -199,11 +201,10 @@ export default function Settings() {
   return (
     <Page title="Settings" subtitle="Manage alerts, thresholds, and preferences">
       <Layout>
-        <div className="bg-background-secondary min-h-screen">
-          <Layout.Section>
-            <div className="px-4 py-6">
-              <Form method="post">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Layout.Section>
+          <div className="px-4 py-6">
+            <Form method="post">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* ── Notifications Card ─────────────────────────── */}
                   <SettingsCard
                     title="Notifications"
@@ -211,154 +212,186 @@ export default function Settings() {
                   >
                     <NotificationToggle
                       label="Email Alerts"
-                      enabled={emailOn}
+                      checked={emailOn}
                       onChange={setEmailOn}
-                      hiddenName="emailAlerts"
+                      name="emailAlerts"
                     />
-
                     <NotificationToggle
                       label="Slack Alerts"
-                      enabled={slackOn}
+                      checked={slackOn}
                       onChange={setSlackOn}
-                      hiddenName="slackEnabled"
+                      name="slackEnabled"
                       additionalFields={
-                        <>
-                          <TextField
-                            label="Slack Webhook URL"
-                            type="url"
-                            name="slackWebhookUrl"
-                            value={slackUrl}
-                            onChange={setSlackUrl}
-                            placeholder="https://hooks.slack.com/services/..."
-                            autoComplete="off"
-                          />
-                          <Text variant="bodySm" as="p" tone="subdued">
-                            Create one at Settings → Apps → Incoming Webhooks
-                          </Text>
-                        </>
+                        <TextField
+                          label="Slack Webhook URL"
+                          type="url"
+                          name="slackWebhookUrl"
+                          value={slackUrl}
+                          onChange={setSlackUrl}
+                          placeholder="https://hooks.slack.com/services/..."
+                          autoComplete="off"
+                        />
                       }
                     />
-
                     <NotificationToggle
                       label="SMS Alerts"
-                      enabled={smsOn}
+                      checked={smsOn}
                       onChange={setSmsOn}
-                      hiddenName="smsEnabled"
+                      name="smsEnabled"
                       additionalFields={
-                        <>
-                          <TextField
-                            label="Phone Numbers"
-                            type="text"
-                            name="smsPhoneNumbers"
-                            value={smsPhones}
-                            onChange={setSmsPhones}
-                            placeholder="+155****5310, +155****5311"
-                            autoComplete="off"
-                          />
-                          <Text variant="bodySm" as="p" tone="subdued">
-                            Comma-separated phone numbers for critical stock alerts
-                          </Text>
-                        </>
+                        <TextField
+                          label="Phone Numbers"
+                          type="text"
+                          name="smsPhoneNumbers"
+                          value={smsPhones}
+                          onChange={setSmsPhones}
+                          placeholder="+155****5310, +155****5311"
+                          autoComplete="off"
+                        />
                       }
                     />
                   </SettingsCard>
 
                   {/* ── Alert Thresholds Card ──────────────────────── */}
-                  <SettingsCard
-                    title="Alert Thresholds"
-                    description="Set stock levels that trigger reorder alerts. Critical must be lower than Low."
-                  >
-                    <TextField
-                      label="Low Stock Threshold"
-                      type="number"
-                      name="lowStockThreshold"
-                      value={lowStock}
-                      onChange={setLowStock}
-                      suffix="units"
-                      autoComplete="off"
-                    />
-                    <TextField
-                      label="Critical Stock Threshold"
-                      type="number"
-                      name="criticalStockThreshold"
-                      value={criticalStock}
-                      onChange={setCriticalStock}
-                      suffix="units"
-                      autoComplete="off"
-                    />
-                    <TextField
-                      label="Safety Stock Multiplier"
-                      type="number"
-                      step={0.1}
-                      name="safetyStockMultiplier"
-                      value={safetyStockMultiplier}
-                      onChange={setSafetyStockMultiplier}
-                      suffix="×"
-                      autoComplete="off"
-                    />
-                  </SettingsCard>
+                  <Card>
+                    <div className="p-4">
+                      <Text variant="headingSm" as="h3">
+                        Alert Thresholds
+                      </Text>
+                      <Text variant="bodySm" as="p" tone="subdued" className="mt-1">
+                        Set stock levels that trigger reorder alerts. Critical must be lower than Low.
+                      </Text>
+
+                      <TextField
+                        label="Low Stock Threshold"
+                        type="number"
+                        name="lowStockThreshold"
+                        value={lowStock}
+                        onChange={setLowStock}
+                        suffix="units"
+                        autoComplete="off"
+                      />
+                      <TextField
+                        label="Critical Stock Threshold"
+                        type="number"
+                        name="criticalStockThreshold"
+                        value={criticalStock}
+                        onChange={setCriticalStock}
+                        suffix="units"
+                        autoComplete="off"
+                      />
+                      <TextField
+                        label="Safety Stock Multiplier"
+                        type="number"
+                        step={0.1}
+                        name="safetyStockMultiplier"
+                        value={safetyStockMultiplier}
+                        onChange={setSafetyStockMultiplier}
+                        suffix="×"
+                        autoComplete="off"
+                      />
+                    </div>
+                  </Card>
 
                   {/* ── Forecasting Card ───────────────────────────── */}
-                  <SettingsCard
-                    title="Forecasting"
-                    description="Configure how far ahead the demand forecast predicts future sales."
-                  >
-                    <TextField
-                      label="Forecast Horizon"
-                      type="number"
-                      name="forecastHorizonDays"
-                      value={forecastHorizon}
-                      onChange={setForecastHorizon}
-                      suffix="days"
-                      autoComplete="off"
-                    />
-                  </SettingsCard>
+                  <Card>
+                    <div className="p-4">
+                      <Text variant="headingSm" as="h3">
+                        Forecasting
+                      </Text>
+                      <Text variant="bodySm" as="p" tone="subdued" className="mt-1">
+                        Configure how far ahead the demand forecast predicts future sales.
+                      </Text>
+
+                      <TextField
+                        label="Forecast Horizon"
+                        type="number"
+                        name="forecastHorizonDays"
+                        value={forecastHorizon}
+                        onChange={setForecastHorizon}
+                        suffix="days"
+                        autoComplete="off"
+                      />
+                    </div>
+                  </Card>
 
                   {/* ── AI Features Card ───────────────────────────── */}
-                  <SettingsCard
-                    title="AI Features"
-                    description="Enable AI-powered insights and natural language explanations for your inventory data."
-                  >
-                    <NotificationToggle
-                      label="AI Insights"
-                      enabled={aiInsightsOn}
-                      onChange={setAiInsightsOn}
-                      hiddenName="enableAiInsights"
-                    />
-                    <Text variant="bodySm" as="p" tone="subdued">
-                      Uses OpenCode API to analyze inventory data and generate insights.
-                      Statistical forecasting still works when AI is disabled.
-                    </Text>
+                  <Card>
+                    <div className="p-4">
+                      <Text variant="headingSm" as="h3">
+                        AI Features
+                      </Text>
+                      <Text variant="bodySm" as="p" tone="subdued" className="mt-1">
+                        Enable AI-powered insights and natural language explanations for your inventory data.
+                      </Text>
 
-                    <NotificationToggle
-                      label="Forecast Explanations"
-                      enabled={forecastExplOn}
-                      onChange={setForecastExplOn}
-                      hiddenName="enableForecastExplanations"
-                    />
-                    <Text variant="bodySm" as="p" tone="subdued">
-                      Shows AI-generated natural language explanations of forecast data.
-                    </Text>
-                  </SettingsCard>
+                      <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
+                        <Text variant="bodyMd" as="p">
+                          AI Insights
+                        </Text>
+                        <Checkbox
+                          label="AI Insights"
+                          labelHidden
+                          checked={aiInsightsOn}
+                          onChange={setAiInsightsOn}
+                        />
+                        <input
+                          type="hidden"
+                          name="enableAiInsights"
+                          value={aiInsightsOn ? "on" : ""}
+                        />
+                      </div>
+                      <Text variant="bodySm" as="p" tone="subdued">
+                        Uses OpenCode API to analyze inventory data and generate insights.
+                        Statistical forecasting still works when AI is disabled.
+                      </Text>
+
+                      <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
+                        <Text variant="bodyMd" as="p">
+                          Forecast Explanations
+                        </Text>
+                        <Checkbox
+                          label="Forecast Explanations"
+                          labelHidden
+                          checked={forecastExplOn}
+                          onChange={setForecastExplOn}
+                        />
+                        <input
+                          type="hidden"
+                          name="enableForecastExplanations"
+                          value={forecastExplOn ? "on" : ""}
+                        />
+                      </div>
+                      <Text variant="bodySm" as="p" tone="subdued">
+                        Shows AI-generated natural language explanations of forecast data.
+                      </Text>
+                    </div>
+                  </Card>
 
                   {/* ── General Card ───────────────────────────────── */}
-                  <SettingsCard
-                    title="General"
-                    description="Configure general settings for your StockFlows account."
-                  >
-                    <Select
-                      label="Currency"
-                      name="currency"
-                      value={settings?.currency || "USD"}
-                      options={[
-                        { label: "USD ($)", value: "USD" },
-                        { label: "EUR (€)", value: "EUR" },
-                        { label: "GBP (£)", value: "GBP" },
-                        { label: "CAD (C$)", value: "CAD" },
-                        { label: "AUD (A$)", value: "AUD" },
-                      ]}
-                    />
-                  </SettingsCard>
+                  <Card>
+                    <div className="p-4">
+                      <Text variant="headingSm" as="h3">
+                        General
+                      </Text>
+                      <Text variant="bodySm" as="p" tone="subdued" className="mt-1">
+                        Configure general settings for your StockFlows account.
+                      </Text>
+
+                      <Select
+                        label="Currency"
+                        name="currency"
+                        value={settings?.currency || "USD"}
+                        options={[
+                          { label: "USD ($)", value: "USD" },
+                          { label: "EUR (€)", value: "EUR" },
+                          { label: "GBP (£)", value: "GBP" },
+                          { label: "CAD (C$)", value: "CAD" },
+                          { label: "AUD (A$)", value: "AUD" },
+                        ]}
+                      />
+                    </div>
+                  </Card>
                 </div>
 
                 {/* ── Save Button ─────────────────────────────────────── */}
@@ -379,7 +412,6 @@ export default function Settings() {
               )}
             </div>
           </Layout.Section>
-        </div>
       </Layout>
     </Page>
   );

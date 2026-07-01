@@ -56,8 +56,8 @@ describe("Settings Page Style Verification", () => {
     const gridPatterns = content.match(/grid-cols-(\d)/g) || [];
     const gapPatterns = content.match(/gap-(\d)/g) || [];
     
-    // Should have grid-cols-2 for main content areas
-    expect(gridPatterns).toContain("grid-cols-2");
+    // Should have grid-cols-3 for main content areas (changed from grid-cols-2 for Polaris consistency)
+    expect(gridPatterns).toContain("grid-cols-3");
     
     // Should have gap-4 for spacing
     expect(gapPatterns).toContain("gap-4");

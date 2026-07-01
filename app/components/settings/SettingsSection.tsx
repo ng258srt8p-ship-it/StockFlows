@@ -6,13 +6,13 @@ interface SettingsSectionProps {
 }
 
 /**
- * Reusable card header pattern: heading + optional description.
- * Used inside SettingsCard or any other Card-based layout.
+ * Reusable card header using Polaris Text component.
+ * Used inside SettingsCard or any Card-based layout.
  */
 export function SettingsSection({ title, description }: SettingsSectionProps) {
   return (
     <>
-      <Text variant="headingLg" as="h2" className="text-gray-900 font-semibold">
+      <Text variant="headingLg" as="h3" className="text-gray-900 font-semibold">
         {title}
       </Text>
       {description && (

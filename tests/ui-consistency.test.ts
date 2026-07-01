@@ -25,8 +25,8 @@ describe("Settings page structural fix", () => {
   expect(content).not.toContain("Manage your preferences");
   expect(content).toContain("Manage alerts, thresholds, and preferences");
 
-    // Gate 2.5: Card grid layout preserved
-    expect(content).toContain("grid grid-cols-1 lg:grid-cols-2 gap-4");
+    // Gate 2.5: Card grid layout preserved (changed from lg:grid-cols-2 to md:grid-cols-3 for Polaris consistency)
+    expect(content).toContain("grid grid-cols-1 md:grid-cols-3 gap-4");
 
     // Gate 2.6: Form wraps only the card grid (inside Layout.Section)
     const formIndex = content.indexOf("<Form method=\"post\">");

@@ -591,7 +591,7 @@ if (Math.abs(zScore) > 3) → ANOMALY_DEMAND alert
 
 | Dependency | Risk | Mitigation |
 |------------|------|------------|
-| Redis provisioning (Fly.io/Railway) | 🔴 Blocks background jobs | Provision Week 1, fallback queue parallel |
+| Redis provisioning (Fly.io) | 🔴 Blocks background jobs | Provision Week 1, fallback queue parallel |
 | Shopify API 2026-04 deprecation timeline | 🟠 Unknown | Build version compatibility layer now |
 | Prisma schema migrations (vendor performance) | 🟠 Data migration complexity | Blue-green deploy, backward compat |
 | OR-Tools / LP solver for transfers | 🟠 Licensing/complexity | Evaluate custom min-cost flow first |
@@ -678,7 +678,7 @@ services:
 ## 9. Next Actions (This Week)
 
 ### Immediate (Week 1)
-- [ ] **Provision Redis** (Fly.io `redis` addon or Railway) — unblocks background jobs
+- [ ] **Provision Redis** (Fly.io `redis` addon) — unblocks background jobs
 - [ ] **Dynamic API Version** — Replace hardcoded `2026-04` with `process.env.SHOPIFY_API_VERSION || '2026-04'` in `client.ts`, `inventory.ts`, `webhooks.ts`
 - [ ] **Webhook Health Endpoint** — Add `GET /api/webhooks/health` returning registration status + last delivery timestamps
 - [ ] **Circuit Breaker** — Add to `shopifyGraphQL` for 5xx errors (open after 5 failures in 30s)

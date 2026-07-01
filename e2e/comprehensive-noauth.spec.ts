@@ -4,8 +4,8 @@
  */
 import { test, expect, type Page, type BrowserContext } from "@playwright/test";
 
-// App routes (Railway deployment) - require Shopify auth
-const APP_BASE_URL = "https://faithful-love-production-18fb.up.railway.app";
+// App routes (Fly.io deployment) - require Shopify auth
+const APP_BASE_URL = "https://stockflows.fly.dev";
 // Marketing pages (Cloudflare Pages deployment) - public
 const MARKETING_BASE_URL = "https://stockflows.app";
 const SCREENSHOT_DIR =

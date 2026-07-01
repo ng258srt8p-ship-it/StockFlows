@@ -1,27 +1,23 @@
-import { Checkbox, Text } from "@shopify/polaris";
+import { Checkbox, TextField, Text } from "@shopify/polaris";
 import type { ReactNode } from "react";
 
 interface NotificationToggleProps {
   label: string;
-  enabled: boolean;
-  onChange: (enabled: boolean) => void;
-  hiddenName: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+  name: string;
   additionalFields?: ReactNode;
 }
 
 /**
- * A reusable toggle row with a label on the left and a Polaris Checkbox
- * (acting as a switch) on the right, plus a hidden input so the
- * unchecked state is still submitted to the Remix action.
- *
- * Optionally renders `additionalFields` below the row when toggled on
- * (e.g. Slack webhook URL, SMS phone numbers).
+ * A reusable toggle row using Polaris Checkbox (acting as a toggle).
+ * Uses hidden input for form submission so unchecked state is still submitted.
  */
 export function NotificationToggle({
   label,
-  enabled,
+  checked,
   onChange,
-  hiddenName,
+  name,
   additionalFields,
 }: NotificationToggleProps) {
   return (
@@ -34,17 +30,17 @@ export function NotificationToggle({
           <Checkbox
             label={label}
             labelHidden
-            checked={enabled}
+            checked={checked}
             onChange={onChange}
           />
           <input
             type="hidden"
-            name={hiddenName}
-            value={enabled ? "on" : ""}
+            name={name}
+            value={checked ? "on" : ""}
           />
         </div>
       </div>
-      {enabled && additionalFields && (
+      {checked && additionalFields && (
         <div className="mt-2">{additionalFields}</div>
       )}
     </>

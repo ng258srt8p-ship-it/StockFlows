@@ -15,8 +15,8 @@
  */
 import { test, expect } from "@playwright/test";
 
-// App routes (Railway deployment)
-const APP_BASE_URL = "https://faithful-love-production-18fb.up.railway.app";
+// App routes (Fly.io deployment)
+const APP_BASE_URL = "https://stockflows.fly.dev";
 // Marketing pages (Cloudflare Pages deployment)
 const MARKETING_BASE_URL = "https://stockflows.app";
 

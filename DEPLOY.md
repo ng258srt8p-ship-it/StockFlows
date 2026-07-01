@@ -6,20 +6,20 @@ StockFlows has two deployed components:
 
 | Component | Host | Purpose |
 |-----------|------|---------|
-| **Remix app** (API server) | Railway | Webhooks, auth, admin UI, background jobs |
+| **Remix app** (API server) | Fly.io | Webhooks, auth, admin UI, background jobs |
 | **Static site** (tour/landing) | Cloudflare Pages | Marketing pages, privacy policy, tour |
 
-The Shopify app runs on Railway. Cloudflare Pages serves the static marketing site at `stockflows.app`.
+The Shopify app runs on Fly.io. Cloudflare Pages serves the static marketing site at `stockflows.app`.
 
 ---
 
 ## Production Architecture
 
 ```
-Shopify ──POST /webhooks──► Railway (Remix app)
+Shopify ──POST /webhooks──► Fly.io (Remix app)
                                     │
-                                    ├── PostgreSQL (Railway add-on)
-                                    ├── Redis (Railway add-on, optional)
+                                    ├── PostgreSQL (Fly Postgres)
+                                    ├── Redis (Fly Redis, optional)
                                     └── BullMQ workers (in-process)
 
 Merchants ──► Cloudflare Pages (stockflows.app)
@@ -46,87 +46,99 @@ The custom `verifyWebhook()` utility in `app/lib/shopify/webhooks.ts` provides a
 
 ---
 
-## Railway Deployment
+## Fly.io Deployment (Primary)
 
 ### Prerequisites
 
-- [Railway CLI](https://docs.railway.app/reference/cli): `npm install -g @railway/cli`
-- Railway account: `railway login`
+- [Fly CLI](https://fly.io/docs/hands-on/install-flyctl/): `curl -L https://fly.io/install.sh | sh`
+- Fly.io account: `fly auth login`
 
-### 1. Create Project
+### 1. Create App and Database
 
 ```bash
-railway init           # Creates project (e.g. "faithful-love")
-railway add --database postgres  # Adds PostgreSQL add-on
+fly launch --no-deploy              # Creates app config (fly.toml)
+fly postgres create                 # Creates Fly Postgres (free 3GB tier)
+fly redis create                    # Creates Fly Redis (for background jobs)
 ```
 
 ### 2. Set Environment Variables
 
 ```bash
 # Required
-railway variable set "SHOPIFY_API_KEY=your_key" --service <service>
-railway variable set "SHOPIFY_API_SECRET=your_secret" --service <service>
-railway variable set "SHOPIFY_APP_URL=https://stockflows.app" --service <service>
-railway variable set "DATABASE_URL=postgresql://..." --service <service>
+fly secrets set SHOPIFY_API_KEY=your_key
+fly secrets set SHOPIFY_API_SECRET=your_secret
+fly secrets set SHOPIFY_APP_URL=https://stockflows.app
+fly secrets set DATABASE_URL=postgresql://...  # From fly postgres create output
 
 # Optional (for background jobs)
-railway variable set "REDIS_HOST=redis" --service <service>
-railway variable set "REDIS_PORT=6379" --service <service>
+fly secrets set REDIS_HOST=...  # From fly redis create output
+fly secrets set REDIS_PORT=6379
 
 # Optional (for notifications)
-railway variable set "RESEND_API_KEY=..." --service <service>
-railway variable set "SLACK_WEBHOOK_URL=..." --service <service>
-railway variable set "TWILIO_ACCOUNT_SID=..." --service <service>
-railway variable set "TWILIO_AUTH_TOKEN=..." --service <service>
-railway variable set "TWILIO_PHONE_NUMBER=..." --service <service>
+fly secrets set RESEND_API_KEY=...
+fly secrets set SLACK_WEBHOOK_URL=...
+fly secrets set TWILIO_ACCOUNT_SID=...
+fly secrets set TWILIO_AUTH_TOKEN=...
+fly secrets set TWILIO_PHONE_NUMBER=...
 ```
 
 ### 3. Deploy
 
 ```bash
-railway up --service <service-name>
+fly deploy
 ```
 
-Railway builds the Docker image, runs migrations (if configured), and starts the app.
+Fly.io builds the Docker image, runs migrations (if configured), and starts the app.
 
 ### 4. Run Database Migrations
 
 ```bash
-railway run npx prisma migrate deploy
+fly ssh console -C "npx prisma migrate deploy"
 ```
 
-### 5. Generate a Public URL
+### 5. Custom Domain (stockflows.app)
 
-```bash
-railway domain --service <service>
-# Creates: https://<service>-production-<hash>.up.railway.app
-```
+1. Get the Fly.io hostname:
+   ```bash
+   fly status
+   # Shows: Hostname: stockflows.fly.dev
+   ```
 
-### 6. Custom Domain (stockflows.app)
-
-1. Add a CNAME record in Cloudflare DNS:
+2. Add a CNAME record in Cloudflare DNS:
    ```
    Type: CNAME
    Name: @ (or stockflows.app)
-   Target: <service>-production-<hash>.up.railway.app
+   Target: stockflows.fly.dev
+   Proxy: Proxied (orange cloud)
    ```
-2. On Railway, add the custom domain:
+
+3. Add the custom domain on Fly.io:
+   ```bash
+   fly certs add stockflows.app
    ```
-   railway domain stockflows.app --service <service>
-   ```
-3. Update `SHOPIFY_APP_URL` in Railway:
-   ```
-   railway variable set "SHOPIFY_APP_URL=https://stockflows.app" --service <service>
+
+4. Update `SHOPIFY_APP_URL` in Fly.io secrets:
+   ```bash
+   fly secrets set SHOPIFY_APP_URL=https://stockflows.app
    ```
 
 ### Health Check
 
-Railway uses the `/health` endpoint to determine if the app is running:
+Fly.io uses the `/health` endpoint to determine if the app is running:
 
 ```bash
 curl https://stockflows.app/health
 # {"status":"alive","timestamp":"2026-06-24T03:34:33.735Z"}
 ```
+
+---
+
+## Fly.io Free Tier
+
+- 3 shared-cpu-1x VMs (256MB RAM each)
+- 3GB Fly Postgres
+- Free TLS certificates
+- Auto-stop/start machines
 
 ---
 
@@ -144,7 +156,7 @@ Or push to `main` — Cloudflare Pages auto-deploys from the linked GitHub repo.
 
 ### Custom Domain
 
-`stockflows.app` is already configured as a custom domain on the Cloudflare Pages project. When switching the Remix app to Railway, update the DNS so `stockflows.app` points to Railway instead.
+`stockflows.app` is already configured as a custom domain on the Cloudflare Pages project. When switching the Remix app to Fly.io, update the DNS so `stockflows.app` points to Fly.io instead.
 
 ---
 
@@ -208,29 +220,6 @@ The `orders/create` and `orders/updated` webhook topics require PCD approval fro
 
 ---
 
-## Fly.io (Alternative — Free Tier)
-
-Fly.io is configured in `fly.toml` but requires account verification before first deploy.
-
-### Setup
-
-```bash
-fly auth login
-fly launch --no-deploy
-fly postgres create   # Creates free 3GB Postgres
-fly secrets set SHOPIFY_API_KEY=... SHOPIFY_API_SECRET=... DATABASE_URL=...
-fly deploy
-```
-
-### Free Tier Includes
-
-- 3 shared-cpu-1x VMs (256MB RAM each)
-- 3GB Fly Postgres
-- Free TLS certificates
-- Auto-stop/start machines
-
----
-
 ## Troubleshooting
 
 ### Webhook 405 error
@@ -239,7 +228,7 @@ fly deploy
 
 **Cause:** The Remix app is not deployed — the domain serves static files only.
 
-**Fix:** Deploy the Remix app to Railway (or Fly.io) and ensure `stockflows.app` DNS points to the app server.
+**Fix:** Deploy the Remix app to Fly.io and ensure `stockflows.app` DNS points to the app server.
 
 ### Webhook 400 error (not 401)
 
@@ -253,9 +242,9 @@ fly deploy
 
 **Cause:** Redis is not configured or not reachable.
 
-**Fix:** Redis is optional — the app starts without it. Add Redis via `railway add --database redis` and set `REDIS_HOST`.
+**Fix:** Redis is optional — the app starts without it. Add Redis via `fly redis create` and set `REDIS_HOST`.
 
-### Build fails on Railway
+### Build fails on Fly.io
 
 **Cause:** Usually the SSR build not running (only client build completes).
 
@@ -265,10 +254,10 @@ fly deploy
 
 ```bash
 # Run migrations manually
-railway run npx prisma migrate deploy
+fly ssh console -C "npx prisma migrate deploy"
 
 # Or reset the database (development only)
-railway run npx prisma migrate reset
+fly ssh console -C "npx prisma migrate reset"
 ```
 
 ---

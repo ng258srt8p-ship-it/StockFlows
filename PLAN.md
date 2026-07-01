@@ -1,348 +1,260 @@
-# StockFlows Enhancement Plan
+# StockFlows Integration Evaluation & Settings Redesign Plan
 
-## Overview
-Comprehensive plan to triage StockFlows app functionality, identify integration issues, research competitive advantages against Shopify's native features, implement new features, and establish recurring enhancement cycle.
-
-**Current Status**: **Phases 1-7 COMPLETE** — Core differentiation features implemented, tested, and verified (127/127 tests passing)
+## Objective
+Identify all data synchronization issues between the Shopify store and StockFlows app, fix the Settings page formatting to match Polaris design standards, and create an automated deploy-verify loop for continuous validation.
 
 ---
 
-## Phase 1: Triage & Integration Diagnosis ✅ COMPLETE
+## 🎯 Phase 1: Diagnostics & Auditing (5 Parallel Subagents)
 
-### 1.1 App Functionality Assessment — COMPLETE
-**Objective**: Complete evaluation of current StockFlows integration with Shopify ecosystem ✅ DONE
+### Subagent 1: Settings vs Forecasting Page CSS Audit ✅ COMPLETE
+**Deliverables:** Component structure analysis
 
-**Key Areas Triaged**:
-- ✅ **Inventory Integration**: Inventory API connectivity, real-time sync, multi-location support — WORKING
-- ✅ **Purchase Order Integration**: PO lifecycle, vendor management, receiving workflow — WORKING (auto-reorder, vendor DB, landed cost, partial receiving)
-- ✅ **Transfer Integration**: Stock transfer functionality between locations — WORKING (auto-approval, audit trail, SSE updates)
-- ✅ **Shopify API Scopes**: Required permissions installed and working
-- ✅ **Webhook Functionality**: Inventory level updates, order notifications, compliance events — Registered (7 topics)
-- ✅ **Authentication Flow**: Admin API access, session management — Working via Remix auth
+**Key Findings:**
+| Issue | Settings Page | Forecasting Page (Reference) | Status |
+|-------|--------------|---------------------------|--------|
+| Component architecture | Custom `SettingsCard` + `NotificationToggle` | Pure Polaris `Card` components | ❌ |
+| Grid layout | `lg:grid-cols-2` + custom wrapper | `md:grid-cols-3` with standard `Layout.Section` | ❌ |
+| Background override | `bg-background-secondary min-h-screen` | None (uses Polaris default) | ❌ |
+| Typography | Mixed `Text` without variant | Consistent `headingSm`, `headingLg`, `bodyMd` | ❌ |
+| Spacing | `px-4 py-6`, `border-t border-gray-200` | Standard `p-4` inside Cards | ❌ |
+| Form toggle | Custom `Checkbox` with `labelHidden` | No toggles (read-only page) | ❌ |
 
-### 1.2 Current Integration Issues — IDENTIFIED & DOCUMENTED
-**Confirmed Issues**:
-- **Rate Limiting**: GraphQL Admin API throttling — mitigation needed via adaptive retry (client.ts has basic retry)
-- **Webhook Registration**: Only 2/14 topics registered in server.ts (vs 14 in shopify.app.toml)
-- **Background Jobs**: Redis optional but required for alerts, forecasting, inventory sync
-- **API Versioning**: Inconsistent — server.ts uses LATEST_API_VERSION, client.ts uses "2026-04", webhooks.ts uses "2024-07"
-- **Error Handling**: Basic error boundaries present; comprehensive retry logic needed
-- **Missing Prisma Model**: Subscription model referenced in billing.ts but not in schema.prisma
-
-**Diagnostic Tests Status**:
-- ✅ Shopify connection verified via app install flow
-- ✅ Webhook registration verified via `/webhooks` endpoint
-- ✅ Inventory sync working via `inventory-sync.worker.ts`
-- ⚠️ Redis connectivity — needs production Redis instance
-
-### 1.3 Integration Recovery Plan — READY TO APPLY
-**Immediate Fixes (1-2 hours)**:
-- [ ] Fix API key reference: `apiKey: process.env.SHOPIFY_API_KEY` in server.ts
-- [ ] Standardize API version to "2026-04" across server.ts, client.ts, webhooks.ts
-- [ ] Add all 14 webhook topics to server.ts matching shopify.app.toml
-- [ ] Add Subscription model to prisma/schema.prisma
-- [ ] Install ESLint TypeScript plugin: `npm install -D @typescript-eslint/eslint-plugin @typescript-eslint/parser`
-- [ ] Add 6 missing webhook handlers in webhooks.tsx
-
-**Long-term Improvements (Month 1)**:
-- [ ] API version compatibility layer
-- [ ] Fallback sync mechanisms for webhook failures
-- [ ] Rate limit awareness in all Shopify API calls
+**Files to fix:**
+- `app/routes/app.settings.tsx` — Replace custom components with Polaris native
+- `app/components/settings/SettingsCard.tsx` — Either remove or align with Polaris `Card`
+- `app/components/settings/NotificationToggle.tsx` — Replace with Polaris `Toggle`
+- `app/components/settings/SettingsSection.tsx` — Replace with Polaris `Text` directly
 
 ---
 
-## Phase 2: Competitive Analysis - StockFlows vs Shopify Native Features ✅ COMPLETE
+### Subagent 2: Playwright E2E Test Suite ✅ COMPLETE
+**Deliverables:** 3 new test files (in `stockflows-e2e-tests/` separate directory)
 
-### 2.1 Shopify POS & Inventory Tracking Limitations
-**Current Shopify Native Capabilities**:
-- Basic inventory tracking across products
-- Simple low stock notifications
-- Manual purchase order creation
-- Basic location management
-- Export to CSV (limited)
-- Manual stock adjustments
+**Tests Created:**
+1. **`visual-consistency.spec.ts`** (20+ tests) — Background colors, typography, heading sizes, card layouts, button styling, conditional fields, iOS settings design
+2. **`data-integration.spec.ts`** (20+ tests) — Product count accuracy, inventory badges, PO data, vendor info, forecast confidence, dashboard metrics, settings persistence
+3. **`form-interactions.spec.ts`** (60+ tests) — All checkbox toggles, numeric input validation, conditional fields, currency select, save button, toast messages, edge cases
 
-**Key Gaps in Shopify Native Solution** (10 gaps identified, 6 now addressed by StockFlows):
-
-1. **No Automated Purchase Orders** → ✅ **IMPLEMENTED** (Smart Reorder Engine)
-2. **Limited Forecast Intelligence** → ✅ **IMPLEMENTED** (5 forecasting models)
-3. **No Stock Transfer Workflow** → ✅ Basic workflow working; ⏳ Optimization engine next
-4. **Basic Alert System** → ✅ Working; ⏳ Predictive enhancement next
-5. **No Cost Tracking** → ⏳ Landed cost calculator next
-6. **Limited Reporting** → ✅ PDF + Google Sheets working
-7. **No Integration with Vendors** → ✅ **IMPLEMENTED** (Vendor Analytics Dashboard)
-8. **Manual Cycle Counting** → ✅ Working
-9. **No Barcode Scanning** → ✅ Working
-10. **Limited Analytics** → ✅ **IMPLEMENTED** (Vendor scorecards, forecast accuracy)
+**Key Features:**
+- Multi-browser: Chromium, Firefox, WebKit
+- Mobile emulation: Pixel 5 (Android)
+- Visual regression with screenshot comparison
+- Tags-based filtering (`@visual`, `@data`, `@form`)
+- CI-ready with JUnit reporting
 
 ---
 
-## Phase 3: Feature Implementation Pipeline — **COMPLETED CORE FEATURES**
+### Subagent 3: Static HTML Analysis ✅ COMPLETE (Direct Analysis)
+**Deliverables:** Line-by-line fix specifications for all static HTML files
 
-### 3.1 Priority Feature Enhancements — **TIER 1 DONE**
+**Three separate Settings rendering implementations found:**
+1. **`explore.html:669`** — Uses `.polaris-page-title`, `.polaris-card`, `.polaris-checkbox` classes defined in inline `<style>` block
+2. **`tour.html:929`** — Uses iOS-style classes (`.ios-settings`, `.ios-toggle`, `.ios-section`) — completely different design system
+3. **`settings-preview.html`** — Standalone page with its own complete `<style>` block
 
-#### Level 1: Revenue Impact ($10K+/month potential) — **COMPLETE**
+**Findings by file:**
 
-**1.1 Advanced Purchase Order Automation + Vendor Analytics** — ✅ **DEPLOYED**
-- **Files**: `app/lib/purchasing/smart-reorder.ts` (429 lines), `app/lib/purchasing/vendor-analytics.ts` (792 lines)
-- **Tests**: 41 + 26 = 67 new tests (all passing)
-- **Features Delivered**:
-  - Dynamic EOQ calculation with min/max bounds
-  - Safety stock optimization (lead time variability × demand variability)
-  - Seasonal demand forecasting integration (peak/normal/low seasons)
-  - Vendor performance scoring (0-100 composite)
-  - Urgency-based prioritization (critical/warning/info)
-  - Natural language reasoning for recommendations
-  - Delivery metrics (on-time rate, lead time stats, reliability score)
-  - Quality metrics (damage/return rates, issue classification)
-  - Cost metrics (spend trends, savings opportunities)
-  - Vendor scorecards with risk levels (low/medium/high/critical)
-  - Cross-vendor comparison and ranking
+**`public/settings-preview.html` (standalone preview page)**
+| Line | Issue | Fix |
+|------|-------|-----|
+| 11 | `--serif` font variable defined for titles | Remove; Polaris uses system sans-serif |
+| 13 | `background: #f6f6f7` on body | Change to Polaris default surface background `#fafafa` |
+| 18 | `.polaris-page-title { font-family: var(--serif); font-size: 1.375rem; }` | Change to `font-family: -apple-system, "Inter", sans-serif; font-size: 1.25rem;` |
+| 29 | `.polaris-card-header { font-size: 1.25rem; }` | Change to `font-size: 1.125rem` or remove — Card title uses Polaris `headingSm` |
+| 67 | `.polaris-btn-primary { background: #D97706; }` (amber) | Change to Polaris green `#008060` |
+| 68-69 | `.polaris-btn-primary:hover { background: #b85f05; }` | Change to `#006e52` (Polaris green hover) |
+| 70 | `.polaris-btn-primary:active { background: #934c04; }` | Change to `#005c45` (Polaris green active) |
 
-**1.2 Demand Forecasting Integration** — ✅ **EXISTING, MATURE**
-- 5 models: ETS, Linear Regression, Moving Average, Seasonal Decomposition, Prophet
-- Auto-selection based on MAPE accuracy
-- Seasonality detection
-- Forecast accuracy tracking (MAPE over time per SKU)
+**`public/explore.html:648-906` (Polaris-style rendering)**
+| Line | Issue | Fix |
+|------|-------|-----|
+| 669 | `<h1 class="polaris-page-title">Settings</h1>` with serif font | Change font-family—CSS is in page `<style>` block, update `.polaris-page-title` |
+| 680 | `.polaris-card-header` uses div with raw text | Should use Polaris `<Text>` component hierarchy |
+| 682-686 | Raw checkbox HTML instead of Polaris `<Checkbox>` | Acceptable for static HTML demo, but visual should match |
+| 802 | Save button uses `#D97706` amber | Change CSS class to use `#008060` green |
 
-#### Level 2: Operational Efficiency ($5K+/month potential) — **NEXT PHASE**
-**2.1 Smart Stock Transfer System** — ⏳ **NEXT**
-- Transfer optimization algorithm (min-cost flow)
-- Cross-location demand balancing using forecast data
-- Seasonal redistribution planning
+**`public/tour.html:929-978` (iOS-style rendering)**
+| Line | Issue | Fix |
+|------|-------|-----|
+| 935 | Uses `.ios-settings` wrapper | Documentation only; iOS style is intentional marketing design |
+| 945-946 | Uses `.ios-input` with inline styles | Matches mobile-first tour design — no change needed |
+| N/A | Completely different design from Polaris | This is intended as iOS-style settings mockup, not Polaris |
 
-**2.2 Enhanced Alert Intelligence** — ⏳ **NEXT**
-- Predictive anomaly detection using forecast residuals
-- Supply chain disruption alerts
-- Alert frequency capping and suppression
+**`public/landing.html:958-959` (Basic rendering)**
+| Line | Issue | Fix |
+|------|-------|-----|
+| 960 | `<h2>Settings</h2>` with basic description | Matches landing page design, not app-level Polaris — no change needed |
 
-#### Level 3: User Experience ($2K+/month potential) — **NEXT PHASE**
-**3.1 Improved User Interface** — ⏳ **NEXT**
-- PWA with offline barcode scanning
-- Dashboard widget system
-- Quick actions panel
+**`public/explore.html` CSS `<style>` block (inline CSS around line 50-125)**
+| CSS Class | Current Value | Should Be |
+|-----------|--------------|-----------|
+| `.polaris-page-title` | `font-family: var(--serif)` | `font-family: -apple-system, "Inter", sans-serif` |
+| `.polaris-btn-primary` | `background: #D97706` | `background: #008060` |
+| `.polaris-btn-primary:hover` | `background: #b85f05` | `background: #006e52` |
 
-**3.2 API & Integration Enhancements** — ⏳ **NEXT**
-- Shopify API rate limit awareness
-- Third-party integrations (QuickBooks, NetSuite, ShipStation)
-- Webhook retry with dead-letter queue
-
----
-
-## Phase 4: Testing Infrastructure ✅ COMPLETE
-
-### 4.1 Test Results Summary
-| Test Suite | Tests | Status |
-|------------|-------|--------|
-| smart-reorder.test.ts | 20 | ✅ |
-| smart-reorder-engine.test.ts | 21 | ✅ |
-| vendor-analytics.test.ts | 26 | ✅ |
-| forecasting.test.ts | 6 | ✅ |
-| ui-consistency.test.ts | 19 | ✅ |
-| integration/webhook-handler.test.ts | 4 | ✅ |
-| integration/inventory-sync-worker.test.ts | 2 | ✅ |
-| schemas.test.ts | 8 | ✅ |
-| notifications.test.ts | 2 | ✅ |
-| permissions.test.ts | 4 | ✅ |
-| pdf.test.ts | 7 | ✅ |
-| stocky-import.test.ts | 3 | ✅ |
-| sse-manager.test.ts | 5 | ✅ |
-| **TOTAL** | **127** | **✅ ALL PASSING** |
-
-### 4.2 Code Quality Gates
-- ✅ TypeScript strict mode: 0 errors
-- ✅ Build: Successful
-- ✅ Unit test coverage: 100% for new modules
-- ✅ Integration tests: All passing
+**Files to fix:**
+- `public/settings-preview.html` — Fix button color, font-family, background color
+- `public/explore.html` — Fix `--serif` font usage on page title, fix amber button
+- No changes needed for `tour.html` (intentionally iOS-style) or `landing.html` (intentionally minimal)
+- `public/tour.html` — Sync settings rendering
+- `public/landing.html` — Sync settings rendering
 
 ---
 
-## Phase 5: Documentation & Knowledge Base ✅ UPDATED
+### Subagent 4: Integration Validation Framework ✅ COMPLETE
+**Deliverables:** Validation scripts and comparison framework
 
-### 5.1 Core Documents (Current Versions)
-| Document | Version | Status |
-|----------|---------|--------|
-| DIAGNOSTIC-REPORT.md | 2.0 | ✅ Updated with implementation status |
-| COMPETITIVE-ANALYSIS.md | 2.0 | ✅ Updated with deployed features |
-| IMPLEMENTATION-ROADMAP.md | 2.0 | ✅ Updated with completion status |
-| PLAN.md | 2.0 | ✅ This document |
-
-### 5.2 Knowledge Base Structure
-```
-/docs/
-├── features/
-│   ├── purchase-orders/
-│   │   ├── automation.md
-│   │   ├── vendor-management.md
-│   │   └── receiving.md
-│   ├── inventory/
-│   │   ├── forecasting.md
-│   │   ├── transfers.md
-│   │   └── cycle-counting.md
-│   └── reporting/
-│       ├── pdf-reports.md
-│       ├── google-sheets.md
-│       └── analytics.md
-├── integrations/
-│   ├── shopify/
-│   │   ├── webhooks.md
-│   │   ├── api-limits.md
-│   │   └── migration-guide.md
-│   └── third-party/
-│       ├── slack.md
-│       ├── email.md
-│       └── twilio.md
-├── operations/
-│   ├── deployment.md
-│   ├── monitoring.md
-│   ├── scaling.md
-│   └── maintenance.md
-└── guides/
-    ├── getting-started.md
-    ├── user-onboarding.md
-    └── developer-portal.md
-```
-
----
-
-## Phase 6: Recurring Enhancement System ⏳ READY TO CONFIGURE
-
-### 6.1 Cron Job Architecture
-**Objective**: Continuous improvement loop running every hour (except 6:30 AM EST)
-
-**System Components**:
-- **Market Analysis**: Monitor Shopify announcements, competitor features, user feedback
-- **Performance Metrics**: Track app usage patterns, feature adoption, revenue impact
-- **Technical Debt Assessment**: Identify areas needing refactoring or modernization
-- **User Sentiment Analysis**: Analyze support tickets, reviews, and usage data
-
-**Prioritization Framework**:
-- Impact vs Effort Matrix
-- Revenue Potential
-- Operational Efficiency
-- Strategic Alignment
-
-**Schedule**:
-- **Hourly**: Run during business hours (9 AM - 6 PM EST)
-- **Except**: Disabled at 6:30 AM EST for night maintenance
-- **Weekend**: Reduced frequency for overnight jobs
-
-### 6.2 Nightly Report Generation
-**Objective**: Create comprehensive report of overnight enhancements and changes
-**Schedule**: 6:30 AM EST (11:30 UTC) Monday-Friday
-
-**Report Structure**:
-- Executive Summary (enhancements, revenue impact, user count, performance)
-- Detailed Changes (features, bugs, code quality, test coverage)
-- Technical Details (branches, commits, benchmarks, deployments)
-- Future Recommendations (priorities, resources, timelines)
-
-### 6.3 Cron Commands Ready to Execute
+**Components Created:**
 ```bash
-# Hourly enhancement loop (runs at :00)
-cronjob create \
-  --action create \
-  --schedule "0 * * * *" \
-  --name "StockFlows Hourly Enhancement" \
-  --prompt "Analyze codebase for improvements, update docs, identify enhancement opportunities" \
-  --skills "coding,terminal,web" \
-  --toolsets "terminal,file,web" \
-  --attach_to_session true
+scripts/deploy-verify-loop.sh     # Full 6-phase deployment pipeline
+scripts/deploy-verify-loop.conf   # Configuration & environment reference
+```
 
-# Nightly report generation (6:30 AM EST = 11:30 UTC)
-cronjob create \
-  --action create \
-  --schedule "30 11 * * 1-5" \
-  --name "StockFlows Nightly Report" \
-  --prompt "Generate comprehensive diagnostic + competitive + roadmap reports for overnight changes" \
-  --skills "analysis,reporting" \
-  --toolsets "terminal,file" \
-  --deliver local
+**6 Phases per Iteration:**
+| Phase | Action | Verification |
+|-------|--------|-------------|
+| 1. Git | `git push origin main` | Exit code |
+| 2. Fly.io | `fly deploy --now` | Health endpoint `/health` |
+| 3. Cloudflare | `wrangler pages deploy` | URL reachable |
+| 4. Shopify | `shopify app deploy --force` | Exit code |
+| 5. E2E Tests | `npx playwright test` | All tests pass (up to 10 retries) |
+| 6. Verification | Health checks on all endpoints | HTTP 200/OK |
+
+---
+
+### Subagent 5: Settings Page Redesign 🔄 IN PROGRESS
+**Deliverables:** Refactored `app.settings.tsx` to match Polaris/Forecasting page design
+
+**Planned Changes:**
+1. Remove `bg-background-secondary min-h-screen` wrapper
+2. Replace custom `SettingsCard` component with Polaris `<Card>`
+3. Replace custom `NotificationToggle` with proper Polaris form pattern
+4. Standardize heading hierarchy using `Text variant="headingLg"`
+5. Ensure consistent `p-4` padding inside all Card containers
+6. Fix font sizes — page titles should use Polaris `headingLg` not custom CSS `--serif`
+7. Fix save button colors — use Polaris `Button primary` (green) not amber
+8. Align grid layout with forecasting page pattern
+
+---
+
+## 🔄 Phase 2: Deploy-Verify Loop (Automated)
+
+### Flow Diagram
+```
+┌─────────────────────────────────────────────────────────┐
+│                    deploy-verify-loop.sh                  │
+│  ┌─────────┐   ┌──────────┐   ┌──────────┐   ┌────────┐ │
+│  │  Git     │→  │ Fly.io   │→  │ Cloudflare│→  │ Shopify│ │
+│  │  Push    │   │ Deploy   │   │ Pages     │   │ App    │ │
+│  └─────────┘   └──────────┘   └──────────┘   └────────┘ │
+│                                                           │
+│  ┌──────────┐   ┌──────────────┐   ┌───────────────────┐ │
+│  │  E2E     │←  │  Health      │←  │  Data Integration  │ │
+│  │  Tests   │   │  Check       │   │  Validation        │ │
+│  └──────────┘   └──────────────┘   └───────────────────┘ │
+└─────────────────────────────────────────────────────────┘
+        │                                     │
+        ▼                                     ▼
+   ✅ All Pass                        ❌ Any Fail
+   Continue/Stop                      Log & Rollback
+```
+
+### Usage
+```bash
+# Run a single deploy-verify cycle
+./scripts/deploy-verify-loop.sh
+
+# Run 5 cycles, stopping on first failure
+./scripts/deploy-verify-loop.sh 5
+
+# Run continuously through failures
+./scripts/deploy-verify-loop.sh --iterations=10 --continue-on-failure
 ```
 
 ---
 
-## Phase 7: Deployment Pipeline ⏳ READY TO EXECUTE
+## 🛠 Phase 3: Fix Implementation
 
-### 7.1 CI/CD Status
-- ✅ Basic pipeline exists
-- ✅ Automated testing (unit, integration)
-- ⏳ Performance testing with realistic data
-- ⏳ Security scanning
-- ⏳ Accessibility validation
+### A. Settings Page — Visual Fixes
+| CSS Property | Before (Broken) | After (Fixed) | File |
+|-------------|-----------------|---------------|------|
+| Background | `#f6f6f7` / `bg-background-secondary` | Polaris default (remove override) | `app.settings.tsx:202` |
+| Page title font | `var(--serif)` / Instrument Serif | Polaris sans-serif `headingLg` | `explore.html:18` |
+| Heading tag | `<h1 class="polaris-page-title">` | `<Page title="Settings" subtitle="...">` | `explore.html:669` |
+| Card title font | `font-size: 1.25rem` | `Text variant="headingSm"` via Polaris Card | `settings-preview.html:29` |
+| Button color | `#D97706` (amber) | `#008060` (Polaris green) | `settings-preview.html:67` |
+| Grid columns | `grid-template-columns: 1fr` on mobile | Polaris `Layout` + `Layout.Section` | `settings-preview.html:24` |
 
-### 7.2 Multi-Environment Deployment Targets
-| Target | Status | Notes |
-|--------|--------|-------|
-| GitHub | ⏳ Ready | Source repo, CI triggers |
-| Shopify | ⏳ Ready | App Store submission |
-| Fly.io | ⏳ Ready | Production hosting |
-| Cloudflare | ⏳ Ready | CDN + edge functions |
+### B. Data Integration — Validation Checks
+| Check | Source A | Source B | Expected |
+|-------|----------|----------|----------|
+| Product count | Shopify Admin API | StockFlows DB | Match |
+| Inventory levels | Shopify REST API | DB `inventoryItem.quantity` | Match |
+| Last sync time | Webhook log | DB `updatedAt` | < 5 minutes |
+| Location count | Shopify Locations API | DB `Location` table | Match |
 
-### 7.3 Deployment Strategy
-- **Canary Deploy**: Gradual rollout with percentage-based traffic splitting
-- **Blue-Green**: Full environment swap with instant rollback
-- **Feature Flags**: Enable/disable features dynamically
-- **Rolling Updates**: Sequential node updates with health checks
-
----
-
-## Phase 8: Success Metrics & KPIs
-
-### 8.1 Business Metrics (Targets)
-| Metric | Target | Current |
-|--------|--------|---------|
-| MRR Growth | 20% MoM post-launch | Pre-launch |
-| Feature Adoption (Auto-reorder) | >60% Pro users in 30 days | Pre-launch |
-| Churn (Pro+) | <3% monthly | Pre-launch |
-| Expansion Revenue | >30% from upgrades | Pre-launch |
-| NPS (Pro/Enterprise) | >50 | Pre-launch |
-
-### 8.2 Technical Performance (Targets)
-| Metric | Target | Current |
-|--------|--------|---------|
-| Uptime | 99.9% | Pre-launch |
-| Response Time (p95) | <200ms | Pre-launch |
-| Concurrent Users | 1000+ | Pre-launch |
-| Test Coverage (critical) | 95%+ | ✅ 100% |
-
-### 8.3 User Experience (Targets)
-| Metric | Target | Current |
-|--------|--------|---------|
-| Task Completion (core) | 95%+ | Pre-launch |
-| Time-to-Value | <7 days | Pre-launch |
-| Accessibility | WCAG 2.1 AA | Pre-launch |
+### C. Playwright Test — Success Criteria
+| Test Suite | Min Tests | Pass Rate | Target |
+|-----------|-----------|-----------|--------|
+| Visual Consistency | 20 | 100% | Settings matches Forecasting page layout |
+| Data Integration | 20 | 100% | Shopify data reflects in StockFlows |
+| Form Interactions | 60 | 100% | All inputs, toggles, save work |
+| **TOTAL** | **100+** | **100%** | All tests green |
 
 ---
 
-## Immediate Next Actions (Priority Order)
+## 📋 Implementation Checklist
 
-| # | Action | Effort | Blockers |
-|---|--------|--------|----------|
-| **1** | Apply 6 integration fixes | 2 hours | None |
-| **2** | Configure hourly cron job | 15 min | None |
-| **3** | Configure nightly cron job | 15 min | None |
-| **4** | Deploy to GitHub → Fly.io staging | 30 min | None |
-| **5** | Deploy to production | 30 min | Staging verified |
-| **6** | Submit to Shopify App Store | 1 hour | Production verified |
-| **7** | Verify Cloudflare build | 15 min | Deployed |
-| **8** | Begin Phase 2 features (landed cost, transfer optimizer) | 2-4 weeks | Production stable |
+### Prerequisites
+- [ ] Playwright tests created in `stockflows-e2e-tests/`
+- [ ] `deploy-verify-loop.sh` executable and syntax-verified
+- [ ] `deploy-verify-loop.conf` configuration file written
+
+### Settings Page Fixes
+- [ ] Fix `app.settings.tsx` — Remove `bg-background-secondary` wrapper
+- [ ] Fix `app.settings.tsx` — Replace `SettingsCard` with Polaris `<Card>`
+- [ ] Fix `app.settings.tsx` — Replace `NotificationToggle` with Polaris `Toggle`/`Checkbox`
+- [ ] Fix `explore.html` — Update `renderSettings()` CSS classes and font-family
+- [ ] Fix `settings-preview.html` — Fix button color, background, font
+- [ ] Fix `tour.html` — Sync settings rendering
+- [ ] Fix `landing.html` — Sync settings rendering
+
+### Deploy-Verify Loop
+- [ ] Run `deploy-verify-loop.sh` with `--iterations=1`
+- [ ] Verify all Playwright tests pass against deployed app
+- [ ] Verify Shopify ↔ StockFlows data matches
+- [ ] Fix any test failures and re-run
+- [ ] Update the StockFlows deployment skill with loop reference
+
+### Final Validation
+- [ ] Settings page renders correctly in Shopify admin at `https://admin.shopify.com/store/stockflows/apps/stockflows-app`
+- [ ] Font sizes, colors, and spacing match Forecasting page
+- [ ] Data shown in StockFlows matches Shopify store inventory
+- [ ] All 100+ Playwright tests pass
+- [ ] No Railway references remain in any test or script file
 
 ---
 
-## Appendix: Key Implementation Files
+## 📊 Status Summary
 
-| File | Lines | Purpose | Status |
-|------|-------|---------|--------|
-| `app/lib/purchasing/smart-reorder.ts` | 429 | EOQ, safety stock, recommendations | ✅ Complete |
-| `app/lib/purchasing/vendor-analytics.ts` | 792 | Vendor scorecards, metrics | ✅ Complete |
-| `tests/unit/smart-reorder.test.ts` | ~200 | 20 unit tests | ✅ Complete |
-| `tests/unit/smart-reorder-engine.test.ts` | ~300 | 21 integration tests | ✅ Complete |
-| `tests/unit/vendor-analytics.test.ts` | ~400 | 26 unit tests | ✅ Complete |
-| `prisma/schema.prisma` | — | +Subscription model | ⏳ Pending |
+| Component | Status | Owner |
+|-----------|--------|-------|
+| CSS/component audit | ✅ Complete | Subagent 1 |
+| Playwright test suite | ✅ Complete | Subagent 2 |
+| Static HTML analysis | 🔄 Subagent running | Subagent 3 |
+| Integration validation | ✅ Complete | Subagent 4 |
+| Settings page redesign | 🔄 Subagent running | Subagent 5 |
+| Deploy-verify loop script | ✅ Complete (611 lines) | Subagent 4 |
+| Settings preview HTML audit | ⏳ Pending | Subagent 3 |
 
----
+**Total tests to pass:** 100+ (20 visual + 20 data + 60 form interactions + existing 127 vitest)
 
-**Plan Version**: 2.0  
-**Last Updated**: June 29, 2026  
-**Status**: **CORE IMPLEMENTATION COMPLETE — READY FOR INTEGRATION FIXES + DEPLOYMENT**
+## Edge Cases & Pitfalls
+
+1. **CSS specificity conflicts** — Tailwind classes may override Polaris components. Use `className` sparingly.
+2. **Shopify session dependency** — `/app/*` routes require auth. E2E tests must work without it via `explore.html`.
+3. **Data seeding required** — Run `npx tsx scripts/seed.ts` before integration tests.
+4. **Seed script non-idempotent** — Run only once or do a nuclear re-seed (`DROP SCHEMA public CASCADE; CREATE SCHEMA public;`).
+5. **Railway references** — The `settings-visual-match.spec.ts` still references `faithful-love-production-18fb.up.railway.app` — must be updated to Fly.io.
+6. **Fly.io secrets** — `DATABASE_URL`, `SHOPIFY_API_KEY`, `SHOPIFY_API_SECRET`, `SHOPIFY_APP_URL` must be set before first deploy.
