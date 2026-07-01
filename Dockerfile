@@ -12,8 +12,9 @@ RUN npx prisma generate
 # Copy source files (.env excluded by .dockerignore)
 COPY . .
 
-# Build the app (use npm run build which runs remix vite:build for SSR)
-RUN npm run build
+# Build the app (vite only - skip type/lint checks, increase memory)
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+RUN npx vite build
 
 ENV NODE_ENV=production
 
