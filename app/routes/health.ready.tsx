@@ -19,13 +19,21 @@ export const loader = async () => {
     if (hasRedis) {
       try {
         const { default: IORedis } = await import("ioredis");
-        const url = process.env.REDIS_URL ?? `redis://${process.env.REDIS_HOST ?? "localhost"}:${process.env.REDIS_PORT ?? "6379"}`;
-        const redis = new IORedis(url, {
+        const { createWorkerConnection } = await import("~/lib/jobs/redis-connection");
+        const connectionConfig = createWorkerConnection();
+
+        if (!connectionConfig) {
+          throw new Error("No Redis connection configured");
+        }
+
+        // Use connection config with connection options
+        const redis = new IORedis({
+          ...connectionConfig,
           maxRetriesPerRequest: 1,
           connectTimeout: 2000,
           lazyConnect: true,
           enableOfflineQueue: false,
-        });
+        } as any);
         await redis.connect();
         await redis.ping();
         await redis.quit();

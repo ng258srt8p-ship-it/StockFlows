@@ -12,6 +12,8 @@
 
 import { test, expect } from "@playwright/test";
 
+const FLY_URL = process.env.FLY_URL || "https://stockflows.fly.dev";
+
 test.describe("Triage Phase 5: End-to-End Data Synchronization", () => {
 
   test("Full dashboard data consistency check", async ({ page }) => {

@@ -12,6 +12,7 @@ import {
 } from "@remix-run/react";
 import { AppProvider, Page, Layout, Card, Text, Button } from "@shopify/polaris";
 import { authenticate } from "~/lib/shopify/server";
+import { prisma } from "~/lib/db/client";
 
 import tailwindStylesHref from "./tailwind.css?url";
 import polarisStylesHref from "@shopify/polaris/build/esm/styles.css?url";
@@ -53,6 +54,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return null;
   }
 
+  // Skip auth for webhook routes (GET /webhooks?resync=true has its own auth)
+  if (url.pathname === "/webhooks") {
+    return null;
+  }
+
+  // Determine if this is an embedded Shopify request (has shop param from Shopify iframe)
+  const isEmbeddedRequest = url.searchParams.has("shop") && url.searchParams.has("embedded");
+
   // Try to authenticate — if no session exists, just continue (child routes
   // will handle their own auth requirements).  This prevents the root layout
   // from crashing the entire app when there is no Shopify session.
@@ -61,8 +70,31 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     if (session && url.pathname === "/") {
       return redirect("/app");
     }
-  } catch {
-    // No valid session — let child routes decide what to do.
+  } catch (error) {
+    // Auth failed — check if we have a session for this shop in the database.
+    // If yes, OAuth already completed but JWT validation failed (e.g., token expired).
+    // Fall back gracefully and let child routes use the DB session directly.
+    const shop = url.searchParams.get("shop");
+    if (shop) {
+      const existingShop = await prisma.shop.findUnique({
+        where: { shopifyDomain: shop },
+      });
+      if (existingShop) {
+        // Shop exists in DB — OAuth completed, JWT validation issue.
+        // Continue to child routes which will use the DB session directly.
+      } else {
+        // Shop not in DB — needs OAuth. Redirect to /auth.
+        const host = url.searchParams.get("host");
+        if (host) {
+          return redirect(`/auth?shop=${shop}&host=${host}&embedded=1`);
+        }
+      }
+    }
+    // Non-embedded request: fall back gracefully.
+  }
+  // Always redirect / to /app — child routes handle their own auth
+  if (url.pathname === "/") {
+    return redirect("/app");
   }
   return null;
 };
@@ -93,6 +125,7 @@ export default function App() {
 
 export function ErrorBoundary() {
   const error = useRouteError();
+  console.error("[root.tsx] ErrorBoundary caught:", error);
 
   if (isRouteErrorResponse(error)) {
     return (

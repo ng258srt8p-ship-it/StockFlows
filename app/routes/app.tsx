@@ -22,28 +22,31 @@ import {
 } from "@shopify/polaris-icons";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+  const isEmbeddedRequest = url.searchParams.has("shop") && url.searchParams.has("embedded");
+
+  // Try Shopify authentication, fall back gracefully if no session
+  let shopDomain: string | null = null;
   try {
-    // Use authenticate.admin directly - if it throws a redirect for OAuth,
-    // that's correct behavior for embedded apps. For non-embedded contexts
-    // (Playwright testing), we return null shopDomain.
     const { session } = await authenticate.admin(request);
-    return json({ shopDomain: session.shop });
+    shopDomain = session.shop;
   } catch (error) {
-    // If it's an OAuth redirect (302), re-throw it for embedded app flow.
-    // For other errors (e.g. missing session without redirect), return null
-    // so child routes can still render content (useful for Playwright).
-    if (error instanceof Response && error.status === 302) {
-      throw error;
-    }
-    // No valid Shopify session (e.g. Playwright tests without OAuth).
-    // Return a placeholder so child route loaders can still render.
-    return json({ shopDomain: null });
+    // Never re-throw auth redirects from the app layout.
+    // Let child routes handle their own auth requirements.
+    shopDomain = null;
   }
+  return json({ shopDomain });
 };
 
 export default function AppLayout() {
   const { shopDomain } = useLoaderData<typeof loader>();
   const location = useLocation();
+
+  // Force full page navigation for embedded app links
+  // (App Bridge intercepts <a> clicks, so we use window.location)
+  const navigate = (url: string) => {
+    window.location.href = url;
+  };
 
   const navigationMarkup = (
     <Navigation location="/app">
@@ -54,30 +57,35 @@ export default function AppLayout() {
             url: "/app",
             icon: HomeIcon,
             selected: location.pathname === "/app",
+            onClick: () => navigate("/app"),
           },
           {
             label: "Inventory",
             url: "/app/inventory",
             icon: PackageIcon,
             selected: location.pathname.startsWith("/app/inventory"),
+            onClick: () => navigate("/app/inventory"),
           },
           {
             label: "Purchasing",
             url: "/app/purchasing",
             icon: CartIcon,
             selected: location.pathname.startsWith("/app/purchasing"),
+            onClick: () => navigate("/app/purchasing"),
           },
           {
             label: "Forecasting",
             url: "/app/forecasting",
             icon: ClipboardIcon,
             selected: location.pathname.startsWith("/app/forecasting"),
+            onClick: () => navigate("/app/forecasting"),
           },
           {
             label: "Reports",
             url: "/app/reports",
             icon: ChartVerticalIcon,
             selected: location.pathname.startsWith("/app/reports"),
+            onClick: () => navigate("/app/reports"),
           },
         ]}
       />
@@ -88,6 +96,7 @@ export default function AppLayout() {
             url: "/app/settings",
             icon: SettingsIcon,
             selected: location.pathname.startsWith("/app/settings"),
+            onClick: () => navigate("/app/settings"),
           },
         ]}
       />

@@ -2,6 +2,12 @@
 
 > AI-powered inventory management, demand forecasting, and purchase order system for Shopify merchants.
 
+## Live App
+
+- **Production**: https://stockflows.fly.dev
+- **Shopify Partners**: https://dev.shopify.com/dashboard/223648437/apps/388020928513
+- **Shopify Admin**: https://admin.shopify.com/store/stockflows2/apps/stockflows-app
+
 ## Quick Start
 
 ### Prerequisites
@@ -139,33 +145,6 @@ extensions/              # Shopify Flow extensions
 - Webhook HMAC verification
 - Row-level security (PostgreSQL RLS)
 
-### Developer Experience
-- Remix streaming SSR for fast dashboard loads
-- Tailwind CSS for rapid styling
-- Zustand for client state with persistence
-- BullMQ for background job processing
-- Sentry for error tracking
-- Pino structured logging
-
-## Recent Changes (v2026-06-29)
-
-### UI/UX Enhancements
-- **Settings page restructured**: `<Page>` is now the outermost JSX return (was wrapped by `<Form>`), matching all other app pages
-- **Marketing buttons removed**: "Watch Demo" and "Take Tour" buttons removed from `explore.html` (were only for marketing site, not app)
-- **Section descriptions added**: Each settings card now has contextual help text
-- **Safety Stock Multiplier field**: Added to Alert Thresholds card
-- **Consistent card padding**: All cards use `p-4`, grid gaps use `gap-4` — matching Dashboard pattern
-
-### Testing Infrastructure
-- **New E2E test suites**: `settings-visual-match.spec.ts` (10 tests), `full-app-qa.spec.ts` (comprehensive), `ui-consistency.test.ts` (19 code-level tests)
-- **Updated existing tests**: `comprehensive-noauth.spec.ts` updated to expect removed marketing buttons
-- **All 86 tests passing**: 57 Playwright + 19 vitest + 10 new browser tests
-
-### Code Quality
-- **Build passes**: `npm run build` and `npx tsc --noEmit` both pass with zero errors
-- **TypeScript strict**: All type errors resolved
-- **Polaris v12 compatibility**: Updated to use correct component APIs (no DescriptionList subcomponents)
-
 ## Testing
 
 ```bash
@@ -175,8 +154,8 @@ npx vitest run
 # E2E tests (Playwright)
 npx playwright test
 
-# Both
-npx vitest run && npx playwright test
+# Live production tests (requires Chrome on port 9222)
+npx playwright test e2e/validate-production.test.ts --config=playwright.live.config.ts
 ```
 
 ## Database
@@ -204,8 +183,8 @@ Shop ──┬── Location ──────── InventoryItem ──┬�
 
 ```
 read_inventory, write_inventory, read_products, write_products,
-read_locations, read_orders, read_customers, read_companies,
-read_report_analytics, write_content
+read_locations, write_locations, read_orders, write_orders,
+read_customers, write_content
 ```
 
 ### Webhook Topics
@@ -218,11 +197,7 @@ read_report_analytics, write_content
 | `locations/*` | Location CRUD events |
 | `orders/create` / `updated` | Order events |
 | `products/create` / `updated` | Product events |
-| `app/uninstalled` | Cleanup on uninstall |
-
-### Flow Extensions
-- **Low Stock Alert** trigger: Fires when inventory drops below reorder point
-- Merchants can wire this into Flow workflows (e.g., auto-email vendor, Slack notification)
+| `app/uninstalled` | Logging on uninstall (data preserved for reinstall) |
 
 ## Environment Variables
 
@@ -230,16 +205,14 @@ read_report_analytics, write_content
 |----------|----------|-------------|
 | `SHOPIFY_API_KEY` | Yes | Shopify app API key |
 | `SHOPIFY_API_SECRET` | Yes | Shopify app API secret |
-| `SHOPIFY_APP_URL` | Yes | Public URL of the app (e.g. `https://stockflows.app`) |
+| `SHOPIFY_APP_URL` | Yes | Public URL of the app (e.g. `https://stockflows.fly.dev`) |
 | `DATABASE_URL` | Yes | PostgreSQL connection string |
-| `REDIS_HOST` | No* | Redis host (default: localhost). Required for background jobs. |
-| `REDIS_PORT` | No* | Redis port (default: 6379) |
+| `SESSION_SECRET` | Yes | Secret for signing session cookies |
+| `SCOPES` | Yes | Comma-separated Shopify API scopes |
+| `REDIS_URL` | No* | Redis URL (required for background jobs) |
 | `SENTRY_DSN` | No | Sentry error tracking DSN |
 | `RESEND_API_KEY` | No | Resend email service API key |
 | `SLACK_WEBHOOK_URL` | No | Slack incoming webhook URL |
-| `TWILIO_ACCOUNT_SID` | No | Twilio Account SID (for SMS alerts) |
-| `TWILIO_AUTH_TOKEN` | No | Twilio Auth Token |
-| `TWILIO_PHONE_NUMBER` | No | Twilio phone number for outgoing SMS |
 
 *Redis is optional — the app starts without it. Background jobs (inventory sync, alerts, forecasting) are only active when Redis is configured.
 
@@ -259,11 +232,13 @@ fly launch --no-deploy
 fly postgres create   # Creates free 3GB Postgres
 fly redis create      # Optional: creates Redis for background jobs
 fly secrets set SHOPIFY_API_KEY=... SHOPIFY_API_SECRET=... DATABASE_URL=...
-
-# For background jobs, also set Redis host
-fly secrets set REDIS_HOST=... REDIS_PORT=6379
+fly secrets set SESSION_SECRET=$(openssl rand -hex 32)
+fly secrets set SCOPES="read_inventory,write_inventory,read_products,write_products,read_locations,write_locations,read_orders,write_orders,read_customers,write_content"
 
 fly deploy
+
+# Push to Shopify Partners
+shopify app deploy --allow-updates --allow-deletes
 ```
 
 ## License

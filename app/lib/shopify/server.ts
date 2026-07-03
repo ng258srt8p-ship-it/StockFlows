@@ -20,6 +20,8 @@ import type { SessionStorage } from "@shopify/shopify-app-session-storage";
 import { Session } from "@shopify/shopify-api";
 
 import { prisma as db } from "~/lib/db/client";
+import { logger } from "~/lib/logger";
+import { syncInitialData } from "./initial-sync";
 
 // ---------------------------------------------------------------------------
 // Prisma Session Storage adapter
@@ -184,12 +186,39 @@ const shopify = shopifyApp({
   },
 
   hooks: {
-    afterAuth: async ({ session }) => {
+    afterAuth: async ({ session, admin }) => {
+      console.log("[shopify.server] Starting afterAuth hook for shop:", session.shop);
+
       // Register webhooks after merchant installs / reinstalls the app.
+      console.log("[shopify.server] Registering webhooks for shop:", session.shop);
       await shopify.registerWebhooks({ session });
+
+      // Trigger initial data sync for new installs - ADD DEBUG LOGGING
+      try {
+        console.log("[shopify.server] Calling syncInitialData for shop:", session.shop);
+        const result = await syncInitialData(
+          session.shop,
+          session.accessToken!,
+        );
+        console.log("[shopify.server] Sync result:", JSON.stringify(result, null, 2));
+        logger.info(
+          { shop: session.shop, result },
+          "Initial data sync completed",
+        );
+      } catch (error) {
+        console.log("[shopify.server] ERROR in syncInitialData for shop:", session.shop);
+        console.log("[shopify.server] Error details:", error);
+        logger.error(
+          { shop: session.shop, error },
+          "Initial data sync failed (non-blocking)",
+        );
+      }
     },
   },
 });
 
 export default shopify;
 export const { authenticate, addDocumentResponseHeaders } = shopify;
+
+// Export syncInitialData function for use in API routes
+export { syncInitialData }; // Add this export

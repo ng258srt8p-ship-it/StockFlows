@@ -12,7 +12,7 @@ RUN npx prisma generate
 # Copy source files (.env excluded by .dockerignore)
 COPY . .
 
-# Build the app - use npx remix vite:build directly for SSR support
+# Build the Remix app (produces both build/client/ and build/server/)
 ENV NODE_OPTIONS="--max-old-space-size=4096"
 RUN npx remix vite:build
 

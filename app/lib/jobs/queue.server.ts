@@ -1,16 +1,21 @@
 import { Queue } from "bullmq";
+import { createBullMQConnection, getRedisConfig } from "./redis-connection";
+import { logger } from "~/lib/logger";
 
-const hasRedis = Boolean(process.env.REDIS_HOST || process.env.REDIS_URL);
+// Use shared Redis connection module
+const connection = createBullMQConnection();
+const redisConfig = getRedisConfig();
 
-const connection = hasRedis
-  ? {
-      host: process.env.REDIS_HOST ?? "localhost",
-      port: Number(process.env.REDIS_PORT ?? 6379),
-      password: process.env.REDIS_PASSWORD ?? undefined,
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-    }
-  : null;
+export const IS_REDIS_ENABLED = !!connection;
+
+if (connection) {
+  logger.info(
+    { connection: redisConfig?.type, target: redisConfig?.target },
+    "BullMQ connecting to Redis"
+  );
+} else {
+  logger.info("BullMQ queues disabled (Redis not configured)");
+}
 
 function createQueue(name: string, options: Record<string, unknown> = {}) {
   if (!connection) {
@@ -61,7 +66,7 @@ export const reportQueue = createQueue("reports", {
     attempts: 2,
     backoff: { type: "fixed", delay: 3000 },
     removeOnComplete: { count: 50 },
-    removeOnFail: { count: 25 },
+    removeOnFail: { count: 100 },
   },
 });
 

@@ -5,18 +5,9 @@ import { sendLowStockEmail } from "~/lib/notifications/email";
 import { sendSlackAlert } from "~/lib/notifications/slack";
 import { sendStockAlertSMS } from "~/lib/notifications/sms";
 import { broadcastSSE } from "~/lib/sse/manager.server";
+import { createWorkerConnection } from "../redis-connection";
 
-const hasRedis = Boolean(process.env.REDIS_HOST || process.env.REDIS_URL);
-
-const connection = hasRedis
-  ? {
-      host: process.env.REDIS_HOST ?? "localhost",
-      port: Number(process.env.REDIS_PORT ?? 6379),
-      password: process.env.REDIS_PASSWORD ?? undefined,
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-    }
-  : null;
+const connection = createWorkerConnection();
 
 interface AlertJobData {
   alertId: string;

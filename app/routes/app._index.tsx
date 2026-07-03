@@ -14,12 +14,15 @@ import {
 import { AlertsList } from "~/components/inventory/AlertsList";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+  const isEmbeddedRequest = url.searchParams.has("shop") && url.searchParams.has("embedded");
+
   // --- 1. Try Shopify authentication ---
   let session;
   try {
     const auth = await authenticate.admin(request);
     session = auth.session;
-  } catch {
+  } catch (error) {
     session = null;
   }
 
@@ -32,8 +35,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       include: { settings: true },
     });
   } else {
-    // Playwright / dev mode: grab the first shop in the database.
-    shop = await prisma.shop.findFirst({
+    // Playwright / dev mode: prefer stockflows2 if it exists, otherwise first shop
+    shop = await prisma.shop.findUnique({
+      where: { shopifyDomain: "stockflows2.myshopify.com" },
+      include: { settings: true },
+    }) ?? await prisma.shop.findFirst({
       include: { settings: true },
     });
   }

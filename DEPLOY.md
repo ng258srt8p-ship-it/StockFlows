@@ -246,9 +246,17 @@ The `orders/create` and `orders/updated` webhook topics require PCD approval fro
 
 ### Build fails on Fly.io
 
-**Cause:** Usually the SSR build not running (only client build completes).
+**Cause:** Usually the SSR build not running (only client build completes). PostCSS/Tailwind v4 config issues.
 
-**Fix:** Ensure `package.json` build script is `remix vite:build` (not `vite build`).
+**Fix:** 
+1. Ensure `package.json` build script is `remix vite:build` (not `vite build`).
+2. PostCSS config must use `@tailwindcss/postcss` (v4 compatible), NOT `tailwindcss` directly.
+3. Dependencies: `@tailwindcss/postcss` and `autoprefixer` must be in `devDependencies`.
+4. **Working build command** (verified 2026-07-03):
+   ```bash
+   fly deploy --app stockflows --no-cache
+   ```
+   The `--no-cache` flag busts Docker layer cache to pick up dependency/config changes.
 
 ### Prisma migration failures
 

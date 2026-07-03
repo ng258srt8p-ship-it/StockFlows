@@ -4,6 +4,7 @@ application_url = "https://stockflows.fly.dev"
 embedded = true
 handle = "stockflows-app"
 
+
 [access_scopes]
 scopes = """
   read_inventory,
@@ -11,8 +12,11 @@ scopes = """
   read_products,
   write_products,
   read_locations,
-  write_content,
-  read_orders
+  write_locations,
+  read_orders,
+  write_orders,
+  read_customers,
+  write_content
 """
 optional_scopes = [
   "read_product_listings",

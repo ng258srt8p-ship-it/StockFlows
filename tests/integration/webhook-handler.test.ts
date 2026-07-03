@@ -88,7 +88,7 @@ describe("Webhook Handlers (Integration)", () => {
           shopDomain: "test-store.myshopify.com",
           changes: expect.arrayContaining([
             expect.objectContaining({
-              inventoryItemId: "12345",
+              inventoryItemId: "gid://shopify/InventoryItem/12345",
               available: 42,
             }),
           ]),

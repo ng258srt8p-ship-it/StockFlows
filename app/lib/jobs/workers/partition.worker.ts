@@ -1,18 +1,9 @@
 import { Worker, Job } from "bullmq";
 import { prisma } from "~/lib/db/client";
 import { logger } from "~/lib/logger";
+import { createWorkerConnection } from "../redis-connection";
 
-const hasRedis = Boolean(process.env.REDIS_HOST || process.env.REDIS_URL);
-
-const connection = hasRedis
-  ? {
-      host: process.env.REDIS_HOST ?? "localhost",
-      port: Number(process.env.REDIS_PORT ?? 6379),
-      password: process.env.REDIS_PASSWORD ?? undefined,
-      maxRetriesPerRequest: null,
-      enableReadyCheck: false,
-    }
-  : null;
+const connection = createWorkerConnection();
 
 function formatPartitionSuffix(date: Date): string {
   const year = date.getFullYear();

@@ -12,9 +12,14 @@
  */
 
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
 import { logger } from "~/lib/logger";
+import { syncInitialData } from "~/lib/shopify/initial-sync";
+import { toInventoryItemGid, toLocationGid } from "~/lib/shopify/id-normalize";
+
+// Manual re-sync endpoint: GET /webhooks?resync=true&shop=stockflows2.myshopify.com
 
 // Lazy queue imports — avoid connecting to Redis at module load time
 // (the Queue/Worker constructors connect eagerly).
@@ -43,11 +48,44 @@ type WebhookHandler = (
 ) => Promise<void>;
 
 // ---------------------------------------------------------------------------
-// Loader — explicitly reject GET requests (webhooks are POST-only)
-// This function handles GET requests to /webhooks by returning 405
+// Loader — Manual re-sync endpoint: GET /webhooks?resync=true&shop=stockflows2.myshopify.com
 // ---------------------------------------------------------------------------
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+
+  // Manual re-sync endpoint: GET /webhooks?resync=true&shop=stockflows2.myshopify.com
+  if (url.searchParams.get("resync") === "true") {
+    const shopDomain = url.searchParams.get("shop");
+    if (!shopDomain) {
+      return new Response("Missing shop parameter", { status: 400 });
+    }
+
+    try {
+      const { session } = await authenticate.admin(request);
+
+      if (!session || session.shop !== shopDomain) {
+        return new Response("Unauthorized - invalid session", { status: 401 });
+      }
+
+      const result = await syncInitialData(shopDomain, session.accessToken!);
+      return json({ success: true, result });
+    } catch (error: any) {
+      // If authenticate.admin throws/returns a redirect Response (302), it means no valid session
+      if (error instanceof Response) {
+        if (error.status === 302) {
+          return new Response("Unauthorized - authentication required", { status: 401 });
+        }
+        if (error.status === 410) {
+          return json({ success: false, error: "Shop not installed - no valid session found. Please install the app first." }, { status: 401 });
+        }
+        // Other response errors (401, etc.)
+        return json({ success: false, error: `Authentication failed: ${error.status} ${error.statusText}` }, { status: 500 });
+      }
+      return json({ success: false, error: error.message ?? String(error) }, { status: 500 });
+    }
+  }
+
   // Reject GET requests (webhooks are POST-only)
   return new Response("Method Not Allowed", { status: 405 });
 };
@@ -96,8 +134,8 @@ const inventoryLevelsUpdateHandler: WebhookHandler = async (shop, payload, log) 
       shopDomain: shop,
       changes: [
         {
-          inventoryItemId: String(payload.inventory_item_id),
-          locationId: String(payload.location_id),
+          inventoryItemId: toInventoryItemGid(String(payload.inventory_item_id)),
+          locationId: toLocationGid(String(payload.location_id)),
           available: Number(payload.available),
         },
       ],
@@ -121,7 +159,7 @@ const inventoryItemsCreateHandler: WebhookHandler = async (shop, payload, log) =
     {
       shopDomain: shop,
       inventoryItem: {
-        id: String(payload.id),
+        id: toInventoryItemGid(String(payload.id)),
         sku: payload.sku,
         barcode: payload.barcode,
         title: payload.title,
@@ -141,7 +179,7 @@ const inventoryItemsUpdateHandler: WebhookHandler = async (shop, payload, log) =
     {
       shopDomain: shop,
       inventoryItem: {
-        id: String(payload.id),
+        id: toInventoryItemGid(String(payload.id)),
         sku: payload.sku,
         barcode: payload.barcode,
         title: payload.title,
@@ -197,7 +235,7 @@ const ordersCreateHandler: WebhookHandler = async (shop, payload, log) => {
   for (const li of lineItems) {
     if (!li.variant_id || !li.quantity) continue;
 
-    const variantId = String(li.variant_id);
+    const variantId = toInventoryItemGid(String(li.variant_id));
     const qty = li.quantity;
 
     const inventoryItem = await prisma.inventoryItem.findFirst({
@@ -239,15 +277,9 @@ const ordersCreateHandler: WebhookHandler = async (shop, payload, log) => {
 // --- App lifecycle ---
 
 const appUninstalledHandler: WebhookHandler = async (shop, _payload, log) => {
-  log.info("App uninstalling — cleaning up data");
-  try {
-    await prisma.shop.delete({
-      where: { shopifyDomain: shop },
-    });
-    log.info("All shop data cleaned up successfully");
-  } catch (error) {
-    log.error({ err: error }, "Failed to clean up on uninstall");
-  }
+  log.info("App uninstalling — logging event but keeping data for reinstall");
+  // DON'T delete the shop record — it will be re-linked on reinstall.
+  // The afterAuth hook will handle re-syncing data.
 };
 
 // --- Privacy / GDPR ---
