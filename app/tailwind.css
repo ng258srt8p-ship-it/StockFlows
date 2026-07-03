@@ -1,24 +1,219 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════
+   StockFlows Design System
+   Matches stockflows.app brutalist editorial design
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  /* StockFlows Colors */
+  --sf-bg: #fafafa;
+  --sf-bg-dark: #111111;
+  --sf-text: #111111;
+  --sf-text-dim: #666666;
+  --sf-text-dimmer: #999999;
+  --sf-border: #e0e0e0;
+  --sf-brand: #111111;
+  --sf-critical: #dc2626;
+  --sf-warning: #d97706;
+  --sf-success: #16a34a;
+  --sf-radius: 0px;
+  --sf-sidebar: 220px;
+  --sf-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --sf-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+
+  /* Override Polaris CSS Variables */
+  --p-color-bg: var(--sf-bg);
+  --p-color-bg-surface: #ffffff;
+  --p-color-bg-surface-hover: #f5f5f5;
+  --p-color-text: var(--sf-text);
+  --p-color-text-subdued: var(--sf-text-dim);
+  --p-color-border: var(--sf-border);
+  --p-color-border-subdued: var(--sf-border);
+  
+  /* Status Colors */
+  --p-color-bg-critical-subdued: #fef2f2;
+  --p-color-text-critical: var(--sf-critical);
+  --p-color-border-critical: var(--sf-critical);
+  
+  --p-color-bg-warning-subdued: #fffbeb;
+  --p-color-text-warning: var(--sf-warning);
+  --p-color-border-warning: var(--sf-warning);
+  
+  --p-color-bg-success-subdued: #f0fdf4;
+  --p-color-text-success: var(--sf-success);
+  --p-color-border-success: var(--sf-success);
+  
+  /* Typography */
+  --p-font-family: var(--sf-font);
+  --p-font-weight-semibold: 600;
+}
+
 /* StockFlows custom theme */
 @theme {
-  --color-brand: #0066cc;
-  --color-brand-hover: #0052a3;
-  --color-critical: #d72c0d;
-  --color-warning: #f49342;
-  --color-success: #008060;
-  --color-info: #5bcdd3;
-  --font-serif: "Instrument Serif", Georgia, "Times New Roman", "Courier New", serif;
+  --color-brand: #111111;
+  --color-brand-hover: #333333;
+  --color-critical: #dc2626;
+  --color-warning: #d97706;
+  --color-success: #16a34a;
+  --color-info: #111111;
+  --font-serif: var(--sf-serif);
 
   /* Core design tokens */
   --background-primary: #ffffff;
-  --background-secondary: #f8f9fa;
-  --background-tertiary: #f0f2f5;
-  --border-primary: #e1e4e8;
-  --border-hover: #d0d7de;
-  --text-primary: #1f2328;
-  --text-secondary: #57606a;
-  --text-muted: #6e7781;
+  --background-secondary: #fafafa;
+  --background-tertiary: #f5f5f5;
+  --border-primary: #e0e0e0;
+  --border-hover: #999999;
+  --text-primary: #111111;
+  --text-secondary: #666666;
+  --text-muted: #999999;
+}
+
+/* ═══════════════════════════════════════════════════
+   COMPONENT OVERRIDES
+   ═══════════════════════════════════════════════════ */
+
+/* Cards */
+.Polaris-Card {
+  background-color: #ffffff !important;
+  border: 1px solid var(--sf-border) !important;
+  border-radius: var(--sf-radius) !important;
+  box-shadow: none !important;
+}
+
+.Polaris-Card:hover {
+  border-color: #999999 !important;
+}
+
+/* Buttons */
+.Polaris-Button--variantPrimary {
+  background-color: var(--sf-brand) !important;
+  border-color: var(--sf-brand) !important;
+  color: #ffffff !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  font-weight: 500 !important;
+  font-family: var(--sf-font) !important;
+}
+
+.Polaris-Button--variantPrimary:hover {
+  background-color: #333333 !important;
+  border-color: #333333 !important;
+}
+
+.Polaris-Button--variantSecondary {
+  background-color: transparent !important;
+  border-color: var(--sf-border) !important;
+  color: var(--sf-text-dim) !important;
+  font-family: var(--sf-font) !important;
+}
+
+.Polaris-Button--variantSecondary:hover {
+  background-color: var(--sf-text) !important;
+  color: #ffffff !important;
+  border-color: var(--sf-text) !important;
+}
+
+/* Badges */
+.Polaris-Badge--toneCritical {
+  background-color: transparent !important;
+  color: var(--sf-critical) !important;
+  border: 1px solid var(--sf-critical) !important;
+}
+
+.Polaris-Badge--toneWarning {
+  background-color: transparent !important;
+  color: var(--sf-warning) !important;
+  border: 1px solid var(--sf-warning) !important;
+}
+
+.Polaris-Badge--toneSuccess {
+  background-color: transparent !important;
+  color: var(--sf-success) !important;
+  border: 1px solid var(--sf-success) !important;
+}
+
+.Polaris-Badge--toneInfo {
+  background-color: transparent !important;
+  color: var(--sf-text) !important;
+  border: 1px solid var(--sf-text) !important;
+}
+
+/* Tables */
+.Polaris-IndexTable__Table {
+  border: 1px solid var(--sf-border) !important;
+}
+
+.Polaris-IndexTable__TableHeading {
+  background-color: var(--sf-bg) !important;
+  font-size: 0.65rem !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  color: var(--sf-text-dimmer) !important;
+  font-family: var(--sf-font) !important;
+}
+
+.Polaris-IndexTable__TableCell {
+  border-bottom: 1px solid var(--sf-border) !important;
+  font-family: var(--sf-font) !important;
+}
+
+/* Page Headers */
+.Polaris-Page-Header__TitleWrapper h1 {
+  font-family: var(--sf-serif) !important;
+  font-style: italic !important;
+  font-weight: 400 !important;
+}
+
+.Polaris-Header-Title {
+  font-family: var(--sf-serif) !important;
+  font-style: italic !important;
+}
+
+/* Navigation */
+.Polaris-Navigation {
+  width: var(--sf-sidebar) !important;
+  background: var(--sf-bg) !important;
+  border-right: 1px solid var(--sf-border) !important;
+}
+
+.Polaris-Navigation__Item {
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  font-family: var(--sf-font) !important;
+}
+
+.Polaris-Navigation__Item--selected {
+  font-weight: 700 !important;
+}
+
+/* Text */
+.Polaris-Text--headingLg {
+  font-family: var(--sf-serif) !important;
+  font-style: italic !important;
+}
+
+.Polaris-Text--headingMd {
+  font-family: var(--sf-serif) !important;
+  font-style: italic !important;
+}
+
+.Polaris-Text--headingSm {
+  font-family: var(--sf-font) !important;
+}
+
+/* Select */
+.Polaris-Select__Input {
+  font-family: var(--sf-font) !important;
+}
+
+/* TextField */
+.Polaris-TextField__Input {
+  font-family: var(--sf-font) !important;
 }
 
 /* Ensure utility classes are generated */

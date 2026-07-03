@@ -24,6 +24,10 @@ export const links: LinksFunction = () => [
     rel: "stylesheet",
     href: "https://cdn.shopify.com/shopifycloud/app-bridge-styles.css",
   },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap",
+  },
 ];
 
 export const meta: MetaFunction = () => [
@@ -109,7 +113,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="antialiased">
+      <body className="antialiased" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", backgroundColor: "#fafafa" }}>
         <AppProvider i18n={i18n}>
           {isLoading && (
             <div className="fixed top-0 left-0 right-0 h-1 bg-blue-600 animate-pulse z-50" />
