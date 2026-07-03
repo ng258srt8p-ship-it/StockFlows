@@ -9,6 +9,14 @@ test-results/
 .DS_Store
 .video-tmp/
 
+# Security - never commit these
+*.pem
+*.key
+*.har
+admin.shopify.com.*
+*.bak
+preview-settings-screenshot.png
+
 # App Store assets — not needed for website deploy
 screenshots/
 
@@ -17,3 +25,10 @@ screenshots/
 
 # Generated screenshots
 e2e/tour-debug.png
+
+# Generated reports
+reports/
+
+# Build output
+build/
+test-results/
