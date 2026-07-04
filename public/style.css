@@ -300,14 +300,36 @@ body {
   margin-bottom: 8px;
 }
 
-.demo-preview {
+.demo-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
   margin-top: 48px;
+  margin-bottom: 48px;
+}
+
+.demo-item {
+  text-align: center;
 }
 
 .demo-image {
-  max-width: 100%;
+  width: 100%;
   border: 1px solid var(--border);
-  margin-bottom: 32px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.demo-image:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.demo-caption {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 /* CTA Section */
