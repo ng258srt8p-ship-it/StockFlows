@@ -238,6 +238,28 @@
     </main>
   </div>
 
+  <!-- Tour Overlay -->
+  <div class="tour-overlay" id="tour-overlay" style="display:none">
+    <div class="tour-backdrop" id="tour-backdrop"></div>
+    <div class="tour-tooltip" id="tour-tooltip">
+      <div class="tour-header">
+        <span class="tour-step" id="tour-step">1/12</span>
+        <button class="tour-close" id="tour-close">×</button>
+      </div>
+      <h3 id="tour-title">Welcome</h3>
+      <p id="tour-message">Message here</p>
+      <div class="tour-nav">
+        <button class="demo-btn" id="tour-prev">← Previous</button>
+        <button class="demo-btn demo-btn-primary" id="tour-next">Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tour Start Button -->
+  <button class="tour-start-btn" id="tour-start-btn" title="Take Tour">
+    <span class="material-symbols-outlined">info</span>
+  </button>
+
   <script>
     window.DEMO_DATA = {
       LOCATIONS: [
@@ -433,7 +455,91 @@
       renderPurchasing();
       renderForecasting();
       renderReports();
+      initTour();
     });
+
+    // Tour System
+    var currentTourStep = 0;
+    var TOUR_STEPS = [
+      { selector: '.demo-sidebar', title: 'Welcome to StockFlows', message: 'This is your inventory management command center. Let\'s take a quick tour of all the features.', position: 'right' },
+      { selector: '.demo-stats', title: 'Real-Time Dashboard', message: 'See your total SKUs, inventory value, low stock items, and alerts at a glance. All data updates in real-time.', position: 'bottom' },
+      { selector: '#recent-activity', title: 'Track Every Movement', message: 'See sales, returns, transfers, and adjustments as they happen. Every change is logged with timestamps.', position: 'right' },
+      { selector: '#low-stock-alerts', title: 'Never Run Out', message: 'Get notified before stockouts with color-coded urgency levels: Critical (red), Warning (yellow).', position: 'right' },
+      { selector: '#page-inventory', title: 'Full Inventory View', message: 'Search, filter, and manage all 35 SKUs across 4 locations. Status badges show stock health at a glance.', position: 'bottom' },
+      { selector: '#inventory-search', title: 'Instant Search', message: 'Find any product in milliseconds. Try searching for "tent" or "boots" to see it in action.', position: 'bottom' },
+      { selector: '.demo-status', title: 'Visual Status Indicators', message: 'Green = In Stock, Yellow = Low Stock, Red = Out of Stock. Color-coded for quick scanning.', position: 'top' },
+      { selector: '#page-purchasing', title: 'Purchase Order Management', message: 'Create POs, track receiving status, and calculate landed costs. PO-2026-002 is partially received.', position: 'bottom' },
+      { selector: '#page-forecasting', title: 'AI-Powered Forecasting', message: '30-day predictions using ETS, Linear Regression, and Ensemble models with confidence scores.', position: 'bottom' },
+      { selector: '#page-reports', title: 'Inventory Valuation', message: 'Track total inventory value ($47,892.50) and movement summaries across all products.', position: 'bottom' },
+      { selector: '#page-settings', title: 'Customize Everything', message: 'Set alert thresholds, notification preferences, timezone, and toggle AI features on/off.', position: 'bottom' },
+      { selector: '.demo-sidebar', title: 'You\'re Ready!', message: 'Start managing your inventory like a pro. Click "Install on Shopify" to get started today.', position: 'right' }
+    ];
+
+    function initTour() {
+      document.getElementById('tour-start-btn').addEventListener('click', startTour);
+      document.getElementById('tour-close').addEventListener('click', endTour);
+      document.getElementById('tour-backdrop').addEventListener('click', endTour);
+      document.getElementById('tour-prev').addEventListener('click', prevStep);
+      document.getElementById('tour-next').addEventListener('click', nextStep);
+      
+      document.addEventListener('keydown', function(e) {
+        if (!document.getElementById('tour-overlay').style.display || 
+            document.getElementById('tour-overlay').style.display === 'none') return;
+        if (e.key === 'Escape') endTour();
+        if (e.key === 'ArrowRight' || e.key === 'Enter') nextStep();
+        if (e.key === 'ArrowLeft') prevStep();
+      });
+    }
+
+    function startTour() {
+      currentTourStep = 0;
+      document.getElementById('tour-overlay').style.display = 'flex';
+      showStep(currentTourStep);
+    }
+
+    function showStep(step) {
+      var data = TOUR_STEPS[step];
+      document.getElementById('tour-step').textContent = (step + 1) + '/' + TOUR_STEPS.length;
+      document.getElementById('tour-title').textContent = data.title;
+      document.getElementById('tour-message').textContent = data.message;
+      
+      document.getElementById('tour-prev').style.display = step === 0 ? 'none' : '';
+      document.getElementById('tour-next').textContent = step === TOUR_STEPS.length - 1 ? 'Finish' : 'Next →';
+      
+      // Highlight target element
+      document.querySelectorAll('.tour-highlight').forEach(function(el) {
+        el.classList.remove('tour-highlight');
+      });
+      var target = document.querySelector(data.selector);
+      if (target) {
+        target.classList.add('tour-highlight');
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function nextStep() {
+      if (currentTourStep < TOUR_STEPS.length - 1) {
+        currentTourStep++;
+        showStep(currentTourStep);
+      } else {
+        endTour();
+      }
+    }
+
+    function prevStep() {
+      if (currentTourStep > 0) {
+        currentTourStep--;
+        showStep(currentTourStep);
+      }
+    }
+
+    function endTour() {
+      document.getElementById('tour-overlay').style.display = 'none';
+      document.querySelectorAll('.tour-highlight').forEach(function(el) {
+        el.classList.remove('tour-highlight');
+      });
+      try { localStorage.setItem('stockflows-tour-seen', 'true'); } catch(e) {}
+    }
   </script>
 </body>
 </html>

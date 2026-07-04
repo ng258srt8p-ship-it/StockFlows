@@ -575,3 +575,118 @@
 .demo-toggle input:checked + .demo-toggle-slider:before {
   transform: translateX(20px);
 }
+
+/* Tour Overlay */
+.tour-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tour-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.tour-tooltip {
+  position: relative;
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 24px;
+  max-width: 400px;
+  z-index: 1001;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.tour-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.tour-step {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.tour-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-dim);
+  padding: 0;
+  line-height: 1;
+}
+
+.tour-close:hover {
+  color: var(--text);
+}
+
+.tour-tooltip h3 {
+  font-family: var(--serif);
+  font-size: 1.5rem;
+  font-weight: 400;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+.tour-tooltip p {
+  font-size: 0.85rem;
+  color: var(--text-dim);
+  line-height: 1.6;
+  margin-bottom: 20px;
+}
+
+.tour-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* Tour Start Button */
+.tour-start-btn {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 999;
+  transition: transform 0.2s;
+}
+
+.tour-start-btn:hover {
+  transform: scale(1.1);
+}
+
+.tour-start-btn .material-symbols-outlined {
+  font-size: 24px;
+}
+
+/* Tour Highlight */
+.tour-highlight {
+  position: relative;
+  z-index: 1002;
+  box-shadow: 0 0 0 4px var(--brand);
+  border-radius: 4px;
+}
