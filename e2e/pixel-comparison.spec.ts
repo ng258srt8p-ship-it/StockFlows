@@ -93,8 +93,12 @@ test.describe("Pixel-Perfect Comparison: Demo vs Shopify App", () => {
       return Array.from(items).map(el => el.textContent?.trim().toLowerCase());
     });
     const demoNavItems = await demoPage.evaluate(() => {
-      const items = document.querySelectorAll('.demo-nav-item span:last-child');
-      return Array.from(items).map(el => el.textContent?.trim().toLowerCase());
+      const items = document.querySelectorAll('.demo-nav-item');
+      return Array.from(items).map(el => {
+        // Get the last span (text label, not icon)
+        const spans = el.querySelectorAll('span');
+        return spans[spans.length - 1]?.textContent?.trim().toLowerCase();
+      });
     });
     console.log("Shopify nav:", shopifyNavItems);
     console.log("Demo nav:", demoNavItems);

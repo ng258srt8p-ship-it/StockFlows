@@ -544,3 +544,19 @@
   .demo-grid { grid-template-columns: 1fr; }
   .demo-stats { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* Force body background to match Polaris exactly */
+body {
+  background-color: #f1f2f4 !important;
+}
+
+/* Nav items — exact match to Polaris Navigation */
+.demo-nav-item {
+  font-family: "Inter", -apple-system, "system-ui", "Segoe UI", Roboto, sans-serif !important;
+}
+
+/* Nav text — uppercase via CSS, not content */
+.demo-nav-item span:last-child {
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
