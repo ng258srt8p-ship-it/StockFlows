@@ -357,7 +357,7 @@
         { productId: "P9-V1", dailyAvg: 6.1, trend: "up", confidence: 0.89, model: "ETS" },
         { productId: "P6-V2", dailyAvg: 3.3, trend: "stable", confidence: 0.85, model: "Moving Avg" }
       ],
-      STATS: { totalSKUs: 35, totalValue: 47892.50, lowStockCount: 6, outOfStockCount: 2, openPOs: 3, pendingAlerts: 6 }
+      STATS: { totalSKUs: 26, totalValue: 0, lowStockCount: 9, outOfStockCount: 6, openPOs: 3, pendingAlerts: 0 }
     };
   </script>
   <script>
@@ -381,21 +381,23 @@
 
     function renderDashboard() {
       document.getElementById('dashboard-stats').innerHTML =
-        '<div class="demo-stat-card"><div class="demo-stat-label">Total SKUs</div><div class="demo-stat-value blue">' + STATS.totalSKUs + '</div></div>' +
-        '<div class="demo-stat-card"><div class="demo-stat-label">Inventory Value</div><div class="demo-stat-value">' + fmtM(STATS.totalValue) + '</div></div>' +
-        '<div class="demo-stat-card"><div class="demo-stat-label">Low Stock Items</div><div class="demo-stat-value red">' + STATS.lowStockCount + '</div></div>' +
-        '<div class="demo-stat-card"><div class="demo-stat-label">Out of Stock</div><div class="demo-stat-value red">' + STATS.outOfStockCount + '</div></div>' +
-        '<div class="demo-stat-card"><div class="demo-stat-label">Open POs</div><div class="demo-stat-value">' + STATS.openPOs + '</div></div>' +
-        '<div class="demo-stat-card"><div class="demo-stat-label">Pending Alerts</div><div class="demo-stat-value">' + STATS.pendingAlerts + '</div></div>';
+        '<div class="demo-stat-card"><div class="demo-stat-label">Total SKUs</div><div class="demo-stat-value">' + STATS.totalSKUs + '</div></div>' +
+        '<div class="demo-stat-card"><div class="demo-stat-label">Low Stock</div><div class="demo-stat-value">' + STATS.lowStockCount + '</div></div>' +
+        '<div class="demo-stat-card"><div class="demo-stat-label">Out of Stock</div><div class="demo-stat-value">' + STATS.outOfStockCount + '</div></div>' +
+        '<div class="demo-stat-card"><div class="demo-stat-label">Inventory Value</div><div class="demo-stat-value">' + fmtM(STATS.totalValue) + '</div></div>';
 
-      document.getElementById('recent-activity').innerHTML = STOCK_MOVEMENTS.slice(0, 6).map(function(m) {
+      document.getElementById('recent-activity').innerHTML = STOCK_MOVEMENTS.length === 0 ?
+        '<div style="text-align:center;padding:24px;color:#6d7175"><p style="font-size:14px;font-weight:500;margin-bottom:4px">No recent stock movements</p><p style="font-size:12px">Activity will appear here as inventory changes.</p></div>' :
+        STOCK_MOVEMENTS.slice(0, 6).map(function(m) {
         var icon = m.type === 'SALE' ? 'point_of_sale' : m.type === 'RETURN' ? 'replay' : m.type === 'RECEIVING' ? 'local_shipping' : 'inventory';
         return '<div class="demo-activity-item"><div class="demo-activity-icon"><span class="material-symbols-outlined">' + icon + '</span></div><div class="demo-activity-text"><strong>' + m.type.replace('_', ' ') + '</strong> — ' + getProductName(m.productId) + '</div><div class="demo-activity-time">' + (m.qty > 0 ? '+' : '') + m.qty + ' units</div></div>';
       }).join('');
 
-      document.getElementById('low-stock-alerts').innerHTML = ALERTS.map(function(a) {
-        return '<div class="demo-alert-item"><div class="demo-alert-dot ' + a.urgency.toLowerCase() + '"></div><div class="demo-alert-text">' + getProductName(a.productId) + '</div><div class="demo-alert-qty">' + a.currentStock + ' / ' + a.reorderPoint + '</div></div>';
-      }).join('');
+      document.getElementById('low-stock-alerts').innerHTML = ALERTS.length === 0 ?
+        '<div style="text-align:center;padding:24px;color:#6d7175"><p style="font-size:14px;font-weight:500;margin-bottom:4px">No active alerts</p><p style="font-size:12px">All stock levels are above their reorder points.</p></div>' :
+        ALERTS.map(function(a) {
+          return '<div class="demo-alert-item"><div class="demo-alert-dot ' + a.urgency.toLowerCase() + '"></div><div class="demo-alert-text">' + getProductName(a.productId) + '</div><div class="demo-alert-qty">' + a.currentStock + ' / ' + a.reorderPoint + '</div></div>';
+        }).join('');
     }
 
     function renderInventory() {
