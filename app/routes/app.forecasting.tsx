@@ -38,18 +38,18 @@ interface ForecastItem {
 // Demo forecast data matching stockflows.app/demo
 const demoForecastData = [
   // A-class (High Priority)
-  { title: "Premium Snowboard Boots", sku: "PSB-001", model: "ETS", confidence: 0.94, predicted: 420, current: 120, trend: "up" },
-  { title: "Performance Ski Goggles", sku: "PSG-002", model: "Ensemble", confidence: 0.91, predicted: 350, current: 95, trend: "up" },
-  { title: "Heated Ski Gloves", sku: "HSG-003", model: "Linear", confidence: 0.87, predicted: 380, current: 65, trend: "up" },
-  { title: "All-Mountain Ski Boots", sku: "AMS-004", model: "ETS", confidence: 0.89, predicted: 290, current: 205, trend: "stable" },
+  { title: "Premium Snowboard Boots", sku: "PSB-001", model: "ETS", confidence: 0.94, predicted: 420, current: 120, trend: "up", category: "A" as const },
+  { title: "Performance Ski Goggles", sku: "PSG-002", model: "Ensemble", confidence: 0.91, predicted: 350, current: 95, trend: "up", category: "A" as const },
+  { title: "Heated Ski Gloves", sku: "HSG-003", model: "Linear", confidence: 0.87, predicted: 380, current: 65, trend: "up", category: "A" as const },
+  { title: "All-Mountain Ski Boots", sku: "AMS-004", model: "ETS", confidence: 0.89, predicted: 290, current: 205, trend: "stable", category: "A" as const },
   // B-class (Medium Priority)
-  { title: "Carbon Fiber Ski Poles", sku: "CFP-005", model: "Linear", confidence: 0.82, predicted: 240, current: 85, trend: "up" },
-  { title: "Insulated Ski Jacket", sku: "ISJ-006", model: "Ensemble", confidence: 0.76, predicted: 110, current: 145, trend: "down" },
-  { title: "Helmet Visor Anti-Fog", sku: "HVA-007", model: "ETS", confidence: 0.80, predicted: 160, current: 130, trend: "stable" },
+  { title: "Carbon Fiber Ski Poles", sku: "CFP-005", model: "Linear", confidence: 0.82, predicted: 240, current: 85, trend: "up", category: "B" as const },
+  { title: "Insulated Ski Jacket", sku: "ISJ-006", model: "Ensemble", confidence: 0.76, predicted: 110, current: 145, trend: "down", category: "B" as const },
+  { title: "Helmet Visor Anti-Fog", sku: "HVA-007", model: "ETS", confidence: 0.80, predicted: 160, current: 130, trend: "stable", category: "B" as const },
   // C-class (Low Priority)
-  { title: "Merino Wool Socks (3-pack)", sku: "MWS-008", model: "Linear", confidence: 0.74, predicted: 180, current: 220, trend: "up" },
-  { title: "Snowboard Wax Kit", sku: "SWK-009", model: "Ensemble", confidence: 0.68, predicted: 75, current: 90, trend: "down" },
-  { title: "Ski Helmet Strap Lock", sku: "SHS-010", model: "ETS", confidence: 0.65, predicted: 90, current: 180, trend: "stable" },
+  { title: "Merino Wool Socks (3-pack)", sku: "MWS-008", model: "Linear", confidence: 0.74, predicted: 180, current: 220, trend: "up", category: "C" as const },
+  { title: "Snowboard Wax Kit", sku: "SWK-009", model: "Ensemble", confidence: 0.68, predicted: 75, current: 90, trend: "down", category: "C" as const },
+  { title: "Ski Helmet Strap Lock", sku: "SHS-010", model: "ETS", confidence: 0.65, predicted: 90, current: 180, trend: "stable", category: "C" as const },
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -213,8 +213,8 @@ export default function Forecasting() {
               <Card key={index}>
                 <div className="p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <Badge tone={item.confidence >= 0.8 ? "success" : item.confidence >= 0.6 ? "warning" : "info"}>
-                      {item.confidence >= 0.8 ? "A" : item.confidence >= 0.6 ? "B" : "C"}
+                    <Badge tone={item.category === "A" ? "success" : item.category === "B" ? "warning" : "info"}>
+                      {item.category}
                     </Badge>
                     <Text variant="bodySm" as="p" tone="subdued">
                       {item.model}
