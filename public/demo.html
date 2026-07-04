@@ -103,6 +103,23 @@
     }
 
     /* ═══════════════════════════════════════════════════
+       Table Header Styles (match live app)
+       ═══════════════════════════════════════════════════ */
+    .Polaris-IndexTable__TableHeading {
+      text-transform: uppercase !important;
+      font-size: 10.4px !important;
+      font-weight: 600 !important;
+      color: rgb(153, 153, 153) !important;
+      letter-spacing: 0.5px !important;
+    }
+
+    .Polaris-IndexTable__TableHeading .Polaris-Text--headingSm {
+      font-size: 10.4px !important;
+      font-weight: 600 !important;
+      color: rgb(153, 153, 153) !important;
+    }
+
+    /* ═══════════════════════════════════════════════════
        Navigation Styles
        ═══════════════════════════════════════════════════ */
     .Polaris-Navigation__Item {
@@ -2114,7 +2131,7 @@
                 <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
                   <div class="p-4">
                     <h3 class="Polaris-Text--root Polaris-Text--headingSm">Forecasting</h3>
-                    <p class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--subdued">Configure forecast parameters for demand prediction.</p>
+                    <p class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--subdued">Configure how far ahead the demand forecast predicts future sales.</p>
                     <div class="space-y-4 mt-4">
                       <!-- Forecast Horizon -->
                       <div>
@@ -2209,137 +2226,6 @@
                             <span class="Polaris-Select__Icon"><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
                           </div>
                           <div class="Polaris-Select__Backdrop"></div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Card 6: Inventory Management -->
-              <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:&quot;&quot;;--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-300)">
-                <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
-                  <div class="p-4">
-                    <h3 class="Polaris-Text--root Polaris-Text--headingSm">Inventory Management</h3>
-                    <p class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--subdued">Configure automatic reordering and inventory thresholds.</p>
-                    <div class="space-y-4 mt-4">
-                      <!-- Auto-reorder -->
-                      <div class="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
-                        <p class="Polaris-Text--root Polaris-Text--bodyMd">Auto-reorder</p>
-                        <div>
-                          <label class="Polaris-Choice Polaris-Choice--labelHidden Polaris-Checkbox__ChoiceLabel">
-                            <span class="Polaris-Choice__Control">
-                              <span class="Polaris-Checkbox">
-                                <input type="checkbox" class="Polaris-Checkbox__Input" role="checkbox" name="autoReorder">
-                                <span class="Polaris-Checkbox__Backdrop"></span>
-                                <span class="Polaris-Checkbox__Icon Polaris-Checkbox--animated"><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg"><path d="M14.79 5.79a.833.833 0 0 0-1.18 0L8.1 11.29 6.39 9.59a.833.833 0 0 0-1.18 1.18l2.47 2.47a.833.833 0 0 0 1.18 0l5.93-5.93a.833.833 0 0 0 0-1.18z" fill="currentColor"></path></svg></span>
-                              </span>
-                            </span>
-                          </label>
-                          <input type="hidden" name="autoReorder" value="">
-                        </div>
-                      </div>
-                      <!-- Default Reorder Point -->
-                      <div>
-                        <div class="Polaris-Labelled__LabelWrapper">
-                          <div class="Polaris-Label">
-                            <label class="Polaris-Label__Text"><span class="Polaris-Text--root Polaris-Text--bodyMd">Default reorder point</span></label>
-                          </div>
-                        </div>
-                        <div class="Polaris-Connected">
-                          <div class="Polaris-Connected__Item Polaris-Connected__Item--primary">
-                            <div class="Polaris-TextField Polaris-TextField--hasValue">
-                              <input name="defaultReorderPoint" type="number" class="Polaris-TextField__Input Polaris-TextField__Input--suffixed" value="10">
-                              <div class="Polaris-TextField__Suffix"><span class="Polaris-Text--root Polaris-Text--bodyMd">units</span></div>
-                              <div class="Polaris-TextField__Backdrop"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      <!-- Safety Stock Multiplier -->
-                      <div>
-                        <div class="Polaris-Labelled__LabelWrapper">
-                          <div class="Polaris-Label">
-                            <label class="Polaris-Label__Text"><span class="Polaris-Text--root Polaris-Text--bodyMd">Safety stock multiplier</span></label>
-                          </div>
-                        </div>
-                        <div class="Polaris-Connected">
-                          <div class="Polaris-Connected__Item Polaris-Connected__Item--primary">
-                            <div class="Polaris-TextField Polaris-TextField--hasValue">
-                              <input name="safetyStockMultiplierInvMgmt" type="number" step="0.1" class="Polaris-TextField__Input Polaris-TextField__Input--suffixed" value="1.5">
-                              <div class="Polaris-TextField__Suffix"><span class="Polaris-Text--root Polaris-Text--bodyMd">×</span></div>
-                              <div class="Polaris-TextField__Backdrop"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Card 7: Reporting -->
-              <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:&quot;&quot;;--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-300)">
-                <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
-                  <div class="p-4">
-                    <h3 class="Polaris-Text--root Polaris-Text--headingSm">Reporting</h3>
-                    <p class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--subdued">Configure automated report generation and delivery.</p>
-                    <div class="space-y-4 mt-4">
-                      <!-- Email Reports -->
-                      <div>
-                        <div class="Polaris-Labelled__LabelWrapper">
-                          <div class="Polaris-Label">
-                            <label class="Polaris-Label__Text"><span class="Polaris-Text--root Polaris-Text--bodyMd">Email reports</span></label>
-                          </div>
-                        </div>
-                        <div class="Polaris-Select">
-                          <select name="emailReportFrequency" class="Polaris-Select__Input">
-                            <option value="off">Disabled</option>
-                            <option value="daily">Daily</option>
-                            <option value="weekly" selected="">Weekly</option>
-                            <option value="monthly">Monthly</option>
-                          </select>
-                          <div class="Polaris-Select__Content" aria-hidden="true">
-                            <span class="Polaris-Select__SelectedOption">Weekly</span>
-                            <span class="Polaris-Select__Icon"><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-                          </div>
-                          <div class="Polaris-Select__Backdrop"></div>
-                        </div>
-                      </div>
-                      <!-- Report Format -->
-                      <div>
-                        <div class="Polaris-Labelled__LabelWrapper">
-                          <div class="Polaris-Label">
-                            <label class="Polaris-Label__Text"><span class="Polaris-Text--root Polaris-Text--bodyMd">Report format</span></label>
-                          </div>
-                        </div>
-                        <div class="Polaris-Select">
-                          <select name="reportFormat" class="Polaris-Select__Input">
-                            <option value="pdf" selected="">PDF</option>
-                            <option value="csv">CSV</option>
-                            <option value="xlsx">Excel (XLSX)</option>
-                          </select>
-                          <div class="Polaris-Select__Content" aria-hidden="true">
-                            <span class="Polaris-Select__SelectedOption">PDF</span>
-                            <span class="Polaris-Select__Icon"><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M5 7.5l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></svg></span>
-                          </div>
-                          <div class="Polaris-Select__Backdrop"></div>
-                        </div>
-                      </div>
-                      <!-- Include Charts -->
-                      <div class="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
-                        <p class="Polaris-Text--root Polaris-Text--bodyMd">Include charts</p>
-                        <div>
-                          <label class="Polaris-Choice Polaris-Choice--labelHidden Polaris-Checkbox__ChoiceLabel">
-                            <span class="Polaris-Choice__Control">
-                              <span class="Polaris-Checkbox">
-                                <input type="checkbox" class="Polaris-Checkbox__Input" role="checkbox" name="includeCharts" checked>
-                                <span class="Polaris-Checkbox__Backdrop"></span>
-                                <span class="Polaris-Checkbox__Icon Polaris-Checkbox--animated"><svg viewBox="0 0 20 20" class="Polaris-Icon__Svg"><path d="M14.79 5.79a.833.833 0 0 0-1.18 0L8.1 11.29 6.39 9.59a.833.833 0 0 0-1.18 1.18l2.47 2.47a.833.833 0 0 0 1.18 0l5.93-5.93a.833.833 0 0 0 0-1.18z" fill="currentColor"></path></svg></span>
-                              </span>
-                            </span>
-                          </label>
-                          <input type="hidden" name="includeCharts" value="on">
                         </div>
                       </div>
                     </div>
