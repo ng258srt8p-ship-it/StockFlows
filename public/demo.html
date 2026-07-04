@@ -62,12 +62,12 @@
       /* ═══════════════════════════════════════════════════
          Heading Font Overrides (Instrument Serif)
          ═══════════════════════════════════════════════════ */
-      h1, .Polaris-Text--headingLg, .Polaris-Header-Title, .Polaris-Text--headingMd {
+      h1, .Polaris-Text--headingLg, .Polaris-Header-Title {
         font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif !important;
         font-weight: 400 !important;
       }
 
-      h2 {
+      h2, .Polaris-Text--headingMd {
         font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif !important;
         font-weight: 650 !important;
       }
@@ -75,9 +75,30 @@
       body {
         background-color: #f1f1f1;
         color: #303030;
-        font-family: 'Inter', -apple-system, "system-ui", sans-serif;
+        font-family: 'Inter', -apple-system, "system-ui", "Segoe UI", Roboto, sans-serif;
       margin: 0;
       padding: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════
+       Primary Button Styles (match live app)
+       ═══════════════════════════════════════════════════ */
+    .Polaris-Button--variantPrimary {
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      font-weight: 500 !important;
+      background-color: rgb(17, 17, 17) !important;
+      color: rgb(255, 255, 255) !important;
+      font-family: 'Inter', -apple-system, "system-ui", "Segoe UI", Roboto, sans-serif !important;
+    }
+
+    .Polaris-Button--variantPrimary:hover {
+      background-color: rgb(30, 30, 30) !important;
+    }
+
+    /* Disabled button style (match live app) */
+    .Polaris-Button[disabled] {
+      color: rgb(102, 102, 102) !important;
     }
 
     /* ═══════════════════════════════════════════════════
@@ -85,12 +106,16 @@
        ═══════════════════════════════════════════════════ */
     .Polaris-Navigation__Item {
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 500;
       text-transform: uppercase;
       letter-spacing: 0.3px;
       color: rgb(48, 48, 48);
       border-radius: 8px;
       padding: 0px 4px 0px 8px;
+    }
+
+    .Polaris-Navigation__Item--selected {
+      font-weight: 700;
     }
 
     .Polaris-Navigation__PrimaryNavigation {
