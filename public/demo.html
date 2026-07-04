@@ -21,7 +21,7 @@
       --sf-bg: rgba(241, 241, 241, 1);
       --sf-bg-dark: #1f2225;
       --sf-text: rgba(48, 48, 48, 1);
-      --sf-text-dim: #6d7175;
+      --sf-text-dim: #616161;
       --sf-text-dimmer: #999999;
       --sf-border: #e3e3e3;
       --sf-brand: #303030;
@@ -34,13 +34,13 @@
       /* Polaris color overrides */
       --p-color-bg: rgba(241, 241, 241, 1);
       --p-color-text: rgba(48, 48, 48, 1);
-      --p-color-text-secondary: #6d7175;
+      --p-color-text-secondary: #616161;
       --p-color-bg-surface: rgba(255, 255, 255, 1);
       --p-color-border: rgba(227, 227, 227, 1);
       --p-color-border-hover: #a9aba8;
-      --p-color-icon: #6d7175;
+      --p-color-icon: #616161;
       --p-color-icon-secondary: #8a8a8a;
-      --p-color-nav-bg: #ebebeb;
+      --p-color-nav-bg: #fafafa;
       --p-color-nav-bg-surface-hover: #f1f1f1;
       --p-color-nav-bg-surface-active: #fafafa;
       --p-color-nav-bg-surface-selected: #fafafa;
@@ -62,15 +62,20 @@
       /* ═══════════════════════════════════════════════════
          Heading Font Overrides (Instrument Serif)
          ═══════════════════════════════════════════════════ */
-      h1, h2, .Polaris-Text--headingLg, .Polaris-Header-Title, .Polaris-Text--headingMd {
-        font-family: 'Instrument Serif', serif !important;
+      h1, .Polaris-Text--headingLg, .Polaris-Header-Title, .Polaris-Text--headingMd {
+        font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif !important;
         font-weight: 400 !important;
+      }
+
+      h2 {
+        font-family: 'Instrument Serif', Georgia, 'Times New Roman', serif !important;
+        font-weight: 650 !important;
       }
 
       body {
         background-color: #f1f1f1;
         color: #303030;
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-family: 'Inter', -apple-system, "system-ui", sans-serif;
       margin: 0;
       padding: 0;
     }
