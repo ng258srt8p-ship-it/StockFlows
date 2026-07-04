@@ -1,5 +1,18 @@
 /* StockFlows Demo — Exact match to Shopify app */
 
+/* Override StockFlows custom variables to match Polaris */
+:root {
+  --sf-bg: rgba(241, 241, 241, 1) !important;
+  --sf-bg-dark: #1f2225 !important;
+  --sf-text: #303030 !important;
+  --sf-text-dim: #6d7175 !important;
+  --sf-border: #e3e3e3 !important;
+  --sf-brand: #303030 !important;
+  --sf-critical: #e51c00 !important;
+  --sf-warning: #ffb800 !important;
+  --sf-success: #29845a !important;
+}
+
 /* Shell Layout */
 .demo-shell {
   display: flex;
@@ -104,7 +117,7 @@
 
 .demo-header h1 {
   font-size: var(--p-font-size-750);
-  font-weight: var(--p-font-weight-bold);
+  font-weight: 400;
   font-family: "Instrument Serif", Georgia, "Times New Roman", serif;
   color: var(--p-color-text);
   margin-bottom: 2px;

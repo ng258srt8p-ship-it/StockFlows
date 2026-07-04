@@ -18,7 +18,7 @@ test.describe("StockFlows Interactive Demo", () => {
     await expect(page.locator(".demo-stat-value").nth(0)).toContainText("26");
     await expect(page.locator(".demo-stat-value").nth(1)).toContainText("9");
     await expect(page.locator(".demo-stat-value").nth(2)).toContainText("6");
-    await expect(page.locator(".demo-stat-value").nth(3)).toContainText("$0.00");
+    await expect(page.locator(".demo-stat-value").nth(3)).toContainText("$0");
   });
 
   test("Navigation switches pages", async ({ page }) => {
@@ -50,10 +50,10 @@ test.describe("StockFlows Interactive Demo", () => {
     await expect(page.locator(".demo-forecast-card")).toHaveCount(5);
   });
 
-  test("Reports show valuation with $0.00 total", async ({ page }) => {
+  test("Reports show valuation with $0 total", async ({ page }) => {
     await page.click('[data-page="reports"]');
     await expect(page.locator("#valuation-report")).toContainText("Total Inventory Value");
-    await expect(page.locator("#valuation-report")).toContainText("$0.00");
+    await expect(page.locator("#valuation-report")).toContainText("$0");
   });
 
   test("Settings page loads with form elements", async ({ page }) => {

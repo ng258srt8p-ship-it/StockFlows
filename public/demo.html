@@ -356,7 +356,7 @@
   </script>
   <script>
     const { LOCATIONS, VENDORS, PRODUCTS, PURCHASE_ORDERS, STOCK_MOVEMENTS, ALERTS, FORECASTS, STATS } = window.DEMO_DATA;
-    function fmtM(n) { return '$' + n.toFixed(2); }
+    function fmtM(n) { return n === 0 ? '$0' : '$' + n.toFixed(2); }
     function getProductName(id) { for (const p of PRODUCTS) { for (const v of p.variants) { if (v.id === id) return p.title + ' — ' + v.title; } } return id; }
     function getVendorName(id) { return VENDORS.find(v => v.id === id)?.name || id; }
 
