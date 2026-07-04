@@ -33,8 +33,8 @@
       --p-color-bg: rgba(241, 241, 241, 1) !important;
       --p-color-text: rgba(48, 48, 48, 1) !important;
       --p-color-text-secondary: #6d7175 !important;
-      --p-color-bg-surface: #ffffff !important;
-      --p-color-border: #e3e3e3 !important;
+      --p-color-bg-surface: rgba(255, 255, 255, 1) !important;
+      --p-color-border: rgba(227, 227, 227, 1) !important;
       --p-color-border-hover: #a9aba8 !important;
       --p-color-icon: #6d7175 !important;
       --p-color-icon-secondary: #8a8a8a !important;
@@ -42,7 +42,7 @@
       --p-color-nav-bg-surface-hover: #f1f1f1 !important;
       --p-color-nav-bg-surface-active: #fafafa !important;
       --p-color-nav-bg-surface-selected: #fafafa !important;
-      --p-color-bg-fill-brand: #303030 !important;
+      --p-color-bg-fill-brand: rgba(48, 48, 48, 1) !important;
       --p-color-bg-fill-brand-hover: #1a1a1a !important;
       --p-color-bg-fill-success: #29845a !important;
       --p-color-bg-fill-warning: #ffb800 !important;
@@ -72,7 +72,20 @@
     .demo-page.active { display: block; }
     .demo-page.active { display: block !important; }
     #page-dashboard { display: block !important; }
-  </style>
+  /* Match Polaris nav item styles exactly */
+.Polaris-Navigation__Item {
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  color: rgb(48, 48, 48) !important;
+  border-radius: 8px !important;
+  padding: 0px 4px 0px 8px !important;
+}
+.Polaris-Navigation__PrimaryNavigation {
+  padding: 16px 0px 0px !important;
+}
+</style>
   <script>
     function showPage(page) {
       document.querySelectorAll('.demo-page').forEach(function(p) { p.style.display = 'none'; p.classList.remove('active'); });
@@ -91,7 +104,7 @@
     }
   </script>
 </head>
-<body style="background-color:#f1f2f4;color:#303030;font-family:'Inter',-apple-system,sans-serif;">
+<body style="background-color:#f1f1f1;color:#303030;font-family:'Inter',-apple-system,sans-serif;">
   <div class="Polaris-Frame Polaris-Frame--hasNav">
     <!-- Navigation Sidebar -->
     <div class="Polaris-Frame__Navigation" id="AppFrameNav">
