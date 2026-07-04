@@ -8,252 +8,341 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
   <link rel="stylesheet" href="polaris-styles.css">
   <link rel="stylesheet" href="tailwind-styles.css">
-  <link rel="stylesheet" href="demo.css">
+  <style>
+    body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background: #f1f2f4; margin: 0; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .nav-item-active { background: var(--p-color-nav-bg-surface-active, #fafafa); border-left: 3px solid var(--p-color-border-brand, #303030); }
+    .nav-item-active span { font-weight: 650 !important; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; padding: 10px 16px; font-weight: 600; color: #6d7175; border-bottom: 1px solid #e3e3e3; font-size: 12px; }
+    td { padding: 10px 16px; border-bottom: 1px solid #e3e3e3; }
+    .badge-success { background: #acf4d5; color: #004f3f; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .badge-warning { background: #ffea8a; color: #7a5c00; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .badge-critical { background: #ff8a71; color: #4e0a0a; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .badge-info { background: #bcd4f0; color: #084e8a; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; }
+    .stat-card { background: #fff; border: 1px solid #e3e3e3; padding: 16px 20px; }
+    .stat-label { font-size: 12px; color: #6d7175; font-weight: 600; }
+    .stat-value { font-size: 20px; font-weight: 700; margin-top: 4px; }
+    .section-title { font-size: 16px; font-weight: 600; margin-bottom: 16px; }
+    .form-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #e3e3e3; }
+    .form-label { font-size: 14px; font-weight: 500; }
+    .form-input { padding: 8px 12px; border: 1px solid #c9cccf; border-radius: 4px; font-size: 14px; }
+    .form-select { padding: 8px 12px; border: 1px solid #c9cccf; border-radius: 4px; font-size: 14px; background: #fff; }
+    .btn { padding: 8px 16px; border-radius: 4px; font-size: 14px; font-weight: 500; cursor: pointer; border: 1px solid #c9cccf; background: #fff; }
+    .btn-primary { background: #303030; color: #fff; border-color: #303030; }
+    .toggle { width: 36px; height: 20px; background: #c9cccf; border-radius: 10px; position: relative; cursor: pointer; }
+    .toggle.on { background: #008060; }
+    .toggle::after { content: ''; position: absolute; width: 16px; height: 16px; background: #fff; border-radius: 50%; top: 2px; left: 2px; transition: 0.2s; }
+    .toggle.on::after { left: 18px; }
+  </style>
 </head>
-<body class="antialiased" style="font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;background-color:#fafafa">
-  <div class="Polaris-Frame Polaris-Frame--hasNav" data-polaris-layer="true" data-has-navigation="true">
-    <div class="Polaris-Frame__Skip">
-      <a href="#AppFrameMain">
-        <span class="Polaris-Text--root Polaris-Text--bodyLg Polaris-Text--medium"></span>
-      </a>
-    </div>
-    <div>
-      <div class="Polaris-Frame__Navigation" id="AppFrameNav">
-        <nav class="Polaris-Navigation">
-          <div class="Polaris-Navigation__PrimaryNavigation Polaris-Scrollable Polaris-Scrollable--vertical Polaris-Scrollable--horizontal Polaris-Scrollable--scrollbarWidthThin" data-polaris-scrollable="true">
-            <ul class="Polaris-Navigation__Section">
-              <li class="Polaris-Navigation__ListItem">
-                <div class="Polaris-Navigation__ItemWrapper">
-                  <div class="Polaris-Navigation__ItemInnerWrapper Polaris-Navigation__ItemInnerWrapper--selected">
-                    <a class="Polaris-Navigation__Item Polaris-Navigation__Item--selected Polaris-Navigation--subNavigationActive" tabindex="0" href="#dashboard" data-polaris-unstyled="true">
-                      <div class="Polaris-Navigation__Icon">
-                        <span class="Polaris-Icon">
-                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M8.344 3.692a2.25 2.25 0 0 1 3.312 0l3.854 4.19a3.75 3.75 0 0 1 .99 2.538v3.33a2.75 2.75 0 0 1-2.75 2.75h-1.75a1.5 1.5 0 0 1-1.5-1.5v-2h-1v2a1.5 1.5 0 0 1-1.5 1.5h-1.75a2.75 2.75 0 0 1-2.75-2.75v-3.33c0-.94.353-1.847.99-2.539l3.854-4.189Zm2.208 1.016a.75.75 0 0 0-1.104 0l-3.854 4.189a2.25 2.25 0 0 0-.594 1.523v3.33c0 .69.56 1.25 1.25 1.25h1.75v-2a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v2h1.75c.69 0 1.25-.56 1.25-1.25v-3.33a2.25 2.25 0 0 0-.594-1.523l-3.854-4.19Z"></path></svg>
-                        </span>
-                      </div>
-                      <span class="Polaris-Navigation__Text">
-                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--semibold">Dashboard</span>
-                      </span>
-                    </a>
-                  </div>
-                </div>
-              </li>
-              <li class="Polaris-Navigation__ListItem">
-                <div class="Polaris-Navigation__ItemWrapper">
-                  <div class="Polaris-Navigation__ItemInnerWrapper">
-                    <a class="Polaris-Navigation__Item" tabindex="0" href="#inventory" data-polaris-unstyled="true">
-                      <div class="Polaris-Navigation__Icon">
-                        <span class="Polaris-Icon">
-                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M7 9a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-4Zm.5 3.5v-2h3v2h-3Z"></path><path fill-rule="evenodd" d="M5.315 4.45a2.25 2.25 0 0 1 1.836-.95h5.796a2.25 2.25 0 0 1 1.872 1.002l1.22 1.828c.3.452.461.983.461 1.526v6.894a1.75 1.75 0 0 1-1.75 1.75h-9.5a1.75 1.75 0 0 1-1.75-1.75v-6.863c0-.57.177-1.125.506-1.59l1.309-1.848Zm1.836.55a.75.75 0 0 0-.612.316l-.839 1.184h3.55v-1.5h-2.1Zm3.599 1.5h3.599l-.778-1.166a.75.75 0 0 0-.624-.334h-2.197v1.5Zm4.25 1.5h-10v6.75c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25v-6.75Z"></path></svg>
-                        </span>
-                      </div>
-                      <span class="Polaris-Navigation__Text">
-                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Inventory</span>
-                      </span>
-                    </a>
-                  </div>
-                </div>
-              </li>
-              <li class="Polaris-Navigation__ListItem">
-                <div class="Polaris-Navigation__ItemWrapper">
-                  <div class="Polaris-Navigation__ItemInnerWrapper">
-                    <a class="Polaris-Navigation__Item" tabindex="0" href="#purchasing" data-polaris-unstyled="true">
-                      <div class="Polaris-Navigation__Icon">
-                        <span class="Polaris-Icon">
-                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M2.5 3.75a.75.75 0 0 1 .75-.75h1.612a1.75 1.75 0 0 1 1.732 1.5h9.656a.75.75 0 0 1 .748.808l-.358 4.653a2.75 2.75 0 0 1-2.742 2.539h-6.351l.093.78a.25.25 0 0 0 .248.22h6.362a.75.75 0 0 1 0 1.5h-6.362a1.75 1.75 0 0 1-1.738-1.543l-1.04-8.737a.25.25 0 0 0-.248-.22h-1.612a.75.75 0 0 1-.75-.75Zm4.868 7.25h6.53a1.25 1.25 0 0 0 1.246-1.154l.296-3.846h-8.667l.595 5Z"></path><path d="M10 17a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path><path d="M15 17a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>
-                        </span>
-                      </div>
-                      <span class="Polaris-Navigation__Text">
-                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Purchasing</span>
-                      </span>
-                    </a>
-                  </div>
-                </div>
-              </li>
-              <li class="Polaris-Navigation__ListItem">
-                <div class="Polaris-Navigation__ItemWrapper">
-                  <div class="Polaris-Navigation__ItemInnerWrapper">
-                    <a class="Polaris-Navigation__Item" tabindex="0" href="#forecasting" data-polaris-unstyled="true">
-                      <div class="Polaris-Navigation__Icon">
-                        <span class="Polaris-Icon">
-                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M6.515 4.75a2 2 0 0 1 1.985-1.75h3a2 2 0 0 1 1.985 1.75h.265a2.25 2.25 0 0 1 2.25 2.25v7.75a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-7.75a2.25 2.25 0 0 1 2.25-2.25h.265Zm1.985-.25h3a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5Zm-1.987 1.73.002.02h-.265a.75.75 0 0 0-.75.75v7.75c0 .414.336.75.75.75h7.5a.75.75 0 0 0 .75-.75v-7.75a.75.75 0 0 0-.75-.75h-.265a2 2 0 0 1-1.985 1.75h-3a2 2 0 0 1-1.987-1.77Z"></path></svg>
-                        </span>
-                      </div>
-                      <span class="Polaris-Navigation__Text">
-                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Forecasting</span>
-                      </span>
-                    </a>
-                  </div>
-                </div>
-              </li>
-              <li class="Polaris-Navigation__ListItem">
-                <div class="Polaris-Navigation__ItemWrapper">
-                  <div class="Polaris-Navigation__ItemInnerWrapper">
-                    <a class="Polaris-Navigation__Item" tabindex="0" href="#reports" data-polaris-unstyled="true">
-                      <div class="Polaris-Navigation__Icon">
-                        <span class="Polaris-Icon">
-                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M9.952 3.5h.096c.182 0 .371 0 .543.034a1.75 1.75 0 0 1 1.375 1.375c.035.172.034.361.034.543v9.096c0 .182 0 .371-.034.543a1.75 1.75 0 0 1-1.375 1.376 2.825 2.825 0 0 1-.543.033h-.096c-.182 0-.371 0-.543-.034a1.75 1.75 0 0 1-1.375-1.375 2.824 2.824 0 0 1-.034-.543v-9.096c0-.182 0-.371.034-.543a1.75 1.75 0 0 1 1.375-1.375c.172-.035.361-.034.543-.034Zm-.253 1.505a.25.25 0 0 0-.194.194 8.217 8.217 0 0 0-.005.3v9.001a8.221 8.221 0 0 0 .005.3.25.25 0 0 0 .194.195l.053.003c.055.002.127.002.248.002s.193 0 .248-.002l.053-.003a.25.25 0 0 0 .194-.194l.003-.053a8.05 8.05 0 0 0 .002-.248v-9a8.046 8.046 0 0 0-.005-.3.25.25 0 0 0-.194-.195 8.217 8.217 0 0 0-.3-.005 8.216 8.216 0 0 0-.302.005Z"></path><path fill-rule="evenodd" d="M5.452 9h.096c.182 0 .371 0 .543.034a1.75 1.75 0 0 1 1.375 1.375c.035.172.034.361.034.543v3.596c0 .182 0 .371-.034.543a1.75 1.75 0 0 1-1.375 1.376 2.825 2.825 0 0 1-.543.033h-.096c-.182 0-.371 0-.543-.034a1.75 1.75 0 0 1-1.375-1.375 2.824 2.824 0 0 1-.034-.543v-3.596c0-.182 0-.371.034-.543a1.75 1.75 0 0 1 1.375-1.375c.172-.035.361-.034.543-.034Zm-.253 1.505a.25.25 0 0 0-.194.194 8.217 8.217 0 0 0-.005.3v3.501a8.221 8.221 0 0 0 .005.3.25.25 0 0 0 .194.195l.053.003c.055.002.127.002.248.002s.193 0 .248-.002l.053-.003a.25.25 0 0 0 .194-.194l.003-.053a8.05 8.05 0 0 0 .002-.248v-3.5a8.208 8.208 0 0 0-.005-.3.25.25 0 0 0-.194-.195 8.045 8.045 0 0 0-.3-.005 8.045 8.045 0 0 0-.302.005Z"></path><path fill-rule="evenodd" d="M14.5 6h-.048c-.182 0-.371 0-.543.034a1.75 1.75 0 0 0-1.375 1.375 2.825 2.825 0 0 0-.034.543v6.596c0 .182 0 .371.034.543a1.75 1.75 0 0 0 1.375 1.376c.172.034.361.033.543.033h.096c.182 0 .371 0 .543-.034a1.75 1.75 0 0 0 1.375-1.375c.035-.172.034-.36.034-.543v-6.596c0-.182 0-.371-.034-.543a1.75 1.75 0 0 0-1.375-1.375c-.172-.035-.361-.034-.543-.034h-.048Zm-.495 1.7a.25.25 0 0 1 .194-.195 8.221 8.221 0 0 1 .3-.005 8.217 8.217 0 0 1 .302.005.25.25 0 0 1 .194.194l.003.053c.002.055.002.127.002.248v6.5a8.05 8.05 0 0 1-.005.3.25.25 0 0 1-.194.195l-.053.003a8.046 8.046 0 0 1-.248.002c-.121 0-.193 0-.248-.002l-.053-.003a.25.25 0 0 1-.194-.194l-.003-.053a8.05 8.05 0 0 1-.002-.248v-6.5c0-.121 0-.193.002-.248l.003-.053v.002-.002Z"></path></svg>
-                        </span>
-                      </div>
-                      <span class="Polaris-Navigation__Text">
-                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Reports</span>
-                      </span>
-                    </a>
-                  </div>
-                </div>
-              </li>
-            </ul>
-            <ul class="Polaris-Navigation__Section">
-              <li class="Polaris-Navigation__ListItem">
-                <div class="Polaris-Navigation__ItemWrapper">
-                  <div class="Polaris-Navigation__ItemInnerWrapper">
-                    <a class="Polaris-Navigation__Item" tabindex="0" href="#settings" data-polaris-unstyled="true">
-                      <div class="Polaris-Navigation__Icon">
-                        <span class="Polaris-Icon">
-                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M12.5 10a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-1.5 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path><path fill-rule="evenodd" d="M9.377 2.5c-.926 0-1.676.75-1.676 1.676v.688c0 .056-.043.17-.198.251-.153.08-.303.168-.448.262-.147.097-.268.076-.318.048l-.6-.346a1.676 1.676 0 0 0-2.29.613l-.622 1.08a1.676 1.676 0 0 0 .613 2.289l.648.374c.048.028.124.12.119.29a5.484 5.484 0 0 0 .005.465c.009.175-.07.27-.119.299l-.653.377a1.676 1.676 0 0 0-.613 2.29l.623 1.08a1.676 1.676 0 0 0 2.29.613l.7-.405c.048-.028.166-.048.312.043.115.071.233.139.353.202.155.08.198.195.198.251v.811c0 .926.75 1.676 1.676 1.676h1.246c.926 0 1.676-.75 1.676-1.676v-.81c0-.057.042-.171.197-.252.121-.063.239-.13.354-.202.146-.091.264-.07.312-.043l.7.405a1.676 1.676 0 0 0 2.29-.614l.623-1.08a1.676 1.676 0 0 0-.613-2.289l-.653-.377c-.05-.029-.128-.123-.119-.3a5.494 5.494 0 0 0 .005-.463c-.005-.171.07-.263.12-.291l.647-.374a1.676 1.676 0 0 0 .613-2.29l-.623-1.079a1.676 1.676 0 0 0-2.29-.613l-.6.346c-.049.028-.17.048-.318-.048a5.4 5.4 0 0 0-.448-.262c-.155-.081-.197-.195-.197-.251v-.688c0-.926-.75-1.676-1.676-1.676h-1.246Zm-.176 1.676c0-.097.078-.176.176-.176h1.246c.097 0 .176.079.176.176v.688c0 .728.462 1.298 1.003 1.58.11.058.219.122.323.19.517.337 1.25.458 1.888.09l.6-.346a.176.176 0 0 1 .24.064l.623 1.08a.176.176 0 0 1-.064.24l-.648.374c-.623.36-.888 1.034-.868 1.638a4.184 4.184 0 0 1-.004.337c-.032.615.23 1.31.867 1.677l.653.377a.176.176 0 0 1 .064.24l-.623 1.08a.176.176 0 0 1-.24.065l-.701-.405c-.624-.36-1.341-.251-1.855.069a3.91 3.91 0 0 1-.255.145c-.54.283-1.003.853-1.003 1.581v.811a.176.176 0 0 1-.176.176h-1.246a.176.176 0 0 1-.176-.176v-.81c0-.73-.462-1.3-1.003-1.582a3.873 3.873 0 0 1-.255-.146c-.514-.32-1.23-.428-1.855-.068l-.7.405a.176.176 0 0 1-.241-.065l-.623-1.08a.176.176 0 0 1 .064-.24l.653-.377c.637-.368.899-1.062.867-1.677a3.97 3.97 0 0 1-.004-.337c.02-.604-.245-1.278-.868-1.638l-.648-.374a.176.176 0 0 1-.064-.24l.623-1.08a.176.176 0 0 1 .24-.064l.6.346c.638.368 1.37.247 1.888-.09a3.85 3.85 0 0 1 .323-.19c.54-.282 1.003-.852 1.003-1.58v-.688Z"></path></svg>
-                        </span>
-                      </div>
-                      <span class="Polaris-Navigation__Text">
-                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Settings</span>
-                      </span>
-                    </a>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div>
-        </nav>
-        <button type="button" class="Polaris-Frame__NavigationDismiss" aria-hidden="true" aria-label="" tabindex="-1">
-          <span class="Polaris-Icon">
-            <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M12.72 13.78a.75.75 0 1 0 1.06-1.06l-2.72-2.72 2.72-2.72a.75.75 0 0 0-1.06-1.06l-2.72 2.72-2.72-2.72a.75.75 0 0 0-1.06 1.06l2.72 2.72-2.72 2.72a.75.75 0 1 0 1.06 1.06l2.72-2.72 2.72 2.72Z"></path></svg>
-          </span>
-        </button>
+<body>
+  <div style="display: flex; height: 100vh;">
+    <!-- Sidebar -->
+    <div style="width: 240px; background: #e3e3e3; flex-shrink: 0; display: flex; flex-direction: column;">
+      <div style="padding: 16px 20px; border-bottom: 1px solid #c9cccf; font-weight: 600; font-size: 13px;">
+        StockFlows
+      </div>
+      <nav style="flex: 1; padding: 8px 0;">
+        <a href="#" class="nav-link nav-item-active" onclick="showPage('dashboard')" style="display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: #202223; text-decoration: none; font-size: 14px; border-left: 3px solid transparent;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M8.344 3.692a2.25 2.25 0 013.312 0l3.854 4.19a3.75 3.75 0 01.99 2.538v3.33a2.75 2.75 0 01-2.75 2.75h-1.75a1.5 1.5 0 01-1.5-1.5v-2h-1v2a1.5 1.5 0 01-1.5 1.5h-1.75a2.75 2.75 0 01-2.75-2.75v-3.33c0-.94.353-1.847.99-2.539l3.854-4.189z" fill="currentColor"/></svg>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="nav-link" onclick="showPage('inventory')" style="display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: #202223; text-decoration: none; font-size: 14px; border-left: 3px solid transparent;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M7 9a1 1 0 00-1 1v3a1 1 0 001 1h4a1 1 0 001-1v-3a1 1 0 00-1-1h-4zm.5 3.5v-2h3v2h-3z" fill="currentColor"/><path d="M5.315 4.45a2.25 2.25 0 011.836-.95h5.796a2.25 2.25 0 011.872 1.002l1.22 1.828c.3.452.461.983.461 1.526v6.894a1.75 1.75 0 01-1.75 1.75h-9.5a1.75 1.75 0 01-1.75-1.75v-6.863c0-.57.177-1.125.506-1.59l1.309-1.848zm1.836.55a.75.75 0 00-.612.316l-.839 1.184h3.55v-1.5h-2.1zm3.599 1.5h3.599l-.778-1.166a.75.75 0 00-.624-.334h-2.197v1.5zm4.25 1.5h-10v6.75c0 .138.112.25.25.25h9.5a.25.25 0 00.25-.25v-6.75z" fill="currentColor"/></svg>
+          <span>Inventory</span>
+        </a>
+        <a href="#" class="nav-link" onclick="showPage('purchasing')" style="display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: #202223; text-decoration: none; font-size: 14px; border-left: 3px solid transparent;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M2.5 3.75a.75.75 0 01.75-.75h1.612a1.75 1.75 0 011.732 1.5h9.656a.75.75 0 01.748.808l-.358 4.653a2.75 2.75 0 01-2.742 2.539h-6.351l.093.78a.25.25 0 00.248.22h6.362a.75.75 0 010 1.5h-6.362a1.75 1.75 0 01-1.738-1.543l-1.04-8.737a.25.25 0 00-.248-.22h-1.612a.75.75 0 01-.75-.75zm4.868 7.25h6.53a1.25 1.25 0 001.246-1.154l.296-3.846h-8.667l.595 5z" fill="currentColor"/><circle cx="10" cy="17" r="1" fill="currentColor"/><circle cx="15" cy="17" r="1" fill="currentColor"/></svg>
+          <span>Purchasing</span>
+        </a>
+        <a href="#" class="nav-link" onclick="showPage('forecasting')" style="display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: #202223; text-decoration: none; font-size: 14px; border-left: 3px solid transparent;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M6.515 4.75a2 2 0 011.985-1.75h3a2 2 0 011.985 1.75h.265a2.25 2.25 0 012.25 2.25v7.75a2.25 2.25 0 01-2.25 2.25h-7.5a2.25 2.25 0 01-2.25-2.25v-7.75a2.25 2.25 0 012.25-2.25h.265zm1.985-.25h3a.5.5 0 01.5.5v1a.5.5 0 01-.5.5h-3a.5.5 0 01-.5-.5v-1a.5.5 0 01.5-.5z" fill="currentColor"/></svg>
+          <span>Forecasting</span>
+        </a>
+        <a href="#" class="nav-link" onclick="showPage('reports')" style="display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: #202223; text-decoration: none; font-size: 14px; border-left: 3px solid transparent;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M9.952 3.5h.096c.182 0 .371 0 .543.034a1.75 1.75 0 011.375 1.375c.035.172.034.361.034.543v9.096c0 .182 0 .371-.034.543a1.75 1.75 0 01-1.375 1.376 2.825 2.825 0 01-.543.033h-.096c-.182 0-.371 0-.543-.034a1.75 1.75 0 01-1.375-1.375 2.824 2.824 0 01-.034-.543v-9.096c0-.182 0-.371.034-.543a1.75 1.75 0 011.375-1.375c.172-.035.361-.034.543-.034z" fill="currentColor"/><path d="M5.452 9h.096c.182 0 .371 0 .543.034a1.75 1.75 0 011.375 1.375c.035.172.034.361.034.543v3.596c0 .182 0 .371-.034.543a1.75 1.75 0 01-1.375 1.376 2.825 2.825 0 01-.543.033h-.096c-.182 0-.371 0-.543-.034a1.75 1.75 0 01-1.375-1.375 2.824 2.824 0 01-.034-.543v-3.596c0-.182 0-.371.034-.543a1.75 1.75 0 011.375-1.375c.172-.035.361-.034.543-.034z" fill="currentColor"/><path d="M14.5 6h-.048c-.182 0-.371 0-.543.034a1.75 1.75 0 00-1.375 1.375 2.825 2.825 0 00-.034.543v6.596c0 .182 0 .371.034.543a1.75 1.75 0 001.375 1.376c.172.034.361.033.543.033h.096c.182 0 .371 0 .543-.034a1.75 1.75 0 001.375-1.375c.035-.172.034-.36.034-.543v-6.596c0-.182 0-.371-.034-.543a1.75 1.75 0 00-1.375-1.375c-.172-.035-.361-.034-.543-.034z" fill="currentColor"/></svg>
+          <span>Reports</span>
+        </a>
+        <div style="border-top: 1px solid #c9cccf; margin: 8px 0;"></div>
+        <a href="#" class="nav-link" onclick="showPage('settings')" style="display: flex; align-items: center; gap: 10px; padding: 10px 20px; color: #202223; text-decoration: none; font-size: 14px; border-left: 3px solid transparent;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M12.5 10a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" fill="currentColor"/><path fill-rule="evenodd" d="M9.377 2.5c-.926 0-1.676.75-1.676 1.676v.688c0 .056-.043.17-.198.251-.153.08-.303.168-.448.262-.147.097-.268.076-.318.048l-.6-.346a1.676 1.676 0 00-2.29.613l-.622 1.08a1.676 1.676 0 00.613 2.289l.648.374c.048.028.124.12.119.29a5.484 5.484 0 00.005.465c.009.175-.07.27-.119.299l-.653.377a1.676 1.676 0 00-.613 2.29l.623 1.08a1.676 1.676 0 002.29.613l.7-.405c.048-.028.166-.048.312.043.115.071.233.139.353.202.155.08.198.195.198.251v.811c0 .926.75 1.676 1.676 1.676h1.246c.926 0 1.676-.75 1.676-1.676v-.81c0-.057.042-.171.197-.252.121-.063.239-.13.354-.202.146-.091.264-.07.312-.043l.7.405a1.676 1.676 0 002.29-.614l.623-1.08a1.676 1.676 0 00-.613-2.289l-.653-.377c-.05-.029-.128-.123-.119-.3a5.494 5.494 0 00.005-.463c-.005-.171.07-.263.12-.291l.647-.374a1.676 1.676 0 00.613-2.29l-.623-1.079a1.676 1.676 0 00-2.29-.613l-.6.346c-.049.028-.17.048-.318-.048a5.4 5.4 0 00-.448-.262c-.155-.081-.197-.195-.197-.251v-.688c0-.926-.75-1.676-1.676-1.676h-1.246z" fill="currentColor"/></svg>
+          <span>Settings</span>
+        </a>
+      </nav>
+      <div style="padding: 12px 20px; border-top: 1px solid #c9cccf; font-size: 12px; color: #6d7175;">
+        <a href="/" style="color: #6d7175; text-decoration: none;">← Back to Site</a>
       </div>
     </div>
-    <div class="Polaris-Frame__ContextualSaveBar Polaris-Frame-CSSAnimation--startFade"></div>
-    <main class="Polaris-Frame__Main" id="AppFrameMain" data-has-global-ribbon="false">
-      <div class="Polaris-Frame__Content">
-        <div class="Polaris-Page">
-          <div class="Polaris-Box" style="--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-start-md:var(--p-space-600);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-block-end-md:var(--p-space-600);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-start-sm:var(--p-space-0);--pc-box-padding-inline-end-xs:var(--p-space-400);--pc-box-padding-inline-end-sm:var(--p-space-0);position:relative">
-            <div role="status">
-              <p class="Polaris-Text--root Polaris-Text--visuallyHidden"></p>
+
+    <!-- Main Content -->
+    <div style="flex: 1; overflow-y: auto; padding: 24px 32px;">
+      <!-- Dashboard Page -->
+      <div id="page-dashboard" class="page active">
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 24px; margin-bottom: 4px;">StockFlows Dashboard</h1>
+        <p style="color: #6d7175; font-size: 13px; margin-bottom: 20px;">Inventory overview</p>
+        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+          <div class="stat-card"><div class="stat-label">Total SKUs</div><div class="stat-value">26</div></div>
+          <div class="stat-card"><div class="stat-label">Low Stock</div><div class="stat-value">9</div></div>
+          <div class="stat-card"><div class="stat-label">Out of Stock</div><div class="stat-value">6</div></div>
+          <div class="stat-card"><div class="stat-label">Inventory Value</div><div class="stat-value">$0</div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h2 class="section-title" style="margin-bottom: 0;">Active Alerts</h2>
+              <span class="badge-info">0</span>
             </div>
-            <div class="Polaris-Page-Header--isSingleRow Polaris-Page-Header--noBreadcrumbs Polaris-Page-Header--mediumTitle">
-              <div class="Polaris-Page-Header__Row">
-                <div class="Polaris-Page-Header__TitleWrapper Polaris-Page-Header__TitleWrapperExpand">
-                  <div class="Polaris-Header-Title__TitleWrapper">
-                    <h1 class="Polaris-Header-Title Polaris-Header-Title__TitleWithSubtitle">
-                      <span class="Polaris-Text--root Polaris-Text--headingLg Polaris-Text--bold">StockFlows Dashboard</span>
-                    </h1>
-                  </div>
-                  <div class="Polaris-Header-Title__SubTitle">
-                    <p class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--subdued">Inventory overview</p>
-                  </div>
-                </div>
-              </div>
+            <p style="color: #6d7175; text-align: center; padding: 40px 0; font-size: 14px;">No active alerts<br><span style="font-size: 13px;">All stock levels are above their reorder points.</span></p>
+            <div style="text-align: center;"><button class="btn btn-primary">View inventory</button></div>
+          </div>
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h2 class="section-title" style="margin-bottom: 0;">Recent Activity</h2>
+              <a href="#" onclick="showPage('inventory')" style="color: #006fbb; font-size: 13px; text-decoration: none;">View all</a>
+            </div>
+            <p style="color: #6d7175; font-size: 13px;">No recent stock movements. Activity will appear here as inventory changes.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Page -->
+      <div id="page-inventory" class="page">
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 24px; margin-bottom: 4px;">Inventory</h1>
+        <p style="color: #6d7175; font-size: 13px; margin-bottom: 16px;">26 products across 4 locations</p>
+        <div style="display: flex; gap: 12px; margin-bottom: 16px;">
+          <input type="text" placeholder="Search inventory..." class="form-input" style="width: 240px;">
+          <select class="form-select"><option>All Locations</option><option>Main Warehouse</option><option>Retail Store #1</option></select>
+        </div>
+        <div style="background: #fff; border: 1px solid #e3e3e3; overflow-x: auto;">
+          <table>
+            <thead>
+              <tr><th>SKU</th><th>Product</th><th>Location</th><th>Qty</th><th>Reorder Pt</th><th>Status</th><th>Cost</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>SKU-001</td><td>Alpine 4-Season Tent</td><td>Main Warehouse</td><td>45</td><td>10</td><td><span class="badge-success">In Stock</span></td><td>$12,999.00</td></tr>
+              <tr><td>SKU-002</td><td>Expedition Backpack 65L</td><td>Main Warehouse</td><td>120</td><td>25</td><td><span class="badge-success">In Stock</span></td><td>$10,740.00</td></tr>
+              <tr><td>SKU-003</td><td>Trailmaster GTX Boots</td><td>Retail Store #1</td><td>3</td><td>10</td><td><span class="badge-critical">Out of Stock</span></td><td>$435.00</td></tr>
+              <tr><td>SKU-004</td><td>Down Sleeping Bag -10°C</td><td>Main Warehouse</td><td>34</td><td>12</td><td><span class="badge-success">In Stock</span></td><td>$6,052.00</td></tr>
+              <tr><td>SKU-005</td><td>Rechargeable Headlamp 900lm</td><td>Retail Store #1</td><td>8</td><td>50</td><td><span class="badge-warning">Low Stock</span></td><td>$256.00</td></tr>
+              <tr><td>SKU-006</td><td>Merino Base Layer Set</td><td>Main Warehouse</td><td>65</td><td>15</td><td><span class="badge-success">In Stock</span></td><td>$4,355.00</td></tr>
+              <tr><td>SKU-007</td><td>Titanium Cookset</td><td>Retail Store #1</td><td>0</td><td>20</td><td><span class="badge-critical">Out of Stock</span></td><td>$0.00</td></tr>
+              <tr><td>SKU-008</td><td>Ultralight Hammock</td><td>Main Warehouse</td><td>92</td><td>30</td><td><span class="badge-success">In Stock</span></td><td>$2,576.00</td></tr>
+              <tr><td>SKU-009</td><td>Water Filter System</td><td>Retail Store #1</td><td>2</td><td>40</td><td><span class="badge-critical">Out of Stock</span></td><td>$44.00</td></tr>
+              <tr><td>SKU-010</td><td>Precision Compass</td><td>Main Warehouse</td><td>110</td><td>30</td><td><span class="badge-success">In Stock</span></td><td>$1,980.00</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Purchasing Page -->
+      <div id="page-purchasing" class="page">
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 24px; margin-bottom: 4px;">Purchase Orders</h1>
+        <p style="color: #6d7175; font-size: 13px; margin-bottom: 16px;">3 open, 1 received</p>
+        <div style="background: #fff; border: 1px solid #e3e3e3; overflow-x: auto;">
+          <table>
+            <thead>
+              <tr><th>PO Number</th><th>Vendor</th><th>Status</th><th>Items</th><th>Total</th><th>Expected</th></tr>
+            </thead>
+            <tbody>
+              <tr><td><strong>PO-2026-001</strong></td><td>Pacific Rim Outfitters</td><td><span class="badge-success">Received</span></td><td>2 items</td><td>$14,450.00</td><td>2026-06-20</td></tr>
+              <tr><td><strong>PO-2026-002</strong></td><td>Summit Textiles</td><td><span class="badge-warning">Partially Received</span></td><td>2 items</td><td>$8,616.00</td><td>2026-07-05</td></tr>
+              <tr><td><strong>PO-2026-003</strong></td><td>Alloy Components</td><td><span class="badge-info">Sent</span></td><td>2 items</td><td>$5,815.00</td><td>2026-07-20</td></tr>
+              <tr><td><strong>PO-2026-004</strong></td><td>Pacific Rim Outfitters</td><td><span class="badge-success">Draft</span></td><td>2 items</td><td>$7,895.00</td><td>2026-08-01</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Forecasting Page -->
+      <div id="page-forecasting" class="page">
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 24px; margin-bottom: 4px;">Demand Forecasting</h1>
+        <p style="color: #6d7175; font-size: 13px; margin-bottom: 16px;">AI-powered predictions using ETS, Linear, and Ensemble models</p>
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong>Expedition Backpack 65L</strong>
+              <span class="badge-info">ETS</span>
+            </div>
+            <div style="display: flex; gap: 4px; height: 48px; align-items: flex-end; margin-bottom: 12px;">
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 60%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 70%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 55%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 80%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 65%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 72%;"></div>
+            </div>
+            <div style="display: flex; gap: 16px; font-size: 12px; color: #6d7175;">
+              <span>Avg: <strong>2.8/day</strong></span>
+              <span>Trend: <strong>up</strong></span>
+              <span>Confidence: <strong>87%</strong></span>
             </div>
           </div>
-          <div class="">
-            <div class="Polaris-Layout">
-              <div class="Polaris-Layout__Section">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <!-- Stat Card 1: Total SKUs -->
-                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
-                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
-                      <div class="p-4">
-                        <h3 class="Polaris-Text--root Polaris-Text--headingSm">Total SKUs</h3>
-                        <p class="Polaris-Text--root Polaris-Text--headingLg">26</p>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Stat Card 2: Low Stock -->
-                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
-                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
-                      <div class="p-4">
-                        <h3 class="Polaris-Text--root Polaris-Text--headingSm">Low Stock</h3>
-                        <p class="Polaris-Text--root Polaris-Text--headingLg">9</p>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Stat Card 3: Out of Stock -->
-                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
-                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
-                      <div class="p-4">
-                        <h3 class="Polaris-Text--root Polaris-Text--headingSm">Out of Stock</h3>
-                        <p class="Polaris-Text--root Polaris-Text--headingLg">6</p>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Stat Card 4: Inventory Value -->
-                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
-                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
-                      <div class="p-4">
-                        <h3 class="Polaris-Text--root Polaris-Text--headingSm">Inventory Value</h3>
-                        <p class="Polaris-Text--root Polaris-Text--headingLg">$0</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div class="Polaris-Layout__Section">
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                  <!-- Active Alerts -->
-                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
-                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
-                      <div class="flex items-center justify-between mb-2">
-                        <h2 class="Polaris-Text--root Polaris-Text--headingMd">Active Alerts</h2>
-                        <span class="Polaris-Badge">
-                          <span class="Polaris-Text--root Polaris-Text--bodySm">0</span>
-                        </span>
-                      </div>
-                      <div class="Polaris-Box" style="--pc-box-padding-block-start-xs:var(--p-space-500);--pc-box-padding-block-end-xs:var(--p-space-1600);--pc-box-padding-inline-start-xs:var(--p-space-0);--pc-box-padding-inline-end-xs:var(--p-space-0)">
-                        <div class="Polaris-BlockStack" style="--pc-block-stack-inline-align:center;--pc-block-stack-order:column">
-                          <div class="Polaris-EmptyState__ImageContainer Polaris-EmptyState__SkeletonImageContainer">
-                            <img alt="" src="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/empty-state.png" class="Polaris-EmptyState__Image" role="presentation"/>
-                            <div class="Polaris-EmptyState__SkeletonImage"></div>
-                          </div>
-                          <div class="Polaris-Box" style="--pc-box-max-width:400px">
-                            <div class="Polaris-BlockStack" style="--pc-block-stack-inline-align:center;--pc-block-stack-order:column">
-                              <div class="Polaris-Box" style="--pc-box-padding-block-end-xs:var(--p-space-400)">
-                                <div class="Polaris-Box" style="--pc-box-padding-block-end-xs:var(--p-space-150)">
-                                  <p class="Polaris-Text--root Polaris-Text--headingMd Polaris-Text--block Polaris-Text--center">No active alerts</p>
-                                </div>
-                                <span class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--block Polaris-Text--center">
-                                  <p>All stock levels are above their reorder points.</p>
-                                </span>
-                              </div>
-                              <div class="Polaris-InlineStack" style="--pc-inline-stack-align:center;--pc-inline-stack-wrap:wrap;--pc-inline-stack-gap-xs:var(--p-space-200);--pc-inline-stack-flex-direction-xs:row">
-                                <button class="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter" type="button">
-                                  <span class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--semibold">View inventory</span>
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <!-- Recent Activity -->
-                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
-                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
-                      <div class="flex items-center justify-between mb-2">
-                        <h2 class="Polaris-Text--root Polaris-Text--headingMd">Recent Activity</h2>
-                        <a class="text-sm text-blue-600 hover:underline" data-discover="true" href="#inventory">View all</a>
-                      </div>
-                      <p class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--subdued">No recent stock movements. Activity will appear here as inventory changes.</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong>Rechargeable Headlamp 900lm</strong>
+              <span class="badge-info">Ensemble</span>
+            </div>
+            <div style="display: flex; gap: 4px; height: 48px; align-items: flex-end; margin-bottom: 12px;">
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 70%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 72%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 68%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 71%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 70%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 69%;"></div>
+            </div>
+            <div style="display: flex; gap: 16px; font-size: 12px; color: #6d7175;">
+              <span>Avg: <strong>4.2/day</strong></span>
+              <span>Trend: <strong>stable</strong></span>
+              <span>Confidence: <strong>92%</strong></span>
+            </div>
+          </div>
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong>Alpine 4-Season Tent</strong>
+              <span class="badge-info">Linear</span>
+            </div>
+            <div style="display: flex; gap: 4px; height: 48px; align-items: flex-end; margin-bottom: 12px;">
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 40%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 50%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 55%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 60%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 65%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 70%;"></div>
+            </div>
+            <div style="display: flex; gap: 16px; font-size: 12px; color: #6d7175;">
+              <span>Avg: <strong>1.5/day</strong></span>
+              <span>Trend: <strong>up</strong></span>
+              <span>Confidence: <strong>81%</strong></span>
+            </div>
+          </div>
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong>Water Filter System</strong>
+              <span class="badge-info">ETS</span>
+            </div>
+            <div style="display: flex; gap: 4px; height: 48px; align-items: flex-end; margin-bottom: 12px;">
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 75%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 80%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 85%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 78%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 82%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 85%;"></div>
+            </div>
+            <div style="display: flex; gap: 16px; font-size: 12px; color: #6d7175;">
+              <span>Avg: <strong>6.1/day</strong></span>
+              <span>Trend: <strong>up</strong></span>
+              <span>Confidence: <strong>89%</strong></span>
+            </div>
+          </div>
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+              <strong>Merino Base Layer Set</strong>
+              <span class="badge-info">Moving Avg</span>
+            </div>
+            <div style="display: flex; gap: 4px; height: 48px; align-items: flex-end; margin-bottom: 12px;">
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 55%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 58%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 60%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.3; height: 57%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 59%;"></div>
+              <div style="flex:1; background: #006fbb; opacity: 0.7; height: 60%;"></div>
+            </div>
+            <div style="display: flex; gap: 16px; font-size: 12px; color: #6d7175;">
+              <span>Avg: <strong>3.3/day</strong></span>
+              <span>Trend: <strong>stable</strong></span>
+              <span>Confidence: <strong>85%</strong></span>
             </div>
           </div>
         </div>
       </div>
-    </main>
+
+      <!-- Reports Page -->
+      <div id="page-reports" class="page">
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 24px; margin-bottom: 4px;">Reports</h1>
+        <p style="color: #6d7175; font-size: 13px; margin-bottom: 16px;">Inventory valuation and stock movement summaries</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <h2 class="section-title">Inventory Valuation</h2>
+            <div style="border-top: 1px solid #e3e3e3;">
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Alpine 4-Season Tent</span><span>45 units — $12,999.00</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Expedition Backpack 65L</span><span>120 units — $10,740.00</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Trailmaster GTX Boots</span><span>3 units — $435.00</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Down Sleeping Bag -10°C</span><span>34 units — $6,052.00</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Rechargeable Headlamp 900lm</span><span>8 units — $256.00</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Merino Base Layer Set</span><span>65 units — $4,355.00</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Titanium Cookset</span><span>0 units — $0.00</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Ultralight Hammock</span><span>92 units — $2,576.00</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Water Filter System</span><span>2 units — $44.00</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>Precision Compass</span><span>110 units — $1,980.00</span></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 12px 0; font-weight: 600; font-size: 14px; border-top: 2px solid #e3e3e3; margin-top: 8px;"><span>Total Inventory Value</span><span>$0</span></div>
+          </div>
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <h2 class="section-title">Stock Movement Summary</h2>
+            <div style="border-top: 1px solid #e3e3e3;">
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>SALE</span><span>39 units</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>RETURN</span><span>2 units</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>RECEIVING</span><span>60 units</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>ADJUSTMENT</span><span>2 units</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e3e3e3; font-size: 14px;"><span>TRANSFER</span><span>20 units</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Page -->
+      <div id="page-settings" class="page">
+        <h1 style="font-family: 'Instrument Serif', serif; font-weight: 400; font-size: 24px; margin-bottom: 4px;">Settings</h1>
+        <p style="color: #6d7175; font-size: 13px; margin-bottom: 20px;">Configure your store preferences</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <h2 class="section-title">General Settings</h2>
+            <div class="form-row"><span class="form-label">Store Name</span><input type="text" class="form-input" value="Alpine Gear Co." readonly></div>
+            <div class="form-row"><span class="form-label">Currency</span><select class="form-select"><option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option></select></div>
+            <div class="form-row"><span class="form-label">Timezone</span><select class="form-select"><option>America/Los_Angeles</option><option>America/New_York</option><option>Europe/London</option></select></div>
+          </div>
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <h2 class="section-title">Alert Thresholds</h2>
+            <div class="form-row"><span class="form-label">Low Stock Threshold</span><input type="number" class="form-input" value="10" style="width: 80px; text-align: right;"></div>
+            <div class="form-row"><span class="form-label">Critical Stock Threshold</span><input type="number" class="form-input" value="3" style="width: 80px; text-align: right;"></div>
+            <div class="form-row"><span class="form-label">Forecast Horizon (days)</span><input type="number" class="form-input" value="30" style="width: 80px; text-align: right;"></div>
+          </div>
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <h2 class="section-title">Notifications</h2>
+            <div class="form-row"><span class="form-label">Email Alerts</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="form-row"><span class="form-label">Slack Integration</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+            <div class="form-row"><span class="form-label">SMS Alerts</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+          <div style="background: #fff; border: 1px solid #e3e3e3; padding: 20px;">
+            <h2 class="section-title">AI Features</h2>
+            <div class="form-row"><span class="form-label">AI Insights</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="form-row"><span class="form-label">Forecast Explanations</span><div class="toggle on" onclick="this.classList.toggle('on')"></div></div>
+            <div class="form-row"><span class="form-label">Auto Reorder</span><div class="toggle" onclick="this.classList.toggle('on')"></div></div>
+          </div>
+        </div>
+        <div style="margin-top: 20px; text-align: right;"><button class="btn btn-primary">Save Settings</button></div>
+      </div>
+    </div>
   </div>
-  <div id="PolarisPortalsContainer"></div>
+
+  <script>
+    function showPage(page) {
+      // Hide all pages
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      // Show selected page
+      document.getElementById('page-' + page).classList.add('active');
+      // Update nav active state
+      document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('nav-item-active');
+        link.style.borderLeftColor = 'transparent';
+      });
+      event.target.closest('.nav-link').classList.add('nav-item-active');
+      event.target.closest('.nav-link').style.borderLeftColor = 'var(--p-color-border-brand, #303030)';
+    }
+  </script>
 </body>
 </html>
