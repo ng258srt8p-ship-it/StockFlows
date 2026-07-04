@@ -80,7 +80,12 @@ test.describe("Pixel-Perfect Comparison: Demo vs Shopify App", () => {
 
   test("7. Stat card count matches", async () => {
     const shopifyStats = await shopifyPage.locator('.Polaris-ShadowBevel').count();
-    const demoStats = await demoPage.locator('.Polaris-ShadowBevel').count();
+    const demoStats = await demoPage.evaluate(() => {
+      // Count all ShadowBevel elements in the dashboard page
+      const dashboard = document.getElementById('page-dashboard');
+      if (!dashboard) return 0;
+      return dashboard.querySelectorAll('.Polaris-ShadowBevel').length;
+    });
     console.log("Shopify stat cards:", shopifyStats);
     console.log("Demo stat cards:", demoStats);
     expect(demoStats).toBe(shopifyStats);
@@ -135,7 +140,10 @@ test.describe("Pixel-Perfect Comparison: Demo vs Shopify App", () => {
       return Array.from(h2s).map(h => h.textContent?.trim());
     });
     const demoActivity = await demoPage.evaluate(() => {
-      const h2s = document.querySelectorAll('h2');
+      // Only get h2 elements from the dashboard page
+      const dashboard = document.getElementById('page-dashboard');
+      if (!dashboard) return [];
+      const h2s = dashboard.querySelectorAll('h2');
       return Array.from(h2s).map(h => h.textContent?.trim());
     });
     console.log("Shopify activity:", shopifyActivity);
