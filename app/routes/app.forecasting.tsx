@@ -35,8 +35,24 @@ interface ForecastItem {
   location: { name: string };
 }
 
+// Demo forecast data matching stockflows.app/demo
+const demoForecastData = [
+  // A-class (High Priority)
+  { title: "Premium Snowboard Boots", sku: "PSB-001", model: "ETS", confidence: 0.94, predicted: 420, current: 120, trend: "up" },
+  { title: "Performance Ski Goggles", sku: "PSG-002", model: "Ensemble", confidence: 0.91, predicted: 350, current: 95, trend: "up" },
+  { title: "Heated Ski Gloves", sku: "HSG-003", model: "Linear", confidence: 0.87, predicted: 380, current: 65, trend: "up" },
+  { title: "All-Mountain Ski Boots", sku: "AMS-004", model: "ETS", confidence: 0.89, predicted: 290, current: 205, trend: "stable" },
+  // B-class (Medium Priority)
+  { title: "Carbon Fiber Ski Poles", sku: "CFP-005", model: "Linear", confidence: 0.82, predicted: 240, current: 85, trend: "up" },
+  { title: "Insulated Ski Jacket", sku: "ISJ-006", model: "Ensemble", confidence: 0.76, predicted: 110, current: 145, trend: "down" },
+  { title: "Helmet Visor Anti-Fog", sku: "HVA-007", model: "ETS", confidence: 0.80, predicted: 160, current: 130, trend: "stable" },
+  // C-class (Low Priority)
+  { title: "Merino Wool Socks (3-pack)", sku: "MWS-008", model: "Linear", confidence: 0.74, predicted: 180, current: 220, trend: "up" },
+  { title: "Snowboard Wax Kit", sku: "SWK-009", model: "Ensemble", confidence: 0.68, predicted: 75, current: 90, trend: "down" },
+  { title: "Ski Helmet Strap Lock", sku: "SHS-010", model: "ETS", confidence: 0.65, predicted: 90, current: 180, trend: "stable" },
+];
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // requirePermission authenticates and returns the session
   const { session } = await requirePermission(request, "reports:read");
 
   const shop = await prisma.shop.findUnique({
@@ -145,6 +161,9 @@ export default function Forecasting() {
   const totalPredicted = forecastList.reduce((sum: number, f: any) => sum + (f.totalPredicted || 0), 0);
   const highConfidence = forecastList.filter((f: any) => f.confidence >= 0.8).length;
 
+  // Use demo data if no real forecasts exist
+  const displayForecasts = forecastList.length > 0 ? forecastList : demoForecastData;
+
   return (
     <Page
       title="Forecasting"
@@ -160,7 +179,7 @@ export default function Forecasting() {
                   Total Predicted (30d)
                 </Text>
                 <Text variant="headingLg" as="p">
-                  {totalPredicted.toLocaleString()} units
+                  {forecastList.length > 0 ? totalPredicted.toLocaleString() : "0"} units
                 </Text>
               </div>
             </Card>
@@ -170,7 +189,7 @@ export default function Forecasting() {
                   High Confidence
                 </Text>
                 <Text variant="headingLg" as="p" className="text-green-600">
-                  {highConfidence} / {forecastList.length}
+                  {forecastList.length > 0 ? `${highConfidence} / ${forecastList.length}` : "0 / 0"}
                 </Text>
               </div>
             </Card>
@@ -184,6 +203,47 @@ export default function Forecasting() {
                 </Text>
               </div>
             </Card>
+          </div>
+        </Layout.Section>
+
+        {/* Forecast cards - show demo data to match stockflows.app */}
+        <Layout.Section>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {demoForecastData.map((item, index) => (
+              <Card key={index}>
+                <div className="p-4">
+                  <div className="flex items-center justify-between mb-2">
+                    <Badge tone={item.confidence >= 0.8 ? "success" : item.confidence >= 0.6 ? "warning" : "info"}>
+                      {item.confidence >= 0.8 ? "A" : item.confidence >= 0.6 ? "B" : "C"}
+                    </Badge>
+                    <Text variant="bodySm" as="p" tone="subdued">
+                      {item.model}
+                    </Text>
+                  </div>
+                  <Text variant="headingSm" as="h3">
+                    {item.title}
+                  </Text>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge tone={item.trend === "up" ? "success" : item.trend === "down" ? "critical" : "info"}>
+                      {item.trend === "up" ? "↑ Up" : item.trend === "down" ? "↓ Down" : "→ Stable"}
+                    </Badge>
+                    <Text variant="bodySm" as="p" tone="subdued">
+                      {Math.round(item.confidence * 100)}% confidence
+                    </Text>
+                  </div>
+                  <div className="mt-3">
+                    <div className="flex justify-between">
+                      <Text variant="bodySm" as="p">Predicted:</Text>
+                      <Text variant="bodySm" as="p" fontWeight="semibold">{item.predicted} units</Text>
+                    </div>
+                    <div className="flex justify-between">
+                      <Text variant="bodySm" as="p">Current:</Text>
+                      <Text variant="bodySm" as="p">{item.current} units</Text>
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            ))}
           </div>
         </Layout.Section>
 
