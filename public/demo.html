@@ -32,6 +32,22 @@
     }
     function toggle(el) { el.classList.toggle('Polaris-Switch--on'); }
   </script>
+
+  <style>
+    /* Override Polaris hover effects */
+    .Polaris-Navigation__Item:hover {
+      background: transparent !important;
+    }
+    .Polaris-Navigation__ItemInnerWrapper:hover {
+      background: transparent !important;
+    }
+    .Polaris-Navigation__Item--selected {
+      background: var(--p-color-nav-bg-surface-active) !important;
+    }
+    .Polaris-Navigation__Item--selected:hover {
+      background: var(--p-color-nav-bg-surface-active) !important;
+    }
+  </style>
 </head>
 <body class="antialiased" style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; background-color: var(--p-color-bg); color: var(--p-color-text);">
   <div class="Polaris-Frame Polaris-Frame--hasNav" data-polaris-layer="true" data-has-navigation="true">
