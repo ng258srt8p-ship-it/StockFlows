@@ -1,4 +1,4 @@
-/* StockFlows Demo — Minimal overrides on top of Polaris */
+/* StockFlows Demo — Exact match to Shopify app */
 
 /* Shell Layout */
 .demo-shell {
@@ -7,33 +7,16 @@
   overflow: hidden;
 }
 
-/* Sidebar — override Polaris Navigation */
+/* Sidebar — exact match to Polaris Navigation */
 .demo-sidebar {
-  width: 215px;
-  background: var(--p-color-nav-bg, #ebebeb);
+  width: 240px;
+  background: transparent;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
-  border-right: var(--p-border-width-025) solid var(--p-color-border);
 }
 
-.demo-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 16px 20px;
-  font-size: var(--p-font-size-300);
-  font-weight: var(--p-font-weight-semibold);
-  color: var(--p-color-text);
-  border-bottom: var(--p-border-width-025) solid var(--p-color-border);
-}
-
-.demo-logo img {
-  width: 24px;
-  height: 24px;
-}
-
-/* Navigation */
+/* Navigation — exact match to Polaris */
 .demo-nav {
   flex: 1;
   padding: var(--p-space-100) 0;
@@ -47,8 +30,8 @@
   padding: 8px 20px;
   color: var(--p-color-text);
   text-decoration: none;
-  font-size: var(--p-font-size-300);
-  font-weight: var(--p-font-weight-medium);
+  font-size: var(--p-font-size-350);
+  font-weight: var(--p-font-weight-regular);
   transition: all 0.15s;
   border-left: 3px solid transparent;
 }
@@ -58,7 +41,7 @@
 }
 
 .demo-nav-item.active {
-  font-weight: var(--p-font-weight-semibold);
+  font-weight: var(--p-font-weight-bold);
   background: var(--p-color-nav-bg-surface-active);
   border-left-color: var(--p-color-border-brand);
 }
@@ -120,6 +103,7 @@
 .demo-header h1 {
   font-size: var(--p-font-size-750);
   font-weight: var(--p-font-weight-bold);
+  font-family: "Instrument Serif", Georgia, "Times New Roman", serif;
   color: var(--p-color-text);
   margin-bottom: 2px;
 }
@@ -146,13 +130,14 @@
 .demo-stat-card {
   background: var(--p-color-bg-surface);
   border-radius: var(--p-border-radius-200);
-  padding: var(--p-space-300);
+  padding: var(--p-space-400);
   box-shadow: var(--p-shadow-100);
   border: var(--p-border-width-025) solid var(--p-color-border);
 }
 
 .demo-stat-label {
   font-size: var(--p-font-size-300);
+  font-weight: var(--p-font-weight-semibold);
   color: var(--p-color-text-secondary);
   margin-bottom: var(--p-space-100);
 }
@@ -178,7 +163,7 @@
 }
 
 .demo-card h3 {
-  font-size: var(--p-font-size-350);
+  font-size: var(--p-font-size-400);
   font-weight: var(--p-font-weight-semibold);
   color: var(--p-color-text);
   margin-bottom: var(--p-space-300);
@@ -206,9 +191,9 @@
 }
 
 .demo-table th {
-  padding: var(--p-space-150);
+  padding: var(--p-space-200);
   text-align: left;
-  font-size: var(--p-font-size-300);
+  font-size: var(--p-font-size-275);
   font-weight: var(--p-font-weight-semibold);
   color: var(--p-color-text-secondary);
   background: var(--p-color-bg);
@@ -216,7 +201,7 @@
 }
 
 .demo-table td {
-  padding: var(--p-space-150);
+  padding: var(--p-space-200);
   font-size: var(--p-font-size-300);
   border-bottom: var(--p-border-width-025) solid var(--p-color-border);
   color: var(--p-color-text);
@@ -230,10 +215,10 @@
 .demo-status {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
+  padding: 2px 10px;
   font-size: 12px;
   font-weight: var(--p-font-weight-medium);
-  border-radius: var(--p-border-radius-100);
+  border-radius: var(--p-border-radius-200);
 }
 
 .demo-status.in-stock {
