@@ -13,529 +13,247 @@
   <link rel="stylesheet" href="tailwind-styles.css">
   <link rel="stylesheet" href="demo.css">
 </head>
-<body>
-  <div class="demo-shell">
-    <!-- Sidebar -->
-    <aside class="demo-sidebar">
-      <div class="demo-logo">
-        <img src="/SF icon.svg" alt="StockFlows" width="20" height="20">
-        <span>StockFlows</span>
-      </div>
-      <nav class="demo-nav">
-        <a href="#" class="demo-nav-item active" data-page="dashboard">
-          <span class="material-symbols-outlined">dashboard</span>
-          <span>Dashboard</span>
-        </a>
-        <a href="#" class="demo-nav-item" data-page="inventory">
-          <span class="material-symbols-outlined">inventory_2</span>
-          <span>Inventory</span>
-        </a>
-        <a href="#" class="demo-nav-item" data-page="purchasing">
-          <span class="material-symbols-outlined">shopping_cart</span>
-          <span>Purchasing</span>
-        </a>
-        <a href="#" class="demo-nav-item" data-page="forecasting">
-          <span class="material-symbols-outlined">monitoring</span>
-          <span>Forecasting</span>
-        </a>
-        <a href="#" class="demo-nav-item" data-page="reports">
-          <span class="material-symbols-outlined">analytics</span>
-          <span>Reports</span>
-        </a>
-        <a href="#" class="demo-nav-item" data-page="settings">
-          <span class="material-symbols-outlined">settings</span>
-          <span>Settings</span>
-        </a>
-      </nav>
-      <div class="demo-sidebar-footer">
-        <div class="demo-badge">DEMO</div>
-        <a href="/" class="demo-back-link">← Back to Site</a>
-      </div>
-    </aside>
-
-    <!-- Main Content -->
-    <main class="demo-main">
-      <!-- Dashboard Page -->
-      <div class="demo-page active" id="page-dashboard">
-        <div class="demo-header">
-          <h1>StockFlows Dashboard</h1>
-          <p class="demo-subtitle">Inventory overview</p>
-        </div>
-        <div class="demo-stats" id="dashboard-stats"></div>
-        <div class="demo-grid">
-          <div class="demo-card">
-            <h3>Recent Activity</h3>
-            <div id="recent-activity"></div>
+<body class="antialiased" style="font-family:'Inter', -apple-system, BlinkMacSystemFont, sans-serif;background-color:#fafafa">
+  <div class="Polaris-Frame Polaris-Frame--hasNav" data-polaris-layer="true" data-has-navigation="true">
+    <div class="Polaris-Frame__Skip">
+      <a href="#AppFrameMain">
+        <span class="Polaris-Text--root Polaris-Text--bodyLg Polaris-Text--medium"></span>
+      </a>
+    </div>
+    <div>
+      <div class="Polaris-Frame__Navigation" id="AppFrameNav">
+        <nav class="Polaris-Navigation">
+          <div class="Polaris-Navigation__PrimaryNavigation Polaris-Scrollable Polaris-Scrollable--vertical Polaris-Scrollable--horizontal Polaris-Scrollable--scrollbarWidthThin" data-polaris-scrollable="true">
+            <ul class="Polaris-Navigation__Section">
+              <li class="Polaris-Navigation__ListItem">
+                <div class="Polaris-Navigation__ItemWrapper">
+                  <div class="Polaris-Navigation__ItemInnerWrapper Polaris-Navigation__ItemInnerWrapper--selected">
+                    <a class="Polaris-Navigation__Item Polaris-Navigation__Item--selected Polaris-Navigation--subNavigationActive" tabindex="0" href="#dashboard" data-polaris-unstyled="true">
+                      <div class="Polaris-Navigation__Icon">
+                        <span class="Polaris-Icon">
+                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M8.344 3.692a2.25 2.25 0 0 1 3.312 0l3.854 4.19a3.75 3.75 0 0 1 .99 2.538v3.33a2.75 2.75 0 0 1-2.75 2.75h-1.75a1.5 1.5 0 0 1-1.5-1.5v-2h-1v2a1.5 1.5 0 0 1-1.5 1.5h-1.75a2.75 2.75 0 0 1-2.75-2.75v-3.33c0-.94.353-1.847.99-2.539l3.854-4.189Zm2.208 1.016a.75.75 0 0 0-1.104 0l-3.854 4.189a2.25 2.25 0 0 0-.594 1.523v3.33c0 .69.56 1.25 1.25 1.25h1.75v-2a1.5 1.5 0 0 1 1.5-1.5h1a1.5 1.5 0 0 1 1.5 1.5v2h1.75c.69 0 1.25-.56 1.25-1.25v-3.33a2.25 2.25 0 0 0-.594-1.523l-3.854-4.19Z"></path></svg>
+                        </span>
+                      </div>
+                      <span class="Polaris-Navigation__Text">
+                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--semibold">Dashboard</span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+              <li class="Polaris-Navigation__ListItem">
+                <div class="Polaris-Navigation__ItemWrapper">
+                  <div class="Polaris-Navigation__ItemInnerWrapper">
+                    <a class="Polaris-Navigation__Item" tabindex="0" href="#inventory" data-polaris-unstyled="true">
+                      <div class="Polaris-Navigation__Icon">
+                        <span class="Polaris-Icon">
+                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M7 9a1 1 0 0 0-1 1v3a1 1 0 0 0 1 1h4a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-4Zm.5 3.5v-2h3v2h-3Z"></path><path fill-rule="evenodd" d="M5.315 4.45a2.25 2.25 0 0 1 1.836-.95h5.796a2.25 2.25 0 0 1 1.872 1.002l1.22 1.828c.3.452.461.983.461 1.526v6.894a1.75 1.75 0 0 1-1.75 1.75h-9.5a1.75 1.75 0 0 1-1.75-1.75v-6.863c0-.57.177-1.125.506-1.59l1.309-1.848Zm1.836.55a.75.75 0 0 0-.612.316l-.839 1.184h3.55v-1.5h-2.1Zm3.599 1.5h3.599l-.778-1.166a.75.75 0 0 0-.624-.334h-2.197v1.5Zm4.25 1.5h-10v6.75c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25v-6.75Z"></path></svg>
+                        </span>
+                      </div>
+                      <span class="Polaris-Navigation__Text">
+                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Inventory</span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+              <li class="Polaris-Navigation__ListItem">
+                <div class="Polaris-Navigation__ItemWrapper">
+                  <div class="Polaris-Navigation__ItemInnerWrapper">
+                    <a class="Polaris-Navigation__Item" tabindex="0" href="#purchasing" data-polaris-unstyled="true">
+                      <div class="Polaris-Navigation__Icon">
+                        <span class="Polaris-Icon">
+                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M2.5 3.75a.75.75 0 0 1 .75-.75h1.612a1.75 1.75 0 0 1 1.732 1.5h9.656a.75.75 0 0 1 .748.808l-.358 4.653a2.75 2.75 0 0 1-2.742 2.539h-6.351l.093.78a.25.25 0 0 0 .248.22h6.362a.75.75 0 0 1 0 1.5h-6.362a1.75 1.75 0 0 1-1.738-1.543l-1.04-8.737a.25.25 0 0 0-.248-.22h-1.612a.75.75 0 0 1-.75-.75Zm4.868 7.25h6.53a1.25 1.25 0 0 0 1.246-1.154l.296-3.846h-8.667l.595 5Z"></path><path d="M10 17a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path><path d="M15 17a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path></svg>
+                        </span>
+                      </div>
+                      <span class="Polaris-Navigation__Text">
+                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Purchasing</span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+              <li class="Polaris-Navigation__ListItem">
+                <div class="Polaris-Navigation__ItemWrapper">
+                  <div class="Polaris-Navigation__ItemInnerWrapper">
+                    <a class="Polaris-Navigation__Item" tabindex="0" href="#forecasting" data-polaris-unstyled="true">
+                      <div class="Polaris-Navigation__Icon">
+                        <span class="Polaris-Icon">
+                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M6.515 4.75a2 2 0 0 1 1.985-1.75h3a2 2 0 0 1 1.985 1.75h.265a2.25 2.25 0 0 1 2.25 2.25v7.75a2.25 2.25 0 0 1-2.25 2.25h-7.5a2.25 2.25 0 0 1-2.25-2.25v-7.75a2.25 2.25 0 0 1 2.25-2.25h.265Zm1.985-.25h3a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5Zm-1.987 1.73.002.02h-.265a.75.75 0 0 0-.75.75v7.75c0 .414.336.75.75.75h7.5a.75.75 0 0 0 .75-.75v-7.75a.75.75 0 0 0-.75-.75h-.265a2 2 0 0 1-1.985 1.75h-3a2 2 0 0 1-1.987-1.77Z"></path></svg>
+                        </span>
+                      </div>
+                      <span class="Polaris-Navigation__Text">
+                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Forecasting</span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+              <li class="Polaris-Navigation__ListItem">
+                <div class="Polaris-Navigation__ItemWrapper">
+                  <div class="Polaris-Navigation__ItemInnerWrapper">
+                    <a class="Polaris-Navigation__Item" tabindex="0" href="#reports" data-polaris-unstyled="true">
+                      <div class="Polaris-Navigation__Icon">
+                        <span class="Polaris-Icon">
+                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M9.952 3.5h.096c.182 0 .371 0 .543.034a1.75 1.75 0 0 1 1.375 1.375c.035.172.034.361.034.543v9.096c0 .182 0 .371-.034.543a1.75 1.75 0 0 1-1.375 1.376 2.825 2.825 0 0 1-.543.033h-.096c-.182 0-.371 0-.543-.034a1.75 1.75 0 0 1-1.375-1.375 2.824 2.824 0 0 1-.034-.543v-9.096c0-.182 0-.371.034-.543a1.75 1.75 0 0 1 1.375-1.375c.172-.035.361-.034.543-.034Zm-.253 1.505a.25.25 0 0 0-.194.194 8.217 8.217 0 0 0-.005.3v9.001a8.221 8.221 0 0 0 .005.3.25.25 0 0 0 .194.195l.053.003c.055.002.127.002.248.002s.193 0 .248-.002l.053-.003a.25.25 0 0 0 .194-.194l.003-.053a8.05 8.05 0 0 0 .002-.248v-9a8.046 8.046 0 0 0-.005-.3.25.25 0 0 0-.194-.195 8.217 8.217 0 0 0-.3-.005 8.216 8.216 0 0 0-.302.005Z"></path><path fill-rule="evenodd" d="M5.452 9h.096c.182 0 .371 0 .543.034a1.75 1.75 0 0 1 1.375 1.375c.035.172.034.361.034.543v3.596c0 .182 0 .371-.034.543a1.75 1.75 0 0 1-1.375 1.376 2.825 2.825 0 0 1-.543.033h-.096c-.182 0-.371 0-.543-.034a1.75 1.75 0 0 1-1.375-1.375 2.824 2.824 0 0 1-.034-.543v-3.596c0-.182 0-.371.034-.543a1.75 1.75 0 0 1 1.375-1.375c.172-.035.361-.034.543-.034Zm-.253 1.505a.25.25 0 0 0-.194.194 8.217 8.217 0 0 0-.005.3v3.501a8.221 8.221 0 0 0 .005.3.25.25 0 0 0 .194.195l.053.003c.055.002.127.002.248.002s.193 0 .248-.002l.053-.003a.25.25 0 0 0 .194-.194l.003-.053a8.05 8.05 0 0 0 .002-.248v-3.5a8.208 8.208 0 0 0-.005-.3.25.25 0 0 0-.194-.195 8.045 8.045 0 0 0-.3-.005 8.045 8.045 0 0 0-.302.005Z"></path><path fill-rule="evenodd" d="M14.5 6h-.048c-.182 0-.371 0-.543.034a1.75 1.75 0 0 0-1.375 1.375 2.825 2.825 0 0 0-.034.543v6.596c0 .182 0 .371.034.543a1.75 1.75 0 0 0 1.375 1.376c.172.034.361.033.543.033h.096c.182 0 .371 0 .543-.034a1.75 1.75 0 0 0 1.375-1.375c.035-.172.034-.36.034-.543v-6.596c0-.182 0-.371-.034-.543a1.75 1.75 0 0 0-1.375-1.375c-.172-.035-.361-.034-.543-.034h-.048Zm-.495 1.7a.25.25 0 0 1 .194-.195 8.221 8.221 0 0 1 .3-.005 8.217 8.217 0 0 1 .302.005.25.25 0 0 1 .194.194l.003.053c.002.055.002.127.002.248v6.5a8.05 8.05 0 0 1-.005.3.25.25 0 0 1-.194.195l-.053.003a8.046 8.046 0 0 1-.248.002c-.121 0-.193 0-.248-.002l-.053-.003a.25.25 0 0 1-.194-.194l-.003-.053a8.05 8.05 0 0 1-.002-.248v-6.5c0-.121 0-.193.002-.248l.003-.053v.002-.002Z"></path></svg>
+                        </span>
+                      </div>
+                      <span class="Polaris-Navigation__Text">
+                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Reports</span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            </ul>
+            <ul class="Polaris-Navigation__Section">
+              <li class="Polaris-Navigation__ListItem">
+                <div class="Polaris-Navigation__ItemWrapper">
+                  <div class="Polaris-Navigation__ItemInnerWrapper">
+                    <a class="Polaris-Navigation__Item" tabindex="0" href="#settings" data-polaris-unstyled="true">
+                      <div class="Polaris-Navigation__Icon">
+                        <span class="Polaris-Icon">
+                          <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path fill-rule="evenodd" d="M12.5 10a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Zm-1.5 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0Z"></path><path fill-rule="evenodd" d="M9.377 2.5c-.926 0-1.676.75-1.676 1.676v.688c0 .056-.043.17-.198.251-.153.08-.303.168-.448.262-.147.097-.268.076-.318.048l-.6-.346a1.676 1.676 0 0 0-2.29.613l-.622 1.08a1.676 1.676 0 0 0 .613 2.289l.648.374c.048.028.124.12.119.29a5.484 5.484 0 0 0 .005.465c.009.175-.07.27-.119.299l-.653.377a1.676 1.676 0 0 0-.613 2.29l.623 1.08a1.676 1.676 0 0 0 2.29.613l.7-.405c.048-.028.166-.048.312.043.115.071.233.139.353.202.155.08.198.195.198.251v.811c0 .926.75 1.676 1.676 1.676h1.246c.926 0 1.676-.75 1.676-1.676v-.81c0-.057.042-.171.197-.252.121-.063.239-.13.354-.202.146-.091.264-.07.312-.043l.7.405a1.676 1.676 0 0 0 2.29-.614l.623-1.08a1.676 1.676 0 0 0-.613-2.289l-.653-.377c-.05-.029-.128-.123-.119-.3a5.494 5.494 0 0 0 .005-.463c-.005-.171.07-.263.12-.291l.647-.374a1.676 1.676 0 0 0 .613-2.29l-.623-1.079a1.676 1.676 0 0 0-2.29-.613l-.6.346c-.049.028-.17.048-.318-.048a5.4 5.4 0 0 0-.448-.262c-.155-.081-.197-.195-.197-.251v-.688c0-.926-.75-1.676-1.676-1.676h-1.246Zm-.176 1.676c0-.097.078-.176.176-.176h1.246c.097 0 .176.079.176.176v.688c0 .728.462 1.298 1.003 1.58.11.058.219.122.323.19.517.337 1.25.458 1.888.09l.6-.346a.176.176 0 0 1 .24.064l.623 1.08a.176.176 0 0 1-.064.24l-.648.374c-.623.36-.888 1.034-.868 1.638a4.184 4.184 0 0 1-.004.337c-.032.615.23 1.31.867 1.677l.653.377a.176.176 0 0 1 .064.24l-.623 1.08a.176.176 0 0 1-.24.065l-.701-.405c-.624-.36-1.341-.251-1.855.069a3.91 3.91 0 0 1-.255.145c-.54.283-1.003.853-1.003 1.581v.811a.176.176 0 0 1-.176.176h-1.246a.176.176 0 0 1-.176-.176v-.81c0-.73-.462-1.3-1.003-1.582a3.873 3.873 0 0 1-.255-.146c-.514-.32-1.23-.428-1.855-.068l-.7.405a.176.176 0 0 1-.241-.065l-.623-1.08a.176.176 0 0 1 .064-.24l.653-.377c.637-.368.899-1.062.867-1.677a3.97 3.97 0 0 1-.004-.337c.02-.604-.245-1.278-.868-1.638l-.648-.374a.176.176 0 0 1-.064-.24l.623-1.08a.176.176 0 0 1 .24-.064l.6.346c.638.368 1.37.247 1.888-.09a3.85 3.85 0 0 1 .323-.19c.54-.282 1.003-.852 1.003-1.58v-.688Z"></path></svg>
+                        </span>
+                      </div>
+                      <span class="Polaris-Navigation__Text">
+                        <span class="Polaris-Text--root Polaris-Text--bodyMd Polaris-Text--medium">Settings</span>
+                      </span>
+                    </a>
+                  </div>
+                </div>
+              </li>
+            </ul>
           </div>
-          <div class="demo-card">
-            <h3>Low Stock Alerts</h3>
-            <div id="low-stock-alerts"></div>
-          </div>
-        </div>
+        </nav>
+        <button type="button" class="Polaris-Frame__NavigationDismiss" aria-hidden="true" aria-label="" tabindex="-1">
+          <span class="Polaris-Icon">
+            <svg viewBox="0 0 20 20" class="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M12.72 13.78a.75.75 0 1 0 1.06-1.06l-2.72-2.72 2.72-2.72a.75.75 0 0 0-1.06-1.06l-2.72 2.72-2.72-2.72a.75.75 0 0 0-1.06 1.06l2.72 2.72-2.72 2.72a.75.75 0 1 0 1.06 1.06l2.72-2.72 2.72 2.72Z"></path></svg>
+          </span>
+        </button>
       </div>
-
-      <!-- Inventory Page -->
-      <div class="demo-page" id="page-inventory">
-        <div class="demo-header">
-          <h1>Inventory</h1>
-          <div class="demo-header-actions">
-            <input type="text" class="demo-search" id="inventory-search" placeholder="Search products...">
-            <select class="demo-select" id="location-filter">
-              <option value="all">All Locations</option>
-            </select>
-          </div>
-        </div>
-        <div class="demo-table-wrap">
-          <table class="demo-table" id="inventory-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>SKU</th>
-                <th>Location</th>
-                <th>Qty</th>
-                <th>Reorder Pt</th>
-                <th>Status</th>
-                <th>Value</th>
-              </tr>
-            </thead>
-            <tbody id="inventory-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Purchasing Page -->
-      <div class="demo-page" id="page-purchasing">
-        <div class="demo-header">
-          <h1>Purchase Orders</h1>
-          <button class="demo-btn demo-btn-primary" id="btn-new-po">+ New PO</button>
-        </div>
-        <div class="demo-table-wrap">
-          <table class="demo-table" id="po-table">
-            <thead>
-              <tr>
-                <th>PO Number</th>
-                <th>Vendor</th>
-                <th>Status</th>
-                <th>Items</th>
-                <th>Total</th>
-                <th>Expected</th>
-              </tr>
-            </thead>
-            <tbody id="po-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Forecasting Page -->
-      <div class="demo-page" id="page-forecasting">
-        <div class="demo-header">
-          <h1>Demand Forecasting</h1>
-          <p class="demo-subtitle">30-day predictions powered by AI</p>
-        </div>
-        <div class="demo-grid" id="forecast-cards"></div>
-      </div>
-
-      <!-- Reports Page -->
-      <div class="demo-page" id="page-reports">
-        <div class="demo-header">
-          <h1>Reports</h1>
-          <div class="demo-header-actions">
-            <button class="demo-btn">Export CSV</button>
-            <button class="demo-btn">Generate PDF</button>
-          </div>
-        </div>
-        <div class="demo-grid">
-          <div class="demo-card">
-            <h3>Inventory Valuation</h3>
-            <div id="valuation-report"></div>
-          </div>
-          <div class="demo-card">
-            <h3>Stock Movement Summary</h3>
-            <div id="movement-report"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Settings Page -->
-      <div class="demo-page" id="page-settings">
-        <div class="demo-header">
-          <h1>Settings</h1>
-          <p class="demo-subtitle">Configure your store preferences</p>
-        </div>
-        <div class="demo-grid">
-          <div class="demo-card">
-            <h3>General Settings</h3>
-            <div class="demo-settings-group">
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Store Name</span>
-                <input type="text" class="demo-input" value="Alpine Gear Co." readonly>
-              </div>
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Currency</span>
-                <select class="demo-select"><option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option></select>
-              </div>
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Timezone</span>
-                <select class="demo-select"><option>America/Los_Angeles</option><option>America/New_York</option><option>Europe/London</option></select>
+    </div>
+    <div class="Polaris-Frame__ContextualSaveBar Polaris-Frame-CSSAnimation--startFade"></div>
+    <main class="Polaris-Frame__Main" id="AppFrameMain" data-has-global-ribbon="false">
+      <div class="Polaris-Frame__Content">
+        <div class="Polaris-Page">
+          <div class="Polaris-Box" style="--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-start-md:var(--p-space-600);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-block-end-md:var(--p-space-600);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-start-sm:var(--p-space-0);--pc-box-padding-inline-end-xs:var(--p-space-400);--pc-box-padding-inline-end-sm:var(--p-space-0);position:relative">
+            <div role="status">
+              <p class="Polaris-Text--root Polaris-Text--visuallyHidden"></p>
+            </div>
+            <div class="Polaris-Page-Header--isSingleRow Polaris-Page-Header--noBreadcrumbs Polaris-Page-Header--mediumTitle">
+              <div class="Polaris-Page-Header__Row">
+                <div class="Polaris-Page-Header__TitleWrapper Polaris-Page-Header__TitleWrapperExpand">
+                  <div class="Polaris-Header-Title__TitleWrapper">
+                    <h1 class="Polaris-Header-Title Polaris-Header-Title__TitleWithSubtitle">
+                      <span class="Polaris-Text--root Polaris-Text--headingLg Polaris-Text--bold">StockFlows Dashboard</span>
+                    </h1>
+                  </div>
+                  <div class="Polaris-Header-Title__SubTitle">
+                    <p class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--subdued">Inventory overview</p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="demo-card">
-            <h3>Alert Thresholds</h3>
-            <div class="demo-settings-group">
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Low Stock Threshold</span>
-                <input type="number" class="demo-input demo-input-sm" value="10">
+          <div class="">
+            <div class="Polaris-Layout">
+              <div class="Polaris-Layout__Section">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <!-- Stat Card 1: Total SKUs -->
+                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
+                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
+                      <div class="p-4">
+                        <h3 class="Polaris-Text--root Polaris-Text--headingSm">Total SKUs</h3>
+                        <p class="Polaris-Text--root Polaris-Text--headingLg">26</p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Stat Card 2: Low Stock -->
+                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
+                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
+                      <div class="p-4">
+                        <h3 class="Polaris-Text--root Polaris-Text--headingSm">Low Stock</h3>
+                        <p class="Polaris-Text--root Polaris-Text--headingLg">9</p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Stat Card 3: Out of Stock -->
+                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
+                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
+                      <div class="p-4">
+                        <h3 class="Polaris-Text--root Polaris-Text--headingSm">Out of Stock</h3>
+                        <p class="Polaris-Text--root Polaris-Text--headingLg">6</p>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Stat Card 4: Inventory Value -->
+                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
+                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
+                      <div class="p-4">
+                        <h3 class="Polaris-Text--root Polaris-Text--headingSm">Inventory Value</h3>
+                        <p class="Polaris-Text--root Polaris-Text--headingLg">$0</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Critical Stock Threshold</span>
-                <input type="number" class="demo-input demo-input-sm" value="3">
-              </div>
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Forecast Horizon (days)</span>
-                <input type="number" class="demo-input demo-input-sm" value="30">
+              <div class="Polaris-Layout__Section">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <!-- Active Alerts -->
+                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
+                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
+                      <div class="flex items-center justify-between mb-2">
+                        <h2 class="Polaris-Text--root Polaris-Text--headingMd">Active Alerts</h2>
+                        <span class="Polaris-Badge">
+                          <span class="Polaris-Text--root Polaris-Text--bodySm">0</span>
+                        </span>
+                      </div>
+                      <div class="Polaris-Box" style="--pc-box-padding-block-start-xs:var(--p-space-500);--pc-box-padding-block-end-xs:var(--p-space-1600);--pc-box-padding-inline-start-xs:var(--p-space-0);--pc-box-padding-inline-end-xs:var(--p-space-0)">
+                        <div class="Polaris-BlockStack" style="--pc-block-stack-inline-align:center;--pc-block-stack-order:column">
+                          <div class="Polaris-EmptyState__ImageContainer Polaris-EmptyState__SkeletonImageContainer">
+                            <img alt="" src="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/empty-state.png" class="Polaris-EmptyState__Image" role="presentation"/>
+                            <div class="Polaris-EmptyState__SkeletonImage"></div>
+                          </div>
+                          <div class="Polaris-Box" style="--pc-box-max-width:400px">
+                            <div class="Polaris-BlockStack" style="--pc-block-stack-inline-align:center;--pc-block-stack-order:column">
+                              <div class="Polaris-Box" style="--pc-box-padding-block-end-xs:var(--p-space-400)">
+                                <div class="Polaris-Box" style="--pc-box-padding-block-end-xs:var(--p-space-150)">
+                                  <p class="Polaris-Text--root Polaris-Text--headingMd Polaris-Text--block Polaris-Text--center">No active alerts</p>
+                                </div>
+                                <span class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--block Polaris-Text--center">
+                                  <p>All stock levels are above their reorder points.</p>
+                                </span>
+                              </div>
+                              <div class="Polaris-InlineStack" style="--pc-inline-stack-align:center;--pc-inline-stack-wrap:wrap;--pc-inline-stack-gap-xs:var(--p-space-200);--pc-inline-stack-flex-direction-xs:row">
+                                <button class="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter" type="button">
+                                  <span class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--semibold">View inventory</span>
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <!-- Recent Activity -->
+                  <div class="Polaris-ShadowBevel" style="--pc-shadow-bevel-z-index:32;--pc-shadow-bevel-content-xs:"";--pc-shadow-bevel-box-shadow-xs:var(--p-shadow-100);--pc-shadow-bevel-border-radius-xs:var(--p-border-radius-0)">
+                    <div class="Polaris-Box" style="--pc-box-background:var(--p-color-bg-surface);--pc-box-min-height:100%;--pc-box-overflow-x:clip;--pc-box-overflow-y:clip;--pc-box-padding-block-start-xs:var(--p-space-400);--pc-box-padding-block-end-xs:var(--p-space-400);--pc-box-padding-inline-start-xs:var(--p-space-400);--pc-box-padding-inline-end-xs:var(--p-space-400)">
+                      <div class="flex items-center justify-between mb-2">
+                        <h2 class="Polaris-Text--root Polaris-Text--headingMd">Recent Activity</h2>
+                        <a class="text-sm text-blue-600 hover:underline" data-discover="true" href="#inventory">View all</a>
+                      </div>
+                      <p class="Polaris-Text--root Polaris-Text--bodySm Polaris-Text--subdued">No recent stock movements. Activity will appear here as inventory changes.</p>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
-          <div class="demo-card">
-            <h3>Notifications</h3>
-            <div class="demo-settings-group">
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Email Alerts</span>
-                <label class="demo-toggle"><input type="checkbox" checked><span class="demo-toggle-slider"></span></label>
-              </div>
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Slack Integration</span>
-                <label class="demo-toggle"><input type="checkbox"><span class="demo-toggle-slider"></span></label>
-              </div>
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">SMS Alerts</span>
-                <label class="demo-toggle"><input type="checkbox"><span class="demo-toggle-slider"></span></label>
-              </div>
-            </div>
-          </div>
-          <div class="demo-card">
-            <h3>AI Features</h3>
-            <div class="demo-settings-group">
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">AI Insights</span>
-                <label class="demo-toggle"><input type="checkbox" checked><span class="demo-toggle-slider"></span></label>
-              </div>
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Forecast Explanations</span>
-                <label class="demo-toggle"><input type="checkbox" checked><span class="demo-toggle-slider"></span></label>
-              </div>
-              <div class="demo-setting-row">
-                <span class="demo-setting-label">Auto Reorder</span>
-                <label class="demo-toggle"><input type="checkbox"><span class="demo-toggle-slider"></span></label>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div style="margin-top:24px;text-align:right">
-          <button class="demo-btn demo-btn-primary">Save Settings</button>
         </div>
       </div>
     </main>
   </div>
-
-  <!-- Tour Overlay -->
-  <div class="tour-overlay" id="tour-overlay" style="display:none">
-    <div class="tour-backdrop" id="tour-backdrop"></div>
-    <div class="tour-tooltip" id="tour-tooltip">
-      <div class="tour-header">
-        <span class="tour-step" id="tour-step">1/12</span>
-        <button class="tour-close" id="tour-close">×</button>
-      </div>
-      <h3 id="tour-title">Welcome</h3>
-      <p id="tour-message">Message here</p>
-      <div class="tour-nav">
-        <button class="demo-btn" id="tour-prev">← Previous</button>
-        <button class="demo-btn demo-btn-primary" id="tour-next">Next →</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Tour Start Button -->
-  <button class="tour-start-btn" id="tour-start-btn" title="Take Tour">
-    <span class="material-symbols-outlined">info</span>
-  </button>
-
-  <script>
-    window.DEMO_DATA = {
-      LOCATIONS: [
-        { id: "L1", name: "Main Warehouse", type: "WAREHOUSE" },
-        { id: "L2", name: "Retail Store #1", type: "RETAIL_STORE" }
-      ],
-      VENDORS: [
-        { id: "V1", name: "Pacific Rim Outfitters" },
-        { id: "V2", name: "Summit Textiles" },
-        { id: "V3", name: "Alloy Components" },
-        { id: "V4", name: "Trail Blazer Packaging" }
-      ],
-      PRODUCTS: [
-        { id: "P1", sku: "AG-TENT-001", title: "Alpine 4-Season Tent", cost: 289.00, variants: [
-          { id: "P1-V1", title: "Green / 2-Person", qty: 45, reorderPoint: 10 },
-          { id: "P1-V2", title: "Green / 4-Person", qty: 12, reorderPoint: 8 },
-          { id: "P1-V3", title: "Orange / 2-Person", qty: 28, reorderPoint: 10 },
-          { id: "P1-V4", title: "Orange / 4-Person", qty: 3, reorderPoint: 5 }
-        ]},
-        { id: "P2", sku: "AG-BAG-002", title: "Expedition Backpack 65L", cost: 89.50, variants: [
-          { id: "P2-V1", title: "Black", qty: 120, reorderPoint: 25 },
-          { id: "P2-V2", title: "Forest Green", qty: 85, reorderPoint: 25 },
-          { id: "P2-V3", title: "Burnt Orange", qty: 8, reorderPoint: 15 }
-        ]},
-        { id: "P3", sku: "AG-BOOTS-003", title: "Trailmaster GTX Boots", cost: 145.00, variants: [
-          { id: "P3-V1", title: "Black / Size 9", qty: 18, reorderPoint: 10 },
-          { id: "P3-V2", title: "Black / Size 10", qty: 22, reorderPoint: 10 },
-          { id: "P3-V3", title: "Black / Size 11", qty: 2, reorderPoint: 10 },
-          { id: "P3-V4", title: "Brown / Size 9", qty: 15, reorderPoint: 8 },
-          { id: "P3-V5", title: "Brown / Size 10", qty: 19, reorderPoint: 8 },
-          { id: "P3-V6", title: "Brown / Size 11", qty: 0, reorderPoint: 8 }
-        ]},
-        { id: "P4", sku: "AG-SLEEPING-004", title: "Down Sleeping Bag -10°C", cost: 178.00, variants: [
-          { id: "P4-V1", title: "Regular", qty: 34, reorderPoint: 12 },
-          { id: "P4-V2", title: "Long", qty: 6, reorderPoint: 8 }
-        ]},
-        { id: "P5", sku: "AG-LAMP-005", title: "Rechargeable Headlamp 900lm", cost: 32.00, variants: [
-          { id: "P5-V1", title: "Black", qty: 200, reorderPoint: 50 },
-          { id: "P5-V2", title: "Red", qty: 150, reorderPoint: 50 }
-        ]},
-        { id: "P6", sku: "AG-CLOTHING-006", title: "Merino Base Layer Set", cost: 67.00, variants: [
-          { id: "P6-V1", title: "Navy / S", qty: 40, reorderPoint: 15 },
-          { id: "P6-V2", title: "Navy / M", qty: 65, reorderPoint: 15 },
-          { id: "P6-V3", title: "Navy / L", qty: 55, reorderPoint: 15 },
-          { id: "P6-V4", title: "Charcoal / S", qty: 12, reorderPoint: 10 },
-          { id: "P6-V5", title: "Charcoal / M", qty: 38, reorderPoint: 10 },
-          { id: "P6-V6", title: "Charcoal / L", qty: 42, reorderPoint: 10 }
-        ]},
-        { id: "P7", sku: "AG-COOKWARE-007", title: "Titanium Cookset", cost: 54.00, variants: [
-          { id: "P7-V1", title: "1-Person", qty: 75, reorderPoint: 20 },
-          { id: "P7-V2", title: "2-Person", qty: 48, reorderPoint: 15 }
-        ]},
-        { id: "P8", sku: "AG-HAMMOCK-008", title: "Ultralight Hammock", cost: 28.00, variants: [
-          { id: "P8-V1", title: "Olive", qty: 92, reorderPoint: 30 },
-          { id: "P8-V2", title: "Royal Blue", qty: 5, reorderPoint: 20 }
-        ]},
-        { id: "P9", sku: "AG-WATER-009", title: "Water Filter System", cost: 22.00, variants: [
-          { id: "P9-V1", title: "Standard", qty: 180, reorderPoint: 40 },
-          { id: "P9-V2", title: "Pro (0.1 micron)", qty: 0, reorderPoint: 25 }
-        ]},
-        { id: "P10", sku: "AG-COMPASS-010", title: "Precision Compass", cost: 18.00, variants: [
-          { id: "P10-V1", title: "Standard", qty: 110, reorderPoint: 30 }
-        ]}
-      ],
-      PURCHASE_ORDERS: [
-        { id: "PO1", number: "PO-2026-001", vendorId: "V1", status: "RECEIVED", expectedDate: "2026-06-20", items: [{ qty: 50, unitCost: 289.00 }, { qty: 30, unitCost: 289.00 }] },
-        { id: "PO2", number: "PO-2026-002", vendorId: "V2", status: "PARTIALLY_RECEIVED", expectedDate: "2026-07-05", items: [{ qty: 100, unitCost: 67.00 }, { qty: 80, unitCost: 67.00 }] },
-        { id: "PO3", number: "PO-2026-003", vendorId: "V3", status: "SENT", expectedDate: "2026-07-20", items: [{ qty: 25, unitCost: 145.00 }, { qty: 15, unitCost: 145.00 }] },
-        { id: "PO4", number: "PO-2026-004", vendorId: "V1", status: "DRAFT", expectedDate: "2026-08-01", items: [{ qty: 20, unitCost: 178.00 }, { qty: 15, unitCost: 289.00 }] }
-      ],
-      STOCK_MOVEMENTS: [
-        { type: "SALE", productId: "P2-V1", qty: -8 },
-        { type: "SALE", productId: "P5-V1", qty: -12 },
-        { type: "SALE", productId: "P9-V1", qty: -5 },
-        { type: "SALE", productId: "P6-V2", qty: -3 },
-        { type: "RETURN", productId: "P3-V1", qty: 2 },
-        { type: "RECEIVING", productId: "P6-V2", qty: 60 },
-        { type: "SALE", productId: "P1-V1", qty: -4 },
-        { type: "ADJUSTMENT", productId: "P8-V2", qty: -2 },
-        { type: "SALE", productId: "P7-V1", qty: -6 },
-        { type: "TRANSFER_OUT", productId: "P5-V1", qty: -20 }
-      ],
-      ALERTS: [],
-      FORECASTS: [
-        { productId: "P2-V1", dailyAvg: 2.8, trend: "up", confidence: 0.87, model: "ETS" },
-        { productId: "P5-V1", dailyAvg: 4.2, trend: "stable", confidence: 0.92, model: "Ensemble" },
-        { productId: "P1-V1", dailyAvg: 1.5, trend: "up", confidence: 0.81, model: "Linear" },
-        { productId: "P9-V1", dailyAvg: 6.1, trend: "up", confidence: 0.89, model: "ETS" },
-        { productId: "P6-V2", dailyAvg: 3.3, trend: "stable", confidence: 0.85, model: "Moving Avg" }
-      ],
-      STATS: { totalSKUs: 26, totalValue: 0, lowStockCount: 9, outOfStockCount: 6, openPOs: 3, pendingAlerts: 0 }
-    };
-  </script>
-  <script>
-    const { LOCATIONS, VENDORS, PRODUCTS, PURCHASE_ORDERS, STOCK_MOVEMENTS, ALERTS, FORECASTS, STATS } = window.DEMO_DATA;
-    function fmtM(n) { return n === 0 ? '$0' : '$' + n.toFixed(2); }
-    function getProductName(id) { for (const p of PRODUCTS) { for (const v of p.variants) { if (v.id === id) return p.title + ' — ' + v.title; } } return id; }
-    function getVendorName(id) { return VENDORS.find(v => v.id === id)?.name || id; }
-
-    function initNavigation() {
-      document.querySelectorAll('.demo-nav-item').forEach(item => {
-        item.addEventListener('click', (e) => {
-          e.preventDefault();
-          const page = item.dataset.page;
-          document.querySelectorAll('.demo-nav-item').forEach(i => i.classList.remove('active'));
-          item.classList.add('active');
-          document.querySelectorAll('.demo-page').forEach(p => p.classList.remove('active'));
-          document.getElementById('page-' + page).classList.add('active');
-        });
-      });
-    }
-
-    function renderDashboard() {
-      document.getElementById('dashboard-stats').innerHTML =
-        '<div class="demo-stat-card"><div class="demo-stat-label">Total SKUs</div><div class="demo-stat-value">' + STATS.totalSKUs + '</div></div>' +
-        '<div class="demo-stat-card"><div class="demo-stat-label">Low Stock</div><div class="demo-stat-value">' + STATS.lowStockCount + '</div></div>' +
-        '<div class="demo-stat-card"><div class="demo-stat-label">Out of Stock</div><div class="demo-stat-value">' + STATS.outOfStockCount + '</div></div>' +
-        '<div class="demo-stat-card"><div class="demo-stat-label">Inventory Value</div><div class="demo-stat-value">' + fmtM(STATS.totalValue) + '</div></div>';
-
-      document.getElementById('recent-activity').innerHTML = STOCK_MOVEMENTS.length === 0 ?
-        '<div style="text-align:center;padding:24px;color:#6d7175"><p style="font-size:14px;font-weight:500;margin-bottom:4px">No recent stock movements</p><p style="font-size:12px">Activity will appear here as inventory changes.</p></div>' :
-        STOCK_MOVEMENTS.slice(0, 6).map(function(m) {
-        var icon = m.type === 'SALE' ? 'point_of_sale' : m.type === 'RETURN' ? 'replay' : m.type === 'RECEIVING' ? 'local_shipping' : 'inventory';
-        return '<div class="demo-activity-item"><div class="demo-activity-icon"><span class="material-symbols-outlined">' + icon + '</span></div><div class="demo-activity-text"><strong>' + m.type.replace('_', ' ') + '</strong> — ' + getProductName(m.productId) + '</div><div class="demo-activity-time">' + (m.qty > 0 ? '+' : '') + m.qty + ' units</div></div>';
-      }).join('');
-
-      document.getElementById('low-stock-alerts').innerHTML = ALERTS.length === 0 ?
-        '<div style="text-align:center;padding:24px;color:#6d7175"><p style="font-size:14px;font-weight:500;margin-bottom:4px">No active alerts</p><p style="font-size:12px">All stock levels are above their reorder points.</p></div>' :
-        ALERTS.map(function(a) {
-          return '<div class="demo-alert-item"><div class="demo-alert-dot ' + a.urgency.toLowerCase() + '"></div><div class="demo-alert-text">' + getProductName(a.productId) + '</div><div class="demo-alert-qty">' + a.currentStock + ' / ' + a.reorderPoint + '</div></div>';
-        }).join('');
-    }
-
-    function renderInventory() {
-      var rows = [];
-      PRODUCTS.forEach(function(product) {
-        product.variants.forEach(function(variant) {
-          var status = variant.qty === 0 ? 'out-of-stock' : variant.qty <= variant.reorderPoint ? 'low-stock' : 'in-stock';
-          var statusLabel = status === 'out-of-stock' ? 'Out of Stock' : status === 'low-stock' ? 'Low Stock' : 'In Stock';
-          rows.push('<tr data-search="' + product.title + ' ' + variant.title + ' ' + product.sku + '"><td><strong>' + product.title + '</strong><br><span style="color:#666;font-size:0.75rem">' + variant.title + '</span></td><td><code style="font-size:0.8rem">' + product.sku + '</code></td><td>Main Warehouse</td><td><strong>' + variant.qty + '</strong></td><td>' + variant.reorderPoint + '</td><td><span class="demo-status ' + status + '">' + statusLabel + '</span></td><td>' + fmtM(variant.qty * product.cost) + '</td></tr>');
-        });
-      });
-      document.getElementById('inventory-tbody').innerHTML = rows.join('');
-      document.getElementById('inventory-search').addEventListener('input', function(e) {
-        var term = e.target.value.toLowerCase();
-        document.querySelectorAll('#inventory-tbody tr').forEach(function(row) {
-          row.style.display = row.dataset.search.toLowerCase().includes(term) ? '' : 'none';
-        });
-      });
-    }
-
-    function renderPurchasing() {
-      document.getElementById('po-tbody').innerHTML = PURCHASE_ORDERS.map(function(po) {
-        var total = po.items.reduce(function(s, i) { return s + i.qty * i.unitCost; }, 0);
-        var statusClass = po.status.toLowerCase().replace('_', '-');
-        return '<tr><td><strong>' + po.number + '</strong></td><td>' + getVendorName(po.vendorId) + '</td><td><span class="demo-status ' + statusClass + '">' + po.status.replace('_', ' ') + '</span></td><td>' + po.items.length + ' items</td><td>' + fmtM(total) + '</td><td>' + po.expectedDate + '</td></tr>';
-      }).join('');
-    }
-
-    function renderForecasting() {
-      document.getElementById('forecast-cards').innerHTML = FORECASTS.map(function(f) {
-        var bars = [];
-        for (var i = 0; i < 30; i++) {
-          var height = Math.max(10, ((Math.sin(i * 0.3) * 0.3 + 0.7) * f.dailyAvg / 10) * 100);
-          bars.push('<div class="demo-forecast-bar ' + (i >= 20 ? 'predicted' : '') + '" style="height:' + height + '%"></div>');
-        }
-        return '<div class="demo-forecast-card"><div class="demo-forecast-header"><div class="demo-forecast-product">' + getProductName(f.productId) + '</div><div class="demo-forecast-model">' + f.model + '</div></div><div class="demo-forecast-chart">' + bars.join('') + '</div><div class="demo-forecast-stats"><span>Avg: <strong>' + f.dailyAvg + '/day</strong></span><span>Trend: <strong>' + f.trend + '</strong></span><span>Confidence: <strong>' + (f.confidence * 100).toFixed(0) + '%</strong></span></div></div>';
-      }).join('');
-    }
-
-    function renderReports() {
-      document.getElementById('valuation-report').innerHTML = PRODUCTS.map(function(p) {
-        var totalQty = p.variants.reduce(function(s, v) { return s + v.qty; }, 0);
-        return '<div class="demo-report-row"><span>' + p.title + '</span><span>' + totalQty + ' units — ' + fmtM(totalQty * p.cost) + '</span></div>';
-      }).join('') + '<div class="demo-report-row" style="font-weight:600;margin-top:8px;padding-top:8px;border-top:2px solid var(--border)"><span>Total Inventory Value</span><span class="demo-report-total">' + fmtM(STATS.totalValue) + '</span></div>';
-
-      var movementTypes = {};
-      STOCK_MOVEMENTS.forEach(function(m) { if (!movementTypes[m.type]) movementTypes[m.type] = 0; movementTypes[m.type] += Math.abs(m.qty); });
-      document.getElementById('movement-report').innerHTML = Object.entries(movementTypes).map(function(entry) {
-        return '<div class="demo-report-row"><span>' + entry[0].replace('_', ' ') + '</span><span>' + entry[1] + ' units</span></div>';
-      }).join('');
-    }
-
-    document.addEventListener('DOMContentLoaded', function() {
-      initNavigation();
-      renderDashboard();
-      renderInventory();
-      renderPurchasing();
-      renderForecasting();
-      renderReports();
-      initTour();
-    });
-
-    // Tour System
-    var currentTourStep = 0;
-    var TOUR_STEPS = [
-      { selector: '.demo-sidebar', title: 'Welcome to StockFlows', message: 'This is your inventory management command center. Let\'s take a quick tour of all the features.', position: 'right' },
-      { selector: '.demo-stats', title: 'Real-Time Dashboard', message: 'See your total SKUs, inventory value, low stock items, and alerts at a glance. All data updates in real-time.', position: 'bottom' },
-      { selector: '#recent-activity', title: 'Track Every Movement', message: 'See sales, returns, transfers, and adjustments as they happen. Every change is logged with timestamps.', position: 'right' },
-      { selector: '#low-stock-alerts', title: 'Never Run Out', message: 'Get notified before stockouts with color-coded urgency levels: Critical (red), Warning (yellow).', position: 'right' },
-      { selector: '#page-inventory', title: 'Full Inventory View', message: 'Search, filter, and manage all 35 SKUs across 4 locations. Status badges show stock health at a glance.', position: 'bottom' },
-      { selector: '#inventory-search', title: 'Instant Search', message: 'Find any product in milliseconds. Try searching for "tent" or "boots" to see it in action.', position: 'bottom' },
-      { selector: '.demo-status', title: 'Visual Status Indicators', message: 'Green = In Stock, Yellow = Low Stock, Red = Out of Stock. Color-coded for quick scanning.', position: 'top' },
-      { selector: '#page-purchasing', title: 'Purchase Order Management', message: 'Create POs, track receiving status, and calculate landed costs. PO-2026-002 is partially received.', position: 'bottom' },
-      { selector: '#page-forecasting', title: 'AI-Powered Forecasting', message: '30-day predictions using ETS, Linear Regression, and Ensemble models with confidence scores.', position: 'bottom' },
-      { selector: '#page-reports', title: 'Inventory Valuation', message: 'Track total inventory value ($47,892.50) and movement summaries across all products.', position: 'bottom' },
-      { selector: '#page-settings', title: 'Customize Everything', message: 'Set alert thresholds, notification preferences, timezone, and toggle AI features on/off.', position: 'bottom' },
-      { selector: '.demo-sidebar', title: 'You\'re Ready!', message: 'Start managing your inventory like a pro. Click "Install on Shopify" to get started today.', position: 'right' }
-    ];
-
-    function initTour() {
-      document.getElementById('tour-start-btn').addEventListener('click', startTour);
-      document.getElementById('tour-close').addEventListener('click', endTour);
-      document.getElementById('tour-backdrop').addEventListener('click', endTour);
-      document.getElementById('tour-prev').addEventListener('click', prevStep);
-      document.getElementById('tour-next').addEventListener('click', nextStep);
-      
-      document.addEventListener('keydown', function(e) {
-        if (!document.getElementById('tour-overlay').style.display || 
-            document.getElementById('tour-overlay').style.display === 'none') return;
-        if (e.key === 'Escape') endTour();
-        if (e.key === 'ArrowRight' || e.key === 'Enter') nextStep();
-        if (e.key === 'ArrowLeft') prevStep();
-      });
-    }
-
-    function startTour() {
-      currentTourStep = 0;
-      document.getElementById('tour-overlay').style.display = 'flex';
-      showStep(currentTourStep);
-    }
-
-    function showStep(step) {
-      var data = TOUR_STEPS[step];
-      document.getElementById('tour-step').textContent = (step + 1) + '/' + TOUR_STEPS.length;
-      document.getElementById('tour-title').textContent = data.title;
-      document.getElementById('tour-message').textContent = data.message;
-      
-      document.getElementById('tour-prev').style.display = step === 0 ? 'none' : '';
-      document.getElementById('tour-next').textContent = step === TOUR_STEPS.length - 1 ? 'Finish' : 'Next →';
-      
-      // Highlight target element
-      document.querySelectorAll('.tour-highlight').forEach(function(el) {
-        el.classList.remove('tour-highlight');
-      });
-      var target = document.querySelector(data.selector);
-      if (target) {
-        target.classList.add('tour-highlight');
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-    }
-
-    function nextStep() {
-      if (currentTourStep < TOUR_STEPS.length - 1) {
-        currentTourStep++;
-        showStep(currentTourStep);
-      } else {
-        endTour();
-      }
-    }
-
-    function prevStep() {
-      if (currentTourStep > 0) {
-        currentTourStep--;
-        showStep(currentTourStep);
-      }
-    }
-
-    function endTour() {
-      document.getElementById('tour-overlay').style.display = 'none';
-      document.querySelectorAll('.tour-highlight').forEach(function(el) {
-        el.classList.remove('tour-highlight');
-      });
-      try { localStorage.setItem('stockflows-tour-seen', 'true'); } catch(e) {}
-    }
-  </script>
+  <div id="PolarisPortalsContainer"></div>
 </body>
 </html>
