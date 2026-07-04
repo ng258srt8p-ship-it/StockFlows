@@ -41,6 +41,10 @@
           <span class="material-symbols-outlined">analytics</span>
           <span>Reports</span>
         </a>
+        <a href="#" class="demo-nav-item" data-page="settings">
+          <span class="material-symbols-outlined">settings</span>
+          <span>Settings</span>
+        </a>
       </nav>
       <div class="demo-sidebar-footer">
         <div class="demo-badge">DEMO</div>
@@ -148,6 +152,87 @@
             <h3>Stock Movement Summary</h3>
             <div id="movement-report"></div>
           </div>
+        </div>
+      </div>
+
+      <!-- Settings Page -->
+      <div class="demo-page" id="page-settings">
+        <div class="demo-header">
+          <h1>Settings</h1>
+          <p class="demo-subtitle">Configure your store preferences</p>
+        </div>
+        <div class="demo-grid">
+          <div class="demo-card">
+            <h3>General Settings</h3>
+            <div class="demo-settings-group">
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Store Name</span>
+                <input type="text" class="demo-input" value="Alpine Gear Co." readonly>
+              </div>
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Currency</span>
+                <select class="demo-select"><option>USD ($)</option><option>EUR (€)</option><option>GBP (£)</option></select>
+              </div>
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Timezone</span>
+                <select class="demo-select"><option>America/Los_Angeles</option><option>America/New_York</option><option>Europe/London</option></select>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <h3>Alert Thresholds</h3>
+            <div class="demo-settings-group">
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Low Stock Threshold</span>
+                <input type="number" class="demo-input demo-input-sm" value="10">
+              </div>
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Critical Stock Threshold</span>
+                <input type="number" class="demo-input demo-input-sm" value="3">
+              </div>
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Forecast Horizon (days)</span>
+                <input type="number" class="demo-input demo-input-sm" value="30">
+              </div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <h3>Notifications</h3>
+            <div class="demo-settings-group">
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Email Alerts</span>
+                <label class="demo-toggle"><input type="checkbox" checked><span class="demo-toggle-slider"></span></label>
+              </div>
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Slack Integration</span>
+                <label class="demo-toggle"><input type="checkbox"><span class="demo-toggle-slider"></span></label>
+              </div>
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">SMS Alerts</span>
+                <label class="demo-toggle"><input type="checkbox"><span class="demo-toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+          <div class="demo-card">
+            <h3>AI Features</h3>
+            <div class="demo-settings-group">
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">AI Insights</span>
+                <label class="demo-toggle"><input type="checkbox" checked><span class="demo-toggle-slider"></span></label>
+              </div>
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Forecast Explanations</span>
+                <label class="demo-toggle"><input type="checkbox" checked><span class="demo-toggle-slider"></span></label>
+              </div>
+              <div class="demo-setting-row">
+                <span class="demo-setting-label">Auto Reorder</span>
+                <label class="demo-toggle"><input type="checkbox"><span class="demo-toggle-slider"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:24px;text-align:right">
+          <button class="demo-btn demo-btn-primary">Save Settings</button>
         </div>
       </div>
     </main>
