@@ -191,6 +191,19 @@
   font-weight: 700 !important;
 }
 
+/* Override navigation hover effects */
+.Polaris-Navigation__Item:hover {
+  background-color: transparent !important;
+}
+
+.Polaris-Navigation__ItemInnerWrapper:hover {
+  background-color: transparent !important;
+}
+
+.Polaris-Navigation__Item--selected:hover {
+  background-color: transparent !important;
+}
+
 /* Text */
 .Polaris-Text--headingLg {
   font-family: var(--sf-serif) !important;
