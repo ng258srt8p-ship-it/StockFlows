@@ -118,6 +118,7 @@
       });
     }
     // Handle hash changes and initial load
+    if (window.location.hash) hashHandler();
     function hashHandler() {
       var hash = window.location.hash.replace('#', '');
       if (hash && document.getElementById('page-' + hash)) {
@@ -125,7 +126,9 @@
       }
     }
     window.addEventListener('hashchange', hashHandler);
+    window.addEventListener('load', hashHandler);
     document.addEventListener('DOMContentLoaded', hashHandler);
+    if (document.readyState === 'complete' || document.readyState === 'interactive') hashHandler();
   </script>
 
 </head>
