@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 
-const DEMO_URL = "https://stockflows.app/demo.html";
+const DEMO_URL = "https://stockflows.app/demo";
 
 test.describe("StockFlows Interactive Demo", () => {
   test.beforeEach(async ({ page }) => {
