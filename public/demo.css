@@ -32,6 +32,8 @@
   text-decoration: none;
   font-size: var(--p-font-size-350);
   font-weight: var(--p-font-weight-regular);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
   transition: all 0.15s;
   border-left: 3px solid transparent;
 }
@@ -83,11 +85,11 @@
   color: var(--p-color-text);
 }
 
-/* Main Content */
+/* Main Content — matches Polaris body background */
 .demo-main {
   flex: 1;
   overflow-y: auto;
-  background: var(--p-color-bg);
+  background: #f1f2f4;
   padding: var(--p-space-400) var(--p-space-400);
 }
 
