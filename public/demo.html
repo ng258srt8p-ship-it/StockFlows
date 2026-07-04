@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StockFlows — Live Demo</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+  <div class="demo-shell">
+    <!-- Sidebar -->
+    <aside class="demo-sidebar">
+      <div class="demo-logo">
+        <img src="/SF icon.svg" alt="StockFlows" width="20" height="20">
+        <span>StockFlows</span>
+      </div>
+      <nav class="demo-nav">
+        <a href="#" class="demo-nav-item active" data-page="dashboard">
+          <span class="material-symbols-outlined">dashboard</span>
+          <span>Dashboard</span>
+        </a>
+        <a href="#" class="demo-nav-item" data-page="inventory">
+          <span class="material-symbols-outlined">inventory_2</span>
+          <span>Inventory</span>
+        </a>
+        <a href="#" class="demo-nav-item" data-page="purchasing">
+          <span class="material-symbols-outlined">shopping_cart</span>
+          <span>Purchasing</span>
+        </a>
+        <a href="#" class="demo-nav-item" data-page="forecasting">
+          <span class="material-symbols-outlined">monitoring</span>
+          <span>Forecasting</span>
+        </a>
+        <a href="#" class="demo-nav-item" data-page="reports">
+          <span class="material-symbols-outlined">analytics</span>
+          <span>Reports</span>
+        </a>
+      </nav>
+      <div class="demo-sidebar-footer">
+        <div class="demo-badge">DEMO</div>
+        <a href="/" class="demo-back-link">← Back to Site</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="demo-main">
+      <!-- Dashboard Page -->
+      <div class="demo-page active" id="page-dashboard">
+        <div class="demo-header">
+          <h1>Dashboard</h1>
+          <p class="demo-subtitle">Alpine Gear Co. — Inventory Overview</p>
+        </div>
+        <div class="demo-stats" id="dashboard-stats"></div>
+        <div class="demo-grid">
+          <div class="demo-card">
+            <h3>Recent Activity</h3>
+            <div id="recent-activity"></div>
+          </div>
+          <div class="demo-card">
+            <h3>Low Stock Alerts</h3>
+            <div id="low-stock-alerts"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Inventory Page -->
+      <div class="demo-page" id="page-inventory">
+        <div class="demo-header">
+          <h1>Inventory</h1>
+          <div class="demo-header-actions">
+            <input type="text" class="demo-search" id="inventory-search" placeholder="Search products...">
+            <select class="demo-select" id="location-filter">
+              <option value="all">All Locations</option>
+            </select>
+          </div>
+        </div>
+        <div class="demo-table-wrap">
+          <table class="demo-table" id="inventory-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>SKU</th>
+                <th>Location</th>
+                <th>Qty</th>
+                <th>Reorder Pt</th>
+                <th>Status</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody id="inventory-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Purchasing Page -->
+      <div class="demo-page" id="page-purchasing">
+        <div class="demo-header">
+          <h1>Purchase Orders</h1>
+          <button class="demo-btn demo-btn-primary" id="btn-new-po">+ New PO</button>
+        </div>
+        <div class="demo-table-wrap">
+          <table class="demo-table" id="po-table">
+            <thead>
+              <tr>
+                <th>PO Number</th>
+                <th>Vendor</th>
+                <th>Status</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Expected</th>
+              </tr>
+            </thead>
+            <tbody id="po-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Forecasting Page -->
+      <div class="demo-page" id="page-forecasting">
+        <div class="demo-header">
+          <h1>Demand Forecasting</h1>
+          <p class="demo-subtitle">30-day predictions powered by AI</p>
+        </div>
+        <div class="demo-grid" id="forecast-cards"></div>
+      </div>
+
+      <!-- Reports Page -->
+      <div class="demo-page" id="page-reports">
+        <div class="demo-header">
+          <h1>Reports</h1>
+          <div class="demo-header-actions">
+            <button class="demo-btn">Export CSV</button>
+            <button class="demo-btn">Generate PDF</button>
+          </div>
+        </div>
+        <div class="demo-grid">
+          <div class="demo-card">
+            <h3>Inventory Valuation</h3>
+            <div id="valuation-report"></div>
+          </div>
+          <div class="demo-card">
+            <h3>Stock Movement Summary</h3>
+            <div id="movement-report"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script type="module" src="demo.js"></script>
+</body>
+</html>
