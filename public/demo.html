@@ -153,7 +153,202 @@
     </main>
   </div>
 
-  <script src="demo-data.js"></script>
-  <script src="demo.js"></script>
+  <script>
+    window.DEMO_DATA = {
+      LOCATIONS: [
+        { id: "L1", name: "Main Warehouse", type: "WAREHOUSE" },
+        { id: "L2", name: "Retail Store #1", type: "RETAIL_STORE" }
+      ],
+      VENDORS: [
+        { id: "V1", name: "Pacific Rim Outfitters" },
+        { id: "V2", name: "Summit Textiles" },
+        { id: "V3", name: "Alloy Components" },
+        { id: "V4", name: "Trail Blazer Packaging" }
+      ],
+      PRODUCTS: [
+        { id: "P1", sku: "AG-TENT-001", title: "Alpine 4-Season Tent", cost: 289.00, variants: [
+          { id: "P1-V1", title: "Green / 2-Person", qty: 45, reorderPoint: 10 },
+          { id: "P1-V2", title: "Green / 4-Person", qty: 12, reorderPoint: 8 },
+          { id: "P1-V3", title: "Orange / 2-Person", qty: 28, reorderPoint: 10 },
+          { id: "P1-V4", title: "Orange / 4-Person", qty: 3, reorderPoint: 5 }
+        ]},
+        { id: "P2", sku: "AG-BAG-002", title: "Expedition Backpack 65L", cost: 89.50, variants: [
+          { id: "P2-V1", title: "Black", qty: 120, reorderPoint: 25 },
+          { id: "P2-V2", title: "Forest Green", qty: 85, reorderPoint: 25 },
+          { id: "P2-V3", title: "Burnt Orange", qty: 8, reorderPoint: 15 }
+        ]},
+        { id: "P3", sku: "AG-BOOTS-003", title: "Trailmaster GTX Boots", cost: 145.00, variants: [
+          { id: "P3-V1", title: "Black / Size 9", qty: 18, reorderPoint: 10 },
+          { id: "P3-V2", title: "Black / Size 10", qty: 22, reorderPoint: 10 },
+          { id: "P3-V3", title: "Black / Size 11", qty: 2, reorderPoint: 10 },
+          { id: "P3-V4", title: "Brown / Size 9", qty: 15, reorderPoint: 8 },
+          { id: "P3-V5", title: "Brown / Size 10", qty: 19, reorderPoint: 8 },
+          { id: "P3-V6", title: "Brown / Size 11", qty: 0, reorderPoint: 8 }
+        ]},
+        { id: "P4", sku: "AG-SLEEPING-004", title: "Down Sleeping Bag -10°C", cost: 178.00, variants: [
+          { id: "P4-V1", title: "Regular", qty: 34, reorderPoint: 12 },
+          { id: "P4-V2", title: "Long", qty: 6, reorderPoint: 8 }
+        ]},
+        { id: "P5", sku: "AG-LAMP-005", title: "Rechargeable Headlamp 900lm", cost: 32.00, variants: [
+          { id: "P5-V1", title: "Black", qty: 200, reorderPoint: 50 },
+          { id: "P5-V2", title: "Red", qty: 150, reorderPoint: 50 }
+        ]},
+        { id: "P6", sku: "AG-CLOTHING-006", title: "Merino Base Layer Set", cost: 67.00, variants: [
+          { id: "P6-V1", title: "Navy / S", qty: 40, reorderPoint: 15 },
+          { id: "P6-V2", title: "Navy / M", qty: 65, reorderPoint: 15 },
+          { id: "P6-V3", title: "Navy / L", qty: 55, reorderPoint: 15 },
+          { id: "P6-V4", title: "Charcoal / S", qty: 12, reorderPoint: 10 },
+          { id: "P6-V5", title: "Charcoal / M", qty: 38, reorderPoint: 10 },
+          { id: "P6-V6", title: "Charcoal / L", qty: 42, reorderPoint: 10 }
+        ]},
+        { id: "P7", sku: "AG-COOKWARE-007", title: "Titanium Cookset", cost: 54.00, variants: [
+          { id: "P7-V1", title: "1-Person", qty: 75, reorderPoint: 20 },
+          { id: "P7-V2", title: "2-Person", qty: 48, reorderPoint: 15 }
+        ]},
+        { id: "P8", sku: "AG-HAMMOCK-008", title: "Ultralight Hammock", cost: 28.00, variants: [
+          { id: "P8-V1", title: "Olive", qty: 92, reorderPoint: 30 },
+          { id: "P8-V2", title: "Royal Blue", qty: 5, reorderPoint: 20 }
+        ]},
+        { id: "P9", sku: "AG-WATER-009", title: "Water Filter System", cost: 22.00, variants: [
+          { id: "P9-V1", title: "Standard", qty: 180, reorderPoint: 40 },
+          { id: "P9-V2", title: "Pro (0.1 micron)", qty: 0, reorderPoint: 25 }
+        ]},
+        { id: "P10", sku: "AG-COMPASS-010", title: "Precision Compass", cost: 18.00, variants: [
+          { id: "P10-V1", title: "Standard", qty: 110, reorderPoint: 30 }
+        ]}
+      ],
+      PURCHASE_ORDERS: [
+        { id: "PO1", number: "PO-2026-001", vendorId: "V1", status: "RECEIVED", expectedDate: "2026-06-20", items: [{ qty: 50, unitCost: 289.00 }, { qty: 30, unitCost: 289.00 }] },
+        { id: "PO2", number: "PO-2026-002", vendorId: "V2", status: "PARTIALLY_RECEIVED", expectedDate: "2026-07-05", items: [{ qty: 100, unitCost: 67.00 }, { qty: 80, unitCost: 67.00 }] },
+        { id: "PO3", number: "PO-2026-003", vendorId: "V3", status: "SENT", expectedDate: "2026-07-20", items: [{ qty: 25, unitCost: 145.00 }, { qty: 15, unitCost: 145.00 }] },
+        { id: "PO4", number: "PO-2026-004", vendorId: "V1", status: "DRAFT", expectedDate: "2026-08-01", items: [{ qty: 20, unitCost: 178.00 }, { qty: 15, unitCost: 289.00 }] }
+      ],
+      STOCK_MOVEMENTS: [
+        { type: "SALE", productId: "P2-V1", qty: -8 },
+        { type: "SALE", productId: "P5-V1", qty: -12 },
+        { type: "SALE", productId: "P9-V1", qty: -5 },
+        { type: "SALE", productId: "P6-V2", qty: -3 },
+        { type: "RETURN", productId: "P3-V1", qty: 2 },
+        { type: "RECEIVING", productId: "P6-V2", qty: 60 },
+        { type: "SALE", productId: "P1-V1", qty: -4 },
+        { type: "ADJUSTMENT", productId: "P8-V2", qty: -2 },
+        { type: "SALE", productId: "P7-V1", qty: -6 },
+        { type: "TRANSFER_OUT", productId: "P5-V1", qty: -20 }
+      ],
+      ALERTS: [
+        { productId: "P3-V3", urgency: "CRITICAL", currentStock: 2, reorderPoint: 10 },
+        { productId: "P3-V6", urgency: "CRITICAL", currentStock: 0, reorderPoint: 8 },
+        { productId: "P4-V2", urgency: "WARNING", currentStock: 6, reorderPoint: 8 },
+        { productId: "P1-V4", urgency: "WARNING", currentStock: 3, reorderPoint: 5 },
+        { productId: "P9-V2", urgency: "CRITICAL", currentStock: 0, reorderPoint: 25 },
+        { productId: "P8-V2", urgency: "WARNING", currentStock: 5, reorderPoint: 20 }
+      ],
+      FORECASTS: [
+        { productId: "P2-V1", dailyAvg: 2.8, trend: "up", confidence: 0.87, model: "ETS" },
+        { productId: "P5-V1", dailyAvg: 4.2, trend: "stable", confidence: 0.92, model: "Ensemble" },
+        { productId: "P1-V1", dailyAvg: 1.5, trend: "up", confidence: 0.81, model: "Linear" },
+        { productId: "P9-V1", dailyAvg: 6.1, trend: "up", confidence: 0.89, model: "ETS" },
+        { productId: "P6-V2", dailyAvg: 3.3, trend: "stable", confidence: 0.85, model: "Moving Avg" }
+      ],
+      STATS: { totalSKUs: 35, totalValue: 47892.50, lowStockCount: 6, outOfStockCount: 2, openPOs: 3, pendingAlerts: 6 }
+    };
+  </script>
+  <script>
+    const { LOCATIONS, VENDORS, PRODUCTS, PURCHASE_ORDERS, STOCK_MOVEMENTS, ALERTS, FORECASTS, STATS } = window.DEMO_DATA;
+    function fmtM(n) { return '$' + n.toFixed(2); }
+    function getProductName(id) { for (const p of PRODUCTS) { for (const v of p.variants) { if (v.id === id) return p.title + ' — ' + v.title; } } return id; }
+    function getVendorName(id) { return VENDORS.find(v => v.id === id)?.name || id; }
+
+    function initNavigation() {
+      document.querySelectorAll('.demo-nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+          e.preventDefault();
+          const page = item.dataset.page;
+          document.querySelectorAll('.demo-nav-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+          document.querySelectorAll('.demo-page').forEach(p => p.classList.remove('active'));
+          document.getElementById('page-' + page).classList.add('active');
+        });
+      });
+    }
+
+    function renderDashboard() {
+      document.getElementById('dashboard-stats').innerHTML =
+        '<div class="demo-stat-card"><div class="demo-stat-label">Total SKUs</div><div class="demo-stat-value blue">' + STATS.totalSKUs + '</div></div>' +
+        '<div class="demo-stat-card"><div class="demo-stat-label">Inventory Value</div><div class="demo-stat-value">' + fmtM(STATS.totalValue) + '</div></div>' +
+        '<div class="demo-stat-card"><div class="demo-stat-label">Low Stock Items</div><div class="demo-stat-value red">' + STATS.lowStockCount + '</div></div>' +
+        '<div class="demo-stat-card"><div class="demo-stat-label">Out of Stock</div><div class="demo-stat-value red">' + STATS.outOfStockCount + '</div></div>' +
+        '<div class="demo-stat-card"><div class="demo-stat-label">Open POs</div><div class="demo-stat-value">' + STATS.openPOs + '</div></div>' +
+        '<div class="demo-stat-card"><div class="demo-stat-label">Pending Alerts</div><div class="demo-stat-value">' + STATS.pendingAlerts + '</div></div>';
+
+      document.getElementById('recent-activity').innerHTML = STOCK_MOVEMENTS.slice(0, 6).map(function(m) {
+        var icon = m.type === 'SALE' ? 'point_of_sale' : m.type === 'RETURN' ? 'replay' : m.type === 'RECEIVING' ? 'local_shipping' : 'inventory';
+        return '<div class="demo-activity-item"><div class="demo-activity-icon"><span class="material-symbols-outlined">' + icon + '</span></div><div class="demo-activity-text"><strong>' + m.type.replace('_', ' ') + '</strong> — ' + getProductName(m.productId) + '</div><div class="demo-activity-time">' + (m.qty > 0 ? '+' : '') + m.qty + ' units</div></div>';
+      }).join('');
+
+      document.getElementById('low-stock-alerts').innerHTML = ALERTS.map(function(a) {
+        return '<div class="demo-alert-item"><div class="demo-alert-dot ' + a.urgency.toLowerCase() + '"></div><div class="demo-alert-text">' + getProductName(a.productId) + '</div><div class="demo-alert-qty">' + a.currentStock + ' / ' + a.reorderPoint + '</div></div>';
+      }).join('');
+    }
+
+    function renderInventory() {
+      var rows = [];
+      PRODUCTS.forEach(function(product) {
+        product.variants.forEach(function(variant) {
+          var status = variant.qty === 0 ? 'out-of-stock' : variant.qty <= variant.reorderPoint ? 'low-stock' : 'in-stock';
+          var statusLabel = status === 'out-of-stock' ? 'Out of Stock' : status === 'low-stock' ? 'Low Stock' : 'In Stock';
+          rows.push('<tr data-search="' + product.title + ' ' + variant.title + ' ' + product.sku + '"><td><strong>' + product.title + '</strong><br><span style="color:#666;font-size:0.75rem">' + variant.title + '</span></td><td><code style="font-size:0.8rem">' + product.sku + '</code></td><td>Main Warehouse</td><td><strong>' + variant.qty + '</strong></td><td>' + variant.reorderPoint + '</td><td><span class="demo-status ' + status + '">' + statusLabel + '</span></td><td>' + fmtM(variant.qty * product.cost) + '</td></tr>');
+        });
+      });
+      document.getElementById('inventory-tbody').innerHTML = rows.join('');
+      document.getElementById('inventory-search').addEventListener('input', function(e) {
+        var term = e.target.value.toLowerCase();
+        document.querySelectorAll('#inventory-tbody tr').forEach(function(row) {
+          row.style.display = row.dataset.search.toLowerCase().includes(term) ? '' : 'none';
+        });
+      });
+    }
+
+    function renderPurchasing() {
+      document.getElementById('po-tbody').innerHTML = PURCHASE_ORDERS.map(function(po) {
+        var total = po.items.reduce(function(s, i) { return s + i.qty * i.unitCost; }, 0);
+        var statusClass = po.status.toLowerCase().replace('_', '-');
+        return '<tr><td><strong>' + po.number + '</strong></td><td>' + getVendorName(po.vendorId) + '</td><td><span class="demo-status ' + statusClass + '">' + po.status.replace('_', ' ') + '</span></td><td>' + po.items.length + ' items</td><td>' + fmtM(total) + '</td><td>' + po.expectedDate + '</td></tr>';
+      }).join('');
+    }
+
+    function renderForecasting() {
+      document.getElementById('forecast-cards').innerHTML = FORECASTS.map(function(f) {
+        var bars = [];
+        for (var i = 0; i < 30; i++) {
+          var height = Math.max(10, ((Math.sin(i * 0.3) * 0.3 + 0.7) * f.dailyAvg / 10) * 100);
+          bars.push('<div class="demo-forecast-bar ' + (i >= 20 ? 'predicted' : '') + '" style="height:' + height + '%"></div>');
+        }
+        return '<div class="demo-forecast-card"><div class="demo-forecast-header"><div class="demo-forecast-product">' + getProductName(f.productId) + '</div><div class="demo-forecast-model">' + f.model + '</div></div><div class="demo-forecast-chart">' + bars.join('') + '</div><div class="demo-forecast-stats"><span>Avg: <strong>' + f.dailyAvg + '/day</strong></span><span>Trend: <strong>' + f.trend + '</strong></span><span>Confidence: <strong>' + (f.confidence * 100).toFixed(0) + '%</strong></span></div></div>';
+      }).join('');
+    }
+
+    function renderReports() {
+      document.getElementById('valuation-report').innerHTML = PRODUCTS.map(function(p) {
+        var totalQty = p.variants.reduce(function(s, v) { return s + v.qty; }, 0);
+        return '<div class="demo-report-row"><span>' + p.title + '</span><span>' + totalQty + ' units — ' + fmtM(totalQty * p.cost) + '</span></div>';
+      }).join('') + '<div class="demo-report-row" style="font-weight:600;margin-top:8px;padding-top:8px;border-top:2px solid var(--border)"><span>Total Inventory Value</span><span class="demo-report-total">' + fmtM(STATS.totalValue) + '</span></div>';
+
+      var movementTypes = {};
+      STOCK_MOVEMENTS.forEach(function(m) { if (!movementTypes[m.type]) movementTypes[m.type] = 0; movementTypes[m.type] += Math.abs(m.qty); });
+      document.getElementById('movement-report').innerHTML = Object.entries(movementTypes).map(function(entry) {
+        return '<div class="demo-report-row"><span>' + entry[0].replace('_', ' ') + '</span><span>' + entry[1] + ' units</span></div>';
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      initNavigation();
+      renderDashboard();
+      renderInventory();
+      renderPurchasing();
+      renderForecasting();
+      renderReports();
+    });
+  </script>
 </body>
 </html>
