@@ -209,9 +209,16 @@
 .Polaris-Frame__Navigation .Polaris-Navigation__Item:hover,
 .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:hover,
 .Polaris-Frame__Navigation .Polaris-Navigation__Item--selected:hover,
-.Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper--selected:hover {
+.Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper--selected:hover,
+.Polaris-Frame__Navigation .Polaris-Navigation__Item:is(:hover, :focus-visible),
+.Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:is(:hover, :focus-visible),
+.Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper--selected:is(:hover, :focus-visible, :focus-within),
+.Polaris-Frame__Navigation .Polaris-Navigation__Item--selected:is(:hover, :focus-visible),
+.Polaris-Frame__Navigation .Polaris-Navigation__Item:active,
+.Polaris-Frame__Navigation .Polaris-Navigation__Item:active:hover {
   background-color: transparent !important;
   background: transparent !important;
+  color: inherit !important;
 }
 
 /* Selected wrapper — transparent, no white block */
@@ -256,14 +263,17 @@
     background: rgba(255, 255, 255, 0.08) !important;
   }
 
-  /* Hover — slightly brighter than selected */
-  .Polaris-Frame__Navigation .Polaris-Navigation__Item:hover {
+  /* Hover — keep text readable, subtle background */
+  .Polaris-Frame__Navigation .Polaris-Navigation__Item:hover,
+  .Polaris-Frame__Navigation .Polaris-Navigation__Item:is(:hover, :focus-visible) {
     color: #ffffff !important;
+    background: transparent !important;
   }
 
-  .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:hover {
-    background-color: rgba(255, 255, 255, 0.05) !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+  .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:hover,
+  .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:is(:hover, :focus-visible) {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
   }
 }
 
