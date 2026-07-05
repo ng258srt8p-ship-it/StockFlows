@@ -172,22 +172,27 @@
   font-style: italic !important;
 }
 
-/* Navigation — only force full width on large screens so Polaris can
-   collapse to a hamburger at tablet widths (≤ 1024px). */
+/* ═══════════════════════════════════════════════════
+   NAVIGATION SIDEBAR
+   Uses .Polaris-Frame__Navigation prefix for higher specificity
+   to override Polaris internal styles
+   ═══════════════════════════════════════════════════ */
+
+/* Base navigation — force full width on large screens */
 @media (min-width: 1025px) {
-  .Polaris-Navigation {
+  .Polaris-Frame__Navigation .Polaris-Navigation {
     width: var(--sf-sidebar) !important;
-    background: var(--sf-bg) !important;
-    border-right: 1px solid var(--sf-border) !important;
   }
 }
 
-.Polaris-Navigation {
+/* Navigation container */
+.Polaris-Frame__Navigation .Polaris-Navigation {
   background: var(--sf-bg) !important;
   border-right: 1px solid var(--sf-border) !important;
 }
 
-.Polaris-Navigation__Item {
+/* Navigation items — typography */
+.Polaris-Frame__Navigation .Polaris-Navigation__Item {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
   text-transform: uppercase !important;
@@ -195,48 +200,70 @@
   font-family: var(--sf-font) !important;
 }
 
-.Polaris-Navigation__Item--selected {
+/* Selected item — bold text only, NO background change */
+.Polaris-Frame__Navigation .Polaris-Navigation__Item--selected {
   font-weight: 700 !important;
 }
 
-/* Override navigation hover effects */
-.Polaris-Navigation__Item:hover {
+/* Hover effects — remove ALL background changes */
+.Polaris-Frame__Navigation .Polaris-Navigation__Item:hover,
+.Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:hover,
+.Polaris-Frame__Navigation .Polaris-Navigation__Item--selected:hover,
+.Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper--selected:hover {
   background-color: transparent !important;
+  background: transparent !important;
 }
 
-.Polaris-Navigation__ItemInnerWrapper:hover {
+/* Selected wrapper — transparent, no white block */
+.Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper--selected {
   background-color: transparent !important;
+  background: transparent !important;
 }
 
-.Polaris-Navigation__Item--selected:hover {
-  background-color: transparent !important;
-}
-
-/* Dark mode navigation fixes */
+/* ═══════════════════════════════════════════════════
+   DARK MODE NAVIGATION
+   ═══════════════════════════════════════════════════ */
 @media (prefers-color-scheme: dark) {
-  .Polaris-Navigation {
+  /* Container */
+  .Polaris-Frame__Navigation .Polaris-Navigation {
     background: #1a1a1a !important;
     border-right: 1px solid #333 !important;
   }
 
-  .Polaris-Navigation__Item {
+  /* All items — light gray text */
+  .Polaris-Frame__Navigation .Polaris-Navigation__Item {
     color: #e0e0e0 !important;
   }
 
-  .Polaris-Navigation__ItemInnerWrapper--selected {
+  /* Selected item — white text, bold */
+  .Polaris-Frame__Navigation .Polaris-Navigation__Item--selected {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+  }
+
+  /* Icons — match text colors */
+  .Polaris-Frame__Navigation .Polaris-Navigation__Icon {
+    color: #e0e0e0 !important;
+  }
+
+  .Polaris-Frame__Navigation .Polaris-Navigation__Item--selected .Polaris-Navigation__Icon {
+    color: #ffffff !important;
+  }
+
+  /* Selected wrapper — subtle highlight, NOT white */
+  .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper--selected {
     background-color: rgba(255, 255, 255, 0.08) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
   }
 
-  .Polaris-Navigation__Item--selected {
+  /* Hover — slightly brighter than selected */
+  .Polaris-Frame__Navigation .Polaris-Navigation__Item:hover {
     color: #ffffff !important;
   }
 
-  .Polaris-Navigation__Icon {
-    color: #e0e0e0 !important;
-  }
-
-  .Polaris-Navigation__ItemInnerWrapper--selected .Polaris-Navigation__Icon {
-    color: #ffffff !important;
+  .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:hover {
+    background-color: rgba(255, 255, 255, 0.05) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
   }
 }
 
