@@ -25,7 +25,7 @@
   /* Override Polaris CSS Variables */
   --p-color-bg: var(--sf-bg);
   --p-color-bg-surface: #ffffff;
-  --p-color-bg-surface-hover: #f5f5f5;
+  --p-color-bg-surface-hover: transparent !important;
   --p-color-text: var(--sf-text);
   --p-color-text-subdued: var(--sf-text-dim);
   --p-color-border: var(--sf-border);
