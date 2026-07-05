@@ -64,7 +64,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (status === "low") where.quantity = { lte: prisma.inventoryItem.fields.reorderPoint };
   if (status === "out") where.quantity = 0;
 
-  const [items, locations] = await Promise.all([
+  const [allItems, locations] = await Promise.all([
     prisma.inventoryItem.findMany({
       where,
       include: { location: true },
@@ -76,6 +76,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       orderBy: { name: "asc" },
     }),
   ]);
+
+  // Filter out Shopify Gift Card test data
+  const items = allItems.filter((item) => item.title !== "Gift Card");
 
   return json({ items, locations });
 };

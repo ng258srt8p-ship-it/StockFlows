@@ -56,10 +56,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   // Fast: inventory summary
   const inventoryPromise = (async () => {
-    const items = await prisma.inventoryItem.findMany({
+    const allItems = await prisma.inventoryItem.findMany({
       where: { shopId: shop.id },
       include: { location: true },
     });
+
+    // Filter out Shopify Gift Card test data
+    const items = allItems.filter((i) => i.title !== "Gift Card");
 
     const totalSKUs = items.length;
     const lowStockItems = items.filter((i) => i.quantity <= i.reorderPoint && i.quantity > 0).length;
