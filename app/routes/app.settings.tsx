@@ -201,7 +201,6 @@ export default function Settings() {
     <Page title="Settings" subtitle="Manage alerts, thresholds, and preferences">
       <Layout>
         <Layout.Section>
-          <div className="px-4 py-6">
             <Form method="post">
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   {/* ── Notifications Card ─────────────────────────── */}
@@ -385,7 +384,6 @@ export default function Settings() {
                   </Banner>
                 </div>
               )}
-            </div>
           </Layout.Section>
       </Layout>
     </Page>
