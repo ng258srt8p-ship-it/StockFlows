@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, Link, useNavigate } from "@remix-run/react";
+import { useLoaderData, Link, useNavigate, useNavigation } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
 import {
@@ -11,6 +11,9 @@ import {
   Badge,
   Banner,
   EmptyState,
+  SkeletonBodyText,
+  SkeletonDisplayText,
+  SkeletonPage,
 } from "@shopify/polaris";
 import { AlertsList } from "~/components/inventory/AlertsList";
 
@@ -153,10 +156,55 @@ const MOVEMENT_TONES: Record<string, "success" | "critical" | "attention" | "inf
 export default function Dashboard() {
   const loaderData = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
   const stats = (loaderData as any).stats ?? { totalSKUs: 0, lowStockItems: 0, outOfStockItems: 0, valueAtRisk: 0, totalInventoryValue: 0 };
   const alerts = (loaderData as any).alerts ?? [];
   const recentActivity = (loaderData as any).recentActivity ?? [];
   const forecastAccuracy = (loaderData as any).forecastAccuracy ?? 0;
+
+  if (isLoading) {
+    return (
+      <SkeletonPage title="StockFlows Dashboard">
+        <Layout>
+          <Layout.Section>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i}>
+                  <div className="p-4">
+                    <SkeletonDisplayText size="small" />
+                    <div className="mt-2">
+                      <SkeletonDisplayText size="medium" />
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </Layout.Section>
+          <Layout.Section>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              <Card>
+                <SkeletonDisplayText size="small" />
+                <div className="mt-4 space-y-3">
+                  <SkeletonBodyText />
+                  <SkeletonBodyText />
+                  <SkeletonBodyText />
+                </div>
+              </Card>
+              <Card>
+                <SkeletonDisplayText size="small" />
+                <div className="mt-4 space-y-3">
+                  <SkeletonBodyText />
+                  <SkeletonBodyText />
+                  <SkeletonBodyText />
+                </div>
+              </Card>
+            </div>
+          </Layout.Section>
+        </Layout>
+      </SkeletonPage>
+    );
+  }
 
   return (
     <Page title="StockFlows Dashboard" subtitle="Inventory overview">

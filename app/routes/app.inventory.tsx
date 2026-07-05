@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate, useSearchParams } from "@remix-run/react";
+import { useLoaderData, useNavigate, useSearchParams, useNavigation } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
 import { requirePermission } from "~/lib/auth/middleware";
@@ -14,6 +14,9 @@ import {
   Badge,
   Button,
   Filters,
+  SkeletonBodyText,
+  SkeletonDisplayText,
+  SkeletonPage,
 } from "@shopify/polaris";
 import { useState, useCallback } from "react";
 import type { InventoryItem, Location } from "@prisma/client";
@@ -86,6 +89,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export default function InventoryList() {
   const { items, locations } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
 
@@ -115,6 +120,42 @@ export default function InventoryList() {
     if (item.quantity <= item.reorderPoint) return { label: "Low Stock", status: "warning" as const };
     return { label: "In Stock", status: "success" as const };
   };
+
+  if (isLoading) {
+    return (
+      <SkeletonPage title="Inventory">
+        <Layout>
+          <Layout.Section>
+            <Card>
+              <div className="p-4">
+                <div className="flex gap-4 mb-4">
+                  <div className="flex-1">
+                    <SkeletonDisplayText size="small" />
+                  </div>
+                  <div className="w-48">
+                    <SkeletonDisplayText size="small" />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex gap-4 items-center">
+                      <div className="w-24"><SkeletonBodyText /></div>
+                      <div className="flex-1"><SkeletonBodyText /></div>
+                      <div className="w-24"><SkeletonBodyText /></div>
+                      <div className="w-16 text-right"><SkeletonBodyText /></div>
+                      <div className="w-16 text-right"><SkeletonBodyText /></div>
+                      <div className="w-24"><SkeletonBodyText /></div>
+                      <div className="w-16 text-right"><SkeletonBodyText /></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </Layout.Section>
+        </Layout>
+      </SkeletonPage>
+    );
+  }
 
   return (
     <Page

@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate, useFetcher } from "@remix-run/react";
+import { useLoaderData, useNavigate, useFetcher, useNavigation } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
 import { requirePermission } from "~/lib/auth/middleware";
@@ -14,6 +14,9 @@ import {
   Button,
   Banner,
   Text,
+  SkeletonBodyText,
+  SkeletonDisplayText,
+  SkeletonPage,
 } from "@shopify/polaris";
 
 const statusBadge: Record<string, "info" | "success" | "warning" | "critical"> = {
@@ -125,8 +128,36 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 export default function PurchasingList() {
   const { purchaseOrders, pendingAlertCount } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
+  const navigation = useNavigation();
   const fetcher = useFetcher();
   const isGenerating = fetcher.state !== "idle";
+  const isLoading = navigation.state === "loading";
+
+  if (isLoading) {
+    return (
+      <SkeletonPage title="Purchase Orders" subtitle="Manage vendor orders and receiving">
+        <Layout>
+          <Layout.Section>
+            <Card>
+              <div className="p-4 space-y-4">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex gap-4 items-center">
+                    <div className="w-24"><SkeletonBodyText /></div>
+                    <div className="flex-1"><SkeletonBodyText /></div>
+                    <div className="w-24"><SkeletonBodyText /></div>
+                    <div className="w-16 text-right"><SkeletonBodyText /></div>
+                    <div className="w-24"><SkeletonBodyText /></div>
+                    <div className="w-24"><SkeletonBodyText /></div>
+                    <div className="w-24"><SkeletonBodyText /></div>
+                  </div>
+                ))}
+              </div>
+            </Card>
+          </Layout.Section>
+        </Layout>
+      </SkeletonPage>
+    );
+  }
 
   return (
     <Page
