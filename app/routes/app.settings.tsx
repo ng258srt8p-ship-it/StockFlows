@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { useLoaderData, Form, useNavigation, useActionData, useNavigate } from "@remix-run/react";
+import { json } from "@remix-run/node";
+import { useLoaderData, Form, useNavigation, useActionData } from "@remix-run/react";
 import { Prisma } from "@prisma/client";
 import { prisma } from "~/lib/db/client";
 import { requirePermission } from "~/lib/auth/middleware";
@@ -16,10 +16,9 @@ import {
   Button,
   Banner,
   Text,
-  Card,
   Checkbox,
 } from "@shopify/polaris";
-import { SettingsCard, SettingsSection } from "~/components/settings";
+import { SettingsCard } from "~/components/settings";
 import { NotificationToggle } from "~/components/settings";
 
 // ---------------------------------------------------------------------------
@@ -253,145 +252,121 @@ export default function Settings() {
                   </SettingsCard>
 
                   {/* ── Alert Thresholds Card ──────────────────────── */}
-                  <Card>
-                    <div className="p-4">
-                      <Text variant="headingSm" as="h3">
-                        Alert Thresholds
-                      </Text>
-                      <Text variant="bodySm" as="p" tone="subdued" className="mt-1">
-                        Set stock levels that trigger reorder alerts. Critical must be lower than Low.
-                      </Text>
-
-                      <TextField
-                        label="Low Stock Threshold"
-                        type="number"
-                        name="lowStockThreshold"
-                        value={lowStock}
-                        onChange={setLowStock}
-                        suffix="units"
-                        autoComplete="off"
-                      />
-                      <TextField
-                        label="Critical Stock Threshold"
-                        type="number"
-                        name="criticalStockThreshold"
-                        value={criticalStock}
-                        onChange={setCriticalStock}
-                        suffix="units"
-                        autoComplete="off"
-                      />
-                      <TextField
-                        label="Safety Stock Multiplier"
-                        type="number"
-                        step={0.1}
-                        name="safetyStockMultiplier"
-                        value={safetyStockMultiplier}
-                        onChange={setSafetyStockMultiplier}
-                        suffix="×"
-                        autoComplete="off"
-                      />
-                    </div>
-                  </Card>
+                  <SettingsCard
+                    title="Alert Thresholds"
+                    description="Set stock levels that trigger reorder alerts. Critical must be lower than Low."
+                  >
+                    <TextField
+                      label="Low Stock Threshold"
+                      type="number"
+                      name="lowStockThreshold"
+                      value={lowStock}
+                      onChange={setLowStock}
+                      suffix="units"
+                      autoComplete="off"
+                    />
+                    <TextField
+                      label="Critical Stock Threshold"
+                      type="number"
+                      name="criticalStockThreshold"
+                      value={criticalStock}
+                      onChange={setCriticalStock}
+                      suffix="units"
+                      autoComplete="off"
+                    />
+                    <TextField
+                      label="Safety Stock Multiplier"
+                      type="number"
+                      step={0.1}
+                      name="safetyStockMultiplier"
+                      value={safetyStockMultiplier}
+                      onChange={setSafetyStockMultiplier}
+                      suffix="×"
+                      autoComplete="off"
+                    />
+                  </SettingsCard>
 
                   {/* ── Forecasting Card ───────────────────────────── */}
-                  <Card>
-                    <div className="p-4">
-                      <Text variant="headingSm" as="h3">
-                        Forecasting
-                      </Text>
-                      <Text variant="bodySm" as="p" tone="subdued" className="mt-1">
-                        Configure how far ahead the demand forecast predicts future sales.
-                      </Text>
-
-                      <TextField
-                        label="Forecast Horizon"
-                        type="number"
-                        name="forecastHorizonDays"
-                        value={forecastHorizon}
-                        onChange={setForecastHorizon}
-                        suffix="days"
-                        autoComplete="off"
-                      />
-                    </div>
-                  </Card>
+                  <SettingsCard
+                    title="Forecasting"
+                    description="Configure how far ahead the demand forecast predicts future sales."
+                  >
+                    <TextField
+                      label="Forecast Horizon"
+                      type="number"
+                      name="forecastHorizonDays"
+                      value={forecastHorizon}
+                      onChange={setForecastHorizon}
+                      suffix="days"
+                      autoComplete="off"
+                    />
+                  </SettingsCard>
 
                   {/* ── AI Features Card ───────────────────────────── */}
-                  <Card>
-                    <div className="p-4">
-                      <Text variant="headingSm" as="h3">
-                        AI Features
+                  <SettingsCard
+                    title="AI Features"
+                    description="Enable AI-powered insights and natural language explanations for your inventory data."
+                  >
+                    <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
+                      <Text variant="bodyMd" as="p">
+                        AI Insights
                       </Text>
-                      <Text variant="bodySm" as="p" tone="subdued" className="mt-1">
-                        Enable AI-powered insights and natural language explanations for your inventory data.
-                      </Text>
-
-                      <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
-                        <Text variant="bodyMd" as="p">
-                          AI Insights
-                        </Text>
-                        <Checkbox
-                          label="AI Insights"
-                          labelHidden
-                          checked={aiInsightsOn}
-                          onChange={setAiInsightsOn}
-                        />
-                        <input
-                          type="hidden"
-                          name="enableAiInsights"
-                          value={aiInsightsOn ? "on" : ""}
-                        />
-                      </div>
-                      <Text variant="bodySm" as="p" tone="subdued">
-                        Uses OpenCode API to analyze inventory data and generate insights.
-                        Statistical forecasting still works when AI is disabled.
-                      </Text>
-
-                      <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
-                        <Text variant="bodyMd" as="p">
-                          Forecast Explanations
-                        </Text>
-                        <Checkbox
-                          label="Forecast Explanations"
-                          labelHidden
-                          checked={forecastExplOn}
-                          onChange={setForecastExplOn}
-                        />
-                        <input
-                          type="hidden"
-                          name="enableForecastExplanations"
-                          value={forecastExplOn ? "on" : ""}
-                        />
-                      </div>
-                      <Text variant="bodySm" as="p" tone="subdued">
-                        Shows AI-generated natural language explanations of forecast data.
-                      </Text>
-                    </div>
-                  </Card>
-
-                  {/* ── General Card ───────────────────────────────── */}
-                  <Card>
-                    <div className="p-4">
-                      <Text variant="headingSm" as="h3">
-                        General
-                      </Text>
-                      <Text variant="bodySm" as="p" tone="subdued" className="mt-1">
-                        Configure general settings for your StockFlows account.
-                      </Text>
-
-                      <Select
-                        label="Currency"
-                        name="currency"
-                        value={settings?.currency || "USD"}
-                        options={[
-                          { label: "USD ($)", value: "USD" },
-                          { label: "EUR (€)", value: "EUR" },
-                          { label: "GBP (£)", value: "GBP" },
-                          { label: "CAD (C$)", value: "CAD" },
-                          { label: "AUD (A$)", value: "AUD" },
-                        ]}
+                      <Checkbox
+                        label="AI Insights"
+                        labelHidden
+                        checked={aiInsightsOn}
+                        onChange={setAiInsightsOn}
+                      />
+                      <input
+                        type="hidden"
+                        name="enableAiInsights"
+                        value={aiInsightsOn ? "on" : ""}
                       />
                     </div>
-                  </Card>
+                    <Text variant="bodySm" as="p" tone="subdued">
+                      Uses OpenCode API to analyze inventory data and generate insights.
+                      Statistical forecasting still works when AI is disabled.
+                    </Text>
+
+                    <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
+                      <Text variant="bodyMd" as="p">
+                        Forecast Explanations
+                      </Text>
+                      <Checkbox
+                        label="Forecast Explanations"
+                        labelHidden
+                        checked={forecastExplOn}
+                        onChange={setForecastExplOn}
+                      />
+                      <input
+                        type="hidden"
+                        name="enableForecastExplanations"
+                        value={forecastExplOn ? "on" : ""}
+                      />
+                    </div>
+                    <Text variant="bodySm" as="p" tone="subdued">
+                      Shows AI-generated natural language explanations of forecast data.
+                    </Text>
+                  </SettingsCard>
+
+                  {/* ── General Card ───────────────────────────────── */}
+                  <SettingsCard
+                    title="General"
+                    description="Configure general settings for your StockFlows account."
+                  >
+                    <Select
+                      label="Currency"
+                      name="currency"
+                      value={settings?.currency || "USD"}
+                      options={[
+                        { label: "USD ($)", value: "USD" },
+                        { label: "EUR (€)", value: "EUR" },
+                        { label: "GBP (£)", value: "GBP" },
+                        { label: "CAD (C$)", value: "CAD" },
+                        { label: "AUD (A$)", value: "AUD" },
+                      ]}
+                    />
+                  </SettingsCard>
                 </div>
 
                 {/* ── Save Button ─────────────────────────────────────── */}
