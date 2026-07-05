@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, Link } from "@remix-run/react";
+import { useLoaderData, Link, useNavigate } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
 import {
@@ -10,6 +10,7 @@ import {
   Text,
   Badge,
   Banner,
+  EmptyState,
 } from "@shopify/polaris";
 import { AlertsList } from "~/components/inventory/AlertsList";
 
@@ -148,6 +149,7 @@ const MOVEMENT_TONES: Record<string, "success" | "critical" | "attention" | "inf
 
 export default function Dashboard() {
   const loaderData = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
   const stats = (loaderData as any).stats ?? { totalSKUs: 0, lowStockItems: 0, outOfStockItems: 0, valueAtRisk: 0, totalInventoryValue: 0 };
   const alerts = (loaderData as any).alerts ?? [];
   const recentActivity = (loaderData as any).recentActivity ?? [];
@@ -187,7 +189,7 @@ export default function Dashboard() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <Card>
               <div className="flex items-center justify-between mb-2">
-                <Text variant="headingMd" as="h2">
+                <Text variant="headingSm" as="h3">
                   Active Alerts
                 </Text>
                 <Badge>{String(alerts?.length ?? 0)}</Badge>
@@ -197,7 +199,7 @@ export default function Dashboard() {
 
             <Card>
               <div className="flex items-center justify-between mb-2">
-                <Text variant="headingMd" as="h2">
+                <Text variant="headingSm" as="h3">
                   Recent Activity
                 </Text>
                 <Link to="/app/inventory" className="text-sm text-blue-600 hover:underline">
@@ -205,10 +207,13 @@ export default function Dashboard() {
                 </Link>
               </div>
               {recentActivity.length === 0 ? (
-                <Text variant="bodySm" as="p" tone="subdued">
-                  No recent stock movements. Activity will appear here as
-                  inventory changes.
-                </Text>
+                <EmptyState
+                  heading="No recent activity"
+                  action={{ content: "View inventory", onAction: () => navigate("/app/inventory") }}
+                  image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/empty-state.png"
+                >
+                  <p>Stock movements will appear here as inventory changes.</p>
+                </EmptyState>
               ) : (
                 <div className="space-y-2">
                   {recentActivity.map((m: any) => (
