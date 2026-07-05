@@ -551,7 +551,7 @@
                     <div class="Polaris-Connected">
                       <div class="Polaris-Connected__Item Polaris-Connected__Item--primary">
                         <div class="Polaris-TextField">
-                          <input placeholder="Search by SKU, product, or barcode..."
+                          <input placeholder="Search inventory"
                                  autocomplete="off"
                                  class="Polaris-TextField__Input Polaris-TextField__Input--hasClearButton"
                                  type="text" value="">
@@ -567,7 +567,7 @@
                     <select class="Polaris-Select__Input">
                       <option value="" selected="">All locations</option>
                       <option value="warehouse-a">My Custom Location</option>
-                      <option value="warehouse-b">My Custom Location</option>
+                      <option value="warehouse-b">Shop location</option>
                     </select>
                     <div class="Polaris-Select__Content" aria-hidden="true">
                       <span class="Polaris-Select__SelectedOption">All locations</span>
@@ -933,7 +933,7 @@
                   <!-- Primary Action -->
                   <div class="Polaris-Page-Header__PrimaryActionWrapper">
                     <button class="Polaris-Button Polaris-Button--pressable Polaris-Button--variantPrimary Polaris-Button--sizeMedium Polaris-Button--textAlignCenter">
-                      Create PO
+                        CREATE PO
                     </button>
                   </div>
                 </div>
@@ -972,190 +972,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <!-- PO-001: Draft -->
-                          <tr class="Polaris-IndexTable__TableRow Polaris-IndexTable__TableRow--unclickable">
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-mono text-sm">PO-001</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-medium">Pacific Coffee Roasters</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="Polaris-Badge Polaris-Badge--toneInfo">
-                                <span class="Polaris-Text--root Polaris-Text--bodySm">Draft</span>
-                              </span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">5</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">$1,245.00</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span>Jan 28, 2025</span>
-                            </td>
-                          </tr>
-                          <!-- PO-002: Sent -->
-                          <tr class="Polaris-IndexTable__TableRow Polaris-IndexTable__TableRow--unclickable">
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-mono text-sm">PO-002</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-medium">Green Valley Suppliers</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="Polaris-Badge Polaris-Badge--toneAttention">
-                                <span class="Polaris-Text--root Polaris-Text--bodySm">Sent</span>
-                              </span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">8</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">$3,872.50</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span>Jan 30, 2025</span>
-                            </td>
-                          </tr>
-                          <!-- PO-003: Partially Received -->
-                          <tr class="Polaris-IndexTable__TableRow Polaris-IndexTable__TableRow--unclickable">
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-mono text-sm">PO-003</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-medium">Metro Dairy Co-op</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="Polaris-Badge Polaris-Badge--toneWarning">
-                                <span class="Polaris-Text--root Polaris-Text--bodySm">Partially received</span>
-                              </span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">12</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">$5,420.00</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span>Feb 2, 2025</span>
-                            </td>
-                          </tr>
-                          <!-- PO-004: Received -->
-                          <tr class="Polaris-IndexTable__TableRow Polaris-IndexTable__TableRow--unclickable">
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-mono text-sm">PO-004</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-medium">Pacific Coffee Roasters</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="Polaris-Badge Polaris-Badge--toneSuccess">
-                                <span class="Polaris-Text--root Polaris-Text--bodySm">Received</span>
-                              </span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">3</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">$890.00</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span>Jan 20, 2025</span>
-                            </td>
-                          </tr>
-                          <!-- PO-005: Draft -->
-                          <tr class="Polaris-IndexTable__TableRow Polaris-IndexTable__TableRow--unclickable">
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-mono text-sm">PO-005</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-medium">Mountain Sports Wholesale</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="Polaris-Badge Polaris-Badge--toneInfo">
-                                <span class="Polaris-Text--root Polaris-Text--bodySm">Draft</span>
-                              </span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">6</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">$2,180.00</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span>Feb 12, 2025</span>
-                            </td>
-                          </tr>
-                          <!-- PO-006: Sent -->
-                          <tr class="Polaris-IndexTable__TableRow Polaris-IndexTable__TableRow--unclickable">
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-mono text-sm">PO-006</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-medium">Alpine Gear Distributors</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="Polaris-Badge Polaris-Badge--toneAttention">
-                                <span class="Polaris-Text--root Polaris-Text--bodySm">Sent</span>
-                              </span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">10</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">$4,560.00</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span>Feb 5, 2025</span>
-                            </td>
-                          </tr>
-                          <!-- PO-007: Partially Received -->
-                          <tr class="Polaris-IndexTable__TableRow Polaris-IndexTable__TableRow--unclickable">
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-mono text-sm">PO-007</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-medium">Summit Beverage Partners</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="Polaris-Badge Polaris-Badge--toneWarning">
-                                <span class="Polaris-Text--root Polaris-Text--bodySm">Partially received</span>
-                              </span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">15</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">$7,235.00</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span>Jan 29, 2025</span>
-                            </td>
-                          </tr>
-                          <!-- PO-008: Received -->
-                          <tr class="Polaris-IndexTable__TableRow Polaris-IndexTable__TableRow--unclickable">
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-mono text-sm">PO-008</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="font-medium">Cascadia Outdoor Supply</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span class="Polaris-Badge Polaris-Badge--toneSuccess">
-                                <span class="Polaris-Text--root Polaris-Text--bodySm">Received</span>
-                              </span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">4</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell Polaris-IndexTable--cellAlignEnd">
-                              <span class="text-right font-semibold">$1,560.00</span>
-                            </td>
-                            <td class="Polaris-IndexTable__TableCell">
-                              <span>Jan 18, 2025</span>
-                            </td>
-                          </tr>
+                          <!-- No purchase orders -->
                         </tbody>
                       </table>
                     </div>
