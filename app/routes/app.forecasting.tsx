@@ -254,7 +254,7 @@ export default function Forecasting() {
               <div className="p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div>
-                    <Text variant="headingMd" as="h2">
+                    <Text variant="headingSm" as="h3">
                       {selectedForecast.inventoryItem.title}
                     </Text>
                     <Text variant="bodySm" as="p" tone="subdued">
