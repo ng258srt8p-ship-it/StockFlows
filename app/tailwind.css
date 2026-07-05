@@ -172,9 +172,17 @@
   font-style: italic !important;
 }
 
-/* Navigation */
+/* Navigation — only force full width on large screens so Polaris can
+   collapse to a hamburger at tablet widths (≤ 1024px). */
+@media (min-width: 1025px) {
+  .Polaris-Navigation {
+    width: var(--sf-sidebar) !important;
+    background: var(--sf-bg) !important;
+    border-right: 1px solid var(--sf-border) !important;
+  }
+}
+
 .Polaris-Navigation {
-  width: var(--sf-sidebar) !important;
   background: var(--sf-bg) !important;
   border-right: 1px solid var(--sf-border) !important;
 }
