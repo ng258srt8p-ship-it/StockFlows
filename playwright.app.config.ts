@@ -6,7 +6,7 @@ import { defineConfig } from "@playwright/test";
  */
 export default defineConfig({
   testDir: "./e2e",
-  testMatch: "app-routes.spec.ts",
+  testMatch: ["app-routes.spec.ts", "visual-regression.spec.ts"],
   fullyParallel: false,
   retries: 1,
   workers: 1,
@@ -15,6 +15,7 @@ export default defineConfig({
 
   use: {
     baseURL: "https://stockflows.fly.dev",
+    viewport: { width: 1280, height: 800 },
     trace: "on-first-retry",
     screenshot: "only-on-failure",
     navigationTimeout: 15_000,
@@ -31,4 +32,11 @@ export default defineConfig({
       use: { browserName: "chromium" },
     },
   ],
+
+  expect: {
+    toHaveScreenshot: {
+      maxDiffPixelRatio: 0.01,
+      threshold: 0.2,
+    },
+  },
 });
