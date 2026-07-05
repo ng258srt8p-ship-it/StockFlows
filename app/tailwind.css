@@ -212,6 +212,34 @@
   background-color: transparent !important;
 }
 
+/* Dark mode navigation fixes */
+@media (prefers-color-scheme: dark) {
+  .Polaris-Navigation {
+    background: #1a1a1a !important;
+    border-right: 1px solid #333 !important;
+  }
+
+  .Polaris-Navigation__Item {
+    color: #e0e0e0 !important;
+  }
+
+  .Polaris-Navigation__ItemInnerWrapper--selected {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  .Polaris-Navigation__Item--selected {
+    color: #ffffff !important;
+  }
+
+  .Polaris-Navigation__Icon {
+    color: #e0e0e0 !important;
+  }
+
+  .Polaris-Navigation__ItemInnerWrapper--selected .Polaris-Navigation__Icon {
+    color: #ffffff !important;
+  }
+}
+
 /* Text */
 .Polaris-Text--headingLg {
   font-family: var(--sf-serif) !important;
