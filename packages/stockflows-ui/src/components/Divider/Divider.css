@@ -1,0 +1,6 @@
+.sf-divider {
+  border: none;
+  border-top: 1px solid var(--sf-border);
+  margin: var(--p-space-400) 0;
+  width: 100%;
+}

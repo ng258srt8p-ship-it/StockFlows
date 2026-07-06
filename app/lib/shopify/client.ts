@@ -7,13 +7,13 @@
  * - Exponential backoff on rate-limit / server errors (max 3 retries)
  *
  * Usage:
- *   import { shopifyGraphQL } from "~/lib/shopify/client";
+ *   import { ApiVersion, shopifyGraphQL } from "~/lib/shopify/client";
  *   const data = await shopifyGraphQL(session, MY_QUERY, { first: 10 });
  */
 
 import type { Session } from "@shopify/shopify-api";
-import { LATEST_API_VERSION } from "@shopify/shopify-api";
-import { logger } from "~/lib/logger";
+import { ApiVersion } from "@shopify/shopify-api";
+import { ApiVersion, logger } from "~/lib/logger";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -156,7 +156,7 @@ export async function shopifyGraphQL<T = Record<string, unknown>>(
 
   for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
     try {
-      const url = `https://${shop}/admin/api/${LATEST_API_VERSION}/graphql.json`;
+      const url = `https://${shop}/admin/api/${'2026-07'}/graphql.json`;
 
       const response = await fetch(url, {
         method: "POST",

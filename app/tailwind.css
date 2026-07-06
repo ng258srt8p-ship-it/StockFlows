@@ -1,46 +1,50 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════
-   StockFlows Design System
+   StockFlows v6 Design System — Polaris Theme Overrides
    Matches stockflows.app brutalist editorial design
    ═══════════════════════════════════════════════════ */
 
 :root {
-  /* StockFlows Colors */
-  --sf-bg: #fafafa;
-  --sf-bg-dark: #111111;
-  --sf-text: #111111;
-  --sf-text-dim: #666666;
-  --sf-text-dimmer: #999999;
-  --sf-border: #e0e0e0;
-  --sf-brand: #111111;
-  --sf-critical: #dc2626;
-  --sf-warning: #d97706;
-  --sf-success: #16a34a;
+  /* StockFlows v6 Colors — Httpster-inspired Brutalist */
+  --sf-bg: #FAFBFC;
+  --sf-bg-raised: #F5F5F7;
+  --sf-bg-dark: #0D0E11;
+  --sf-text: #0F172A;
+  --sf-text-dim: #475569;
+  --sf-text-dimmer: #94A3B8;
+  --sf-border: #E2E8F0;
+  --sf-border-strong: #CBD5E1;
+  --sf-brand: #0F172A;
+  --sf-accent: #C7FB33;
+  --sf-critical: #DC2626;
+  --sf-warning: #D97706;
+  --sf-success: #16A34A;
   --sf-radius: 0px;
   --sf-sidebar: 220px;
-  --sf-font: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --sf-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  --sf-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --sf-serif: 'Playfair Display', Georgia, 'Times New Roman', serif;
+  --sf-mono: 'JetBrains Mono', 'SF Mono', monospace;
 
   /* Override Polaris CSS Variables */
   --p-color-bg: var(--sf-bg);
   --p-color-bg-surface: #ffffff;
-  --p-color-bg-surface-hover: transparent !important;
+  --p-color-bg-surface-hover: var(--sf-bg-raised);
   --p-color-text: var(--sf-text);
   --p-color-text-subdued: var(--sf-text-dim);
   --p-color-border: var(--sf-border);
   --p-color-border-subdued: var(--sf-border);
   
   /* Status Colors */
-  --p-color-bg-critical-subdued: #fef2f2;
+  --p-color-bg-critical-subdued: #FEF2F2;
   --p-color-text-critical: var(--sf-critical);
   --p-color-border-critical: var(--sf-critical);
   
-  --p-color-bg-warning-subdued: #fffbeb;
+  --p-color-bg-warning-subdued: #FFFBEB;
   --p-color-text-warning: var(--sf-warning);
   --p-color-border-warning: var(--sf-warning);
   
-  --p-color-bg-success-subdued: #f0fdf4;
+  --p-color-bg-success-subdued: #F0FDF4;
   --p-color-text-success: var(--sf-success);
   --p-color-border-success: var(--sf-success);
   
@@ -49,25 +53,27 @@
   --p-font-weight-semibold: 600;
 }
 
-/* StockFlows custom theme */
+/* StockFlows v6 custom theme */
 @theme {
-  --color-brand: #111111;
-  --color-brand-hover: #333333;
-  --color-critical: #dc2626;
-  --color-warning: #d97706;
-  --color-success: #16a34a;
-  --color-info: #111111;
-  --font-serif: var(--sf-serif);
+  --color-v6-bg: #FAFBFC;
+  --color-v6-surface: #FFFFFF;
+  --color-v6-border: #E2E8F0;
+  --color-v6-text: #0F172A;
+  --color-v6-text-dim: #475569;
+  --color-v6-text-dimmer: #94A3B8;
+  --color-v6-brand: #0F172A;
+  --color-v6-accent: #C7FB33;
+  --color-v6-critical: #DC2626;
+  --color-v6-warning: #D97706;
+  --color-v6-success: #16A34A;
 
-  /* Core design tokens */
-  --background-primary: #ffffff;
-  --background-secondary: #fafafa;
-  --background-tertiary: #f5f5f5;
-  --border-primary: #e0e0e0;
-  --border-hover: #999999;
-  --text-primary: #111111;
-  --text-secondary: #666666;
-  --text-muted: #999999;
+  --font-v6-ui: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-v6-display: 'Playfair Display', Georgia, serif;
+  --font-v6-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+  --radius-v6: 0px;
+  --shadow-v6-sm: 0 1px 2px rgba(0,0,0,0.05);
+  --shadow-v6-md: 0 4px 6px -1px rgba(0,0,0,0.07);
 }
 
 /* ═══════════════════════════════════════════════════
@@ -83,39 +89,45 @@
 }
 
 .Polaris-Card:hover {
-  border-color: #999999 !important;
+  border-color: var(--sf-border-strong) !important;
 }
 
-/* Buttons */
+/* Primary Buttons — flat, bold, uppercase */
 .Polaris-Button--variantPrimary {
   background-color: var(--sf-brand) !important;
   border-color: var(--sf-brand) !important;
   color: #ffffff !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
-  font-weight: 500 !important;
+  letter-spacing: 0.3px !important;
+  font-weight: 600 !important;
   font-family: var(--sf-font) !important;
+  border-radius: 0px !important;
 }
 
 .Polaris-Button--variantPrimary:hover {
-  background-color: #333333 !important;
-  border-color: #333333 !important;
+  background-color: #1E293B !important;
+  border-color: #1E293B !important;
 }
 
+/* Secondary Buttons — outlined, uppercase */
 .Polaris-Button--variantSecondary {
   background-color: transparent !important;
   border-color: var(--sf-border) !important;
-  color: var(--sf-text-dim) !important;
+  color: var(--sf-text) !important;
   font-family: var(--sf-font) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.3px !important;
+  font-weight: 500 !important;
+  border-radius: 0px !important;
 }
 
 .Polaris-Button--variantSecondary:hover {
-  background-color: var(--sf-text) !important;
-  color: #ffffff !important;
+  background-color: var(--sf-bg) !important;
   border-color: var(--sf-text) !important;
+  color: var(--sf-text) !important;
 }
 
-/* Badges */
+/* Badges — outlined style */
 .Polaris-Badge--toneCritical {
   background-color: transparent !important;
   color: var(--sf-critical) !important;
@@ -150,7 +162,7 @@
   font-size: 0.65rem !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.5px !important;
+  letter-spacing: 0.3px !important;
   color: var(--sf-text-dimmer) !important;
   font-family: var(--sf-font) !important;
 }
@@ -160,38 +172,33 @@
   font-family: var(--sf-font) !important;
 }
 
-/* Page Headers */
+/* Page Headers — Playfair Display serif */
 .Polaris-Page-Header__TitleWrapper h1 {
   font-family: var(--sf-serif) !important;
-  font-style: italic !important;
-  font-weight: 400 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.02em !important;
 }
 
 .Polaris-Header-Title {
   font-family: var(--sf-serif) !important;
-  font-style: italic !important;
+  font-weight: 700 !important;
 }
 
 /* ═══════════════════════════════════════════════════
    NAVIGATION SIDEBAR
-   Uses .Polaris-Frame__Navigation prefix for higher specificity
-   to override Polaris internal styles
    ═══════════════════════════════════════════════════ */
 
-/* Base navigation — force full width on large screens */
 @media (min-width: 1025px) {
   .Polaris-Frame__Navigation .Polaris-Navigation {
     width: var(--sf-sidebar) !important;
   }
 }
 
-/* Navigation container */
 .Polaris-Frame__Navigation .Polaris-Navigation {
   background: var(--sf-bg) !important;
   border-right: 1px solid var(--sf-border) !important;
 }
 
-/* Navigation items — typography */
 .Polaris-Frame__Navigation .Polaris-Navigation__Item {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
@@ -200,12 +207,10 @@
   font-family: var(--sf-font) !important;
 }
 
-/* Selected item — bold text only, NO background change */
 .Polaris-Frame__Navigation .Polaris-Navigation__Item--selected {
   font-weight: 700 !important;
 }
 
-/* Hover effects — remove ALL background changes */
 .Polaris-Frame__Navigation .Polaris-Navigation__Item:hover,
 .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:hover,
 .Polaris-Frame__Navigation .Polaris-Navigation__Item--selected:hover,
@@ -221,116 +226,69 @@
   color: inherit !important;
 }
 
-/* Selected wrapper — transparent, no white block */
 .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper--selected {
   background-color: transparent !important;
   background: transparent !important;
 }
 
-/* ═══════════════════════════════════════════════════
-   DARK MODE NAVIGATION
-   ═══════════════════════════════════════════════════ */
-@media (prefers-color-scheme: dark) {
-  /* Container */
-  .Polaris-Frame__Navigation .Polaris-Navigation {
-    background: #1a1a1a !important;
-    border-right: 1px solid #333 !important;
-  }
-
-  /* All items — light gray text */
-  .Polaris-Frame__Navigation .Polaris-Navigation__Item {
-    color: #e0e0e0 !important;
-  }
-
-  /* Selected item — white text, bold */
-  .Polaris-Frame__Navigation .Polaris-Navigation__Item--selected {
-    color: #ffffff !important;
-    font-weight: 700 !important;
-  }
-
-  /* Icons — match text colors */
-  .Polaris-Frame__Navigation .Polaris-Navigation__Icon {
-    color: #e0e0e0 !important;
-  }
-
-  .Polaris-Frame__Navigation .Polaris-Navigation__Item--selected .Polaris-Navigation__Icon {
-    color: #ffffff !important;
-  }
-
-  /* Selected wrapper — subtle highlight, NOT white */
-  .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper--selected {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-  }
-
-  /* Hover — keep text readable, subtle background */
-  .Polaris-Frame__Navigation .Polaris-Navigation__Item:hover,
-  .Polaris-Frame__Navigation .Polaris-Navigation__Item:is(:hover, :focus-visible) {
-    color: #ffffff !important;
-    background: transparent !important;
-  }
-
-  .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:hover,
-  .Polaris-Frame__Navigation .Polaris-Navigation__ItemInnerWrapper:is(:hover, :focus-visible) {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-  }
+/* Select and TextField — flat */
+.Polaris-Select__Input {
+  font-family: var(--sf-font) !important;
+  border-radius: 0px !important;
 }
 
-/* Text */
+.Polaris-TextField__Input {
+  font-family: var(--sf-font) !important;
+  border-radius: 0px !important;
+}
+
+.Polaris-TextField {
+  border-radius: 0px !important;
+}
+
+/* Text headings */
 .Polaris-Text--headingLg {
   font-family: var(--sf-serif) !important;
-  font-style: italic !important;
+  font-weight: 700 !important;
 }
 
 .Polaris-Text--headingMd {
   font-family: var(--sf-serif) !important;
-  font-style: italic !important;
+  font-weight: 650 !important;
 }
 
 .Polaris-Text--headingSm {
   font-family: var(--sf-font) !important;
 }
 
-/* Select */
-.Polaris-Select__Input {
-  font-family: var(--sf-font) !important;
+/* ═══════════════════════════════════════════════════
+   UTILITY CLASSES
+   ═══════════════════════════════════════════════════ */
+
+@utility bg-v6-bg {
+  background-color: var(--color-v6-bg);
 }
 
-/* TextField */
-.Polaris-TextField__Input {
-  font-family: var(--sf-font) !important;
+@utility bg-v6-surface {
+  background-color: var(--color-v6-surface);
 }
 
-/* Ensure utility classes are generated */
-@utility bg-background-secondary {
-  background-color: var(--background-secondary);
+@utility border-v6-border {
+  border-color: var(--color-v6-border);
 }
 
-@utility bg-background-primary {
-  background-color: var(--background-primary);
+@utility text-v6-text {
+  color: var(--color-v6-text);
 }
 
-@utility bg-background-tertiary {
-  background-color: var(--background-tertiary);
+@utility text-v6-text-dim {
+  color: var(--color-v6-text-dim);
 }
 
-@utility border-border-primary {
-  border-color: var(--border-primary);
+@utility font-v6-ui {
+  font-family: var(--font-v6-ui);
 }
 
-@utility border-border-hover {
-  border-color: var(--border-hover);
-}
-
-@utility text-text-primary {
-  color: var(--text-primary);
-}
-
-@utility text-text-secondary {
-  color: var(--text-secondary);
-}
-
-@utility text-text-muted {
-  color: var(--text-muted);
+@utility font-v6-display {
+  font-family: var(--font-v6-display);
 }

@@ -54,9 +54,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const movementSummary: MovementSummary = { inbound: 0, outbound: 0, adjustments: 0 };
   movements.forEach((m) => {
     const qty = Math.abs(m._sum.quantityChange ?? 0);
-    if (m.type === "RECEIVED" || m.type === "RETURN") {
+    if (m.type === "RECEIVING" || m.type === "RETURN") {
       movementSummary.inbound += qty;
-    } else if (m.type === "SALE" || m.type === "SHIPPED") {
+    } else if (m.type === "SALE") {
       movementSummary.outbound += qty;
     } else {
       movementSummary.adjustments += qty;
@@ -140,19 +140,6 @@ export default function Reports() {
                       { title: "Unit Cost", alignment: "end" },
                       { title: "Total Value", alignment: "end" },
                     ]}
-                    totalsRow={{
-                      totals: [
-                        { total: "Total Inventory Value" },
-                        { total: null },
-                        { total: null },
-                        {
-                          total: `$${stats.totalValue.toLocaleString(undefined, {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                          })}`,
-                        },
-                      ],
-                    }}
                   >
                     {items.map((item, index) => (
                       <IndexTable.Row key={item.id} id={item.id} position={index}>
@@ -166,12 +153,12 @@ export default function Reports() {
                             {item.sku ?? "—"}
                           </Text>
                         </IndexTable.Cell>
-                        <IndexTable.Cell alignment="end">
+                        <IndexTable.Cell>
                           <Text variant="bodySm" as="p">
                             {item.quantity.toLocaleString()}
                           </Text>
                         </IndexTable.Cell>
-                        <IndexTable.Cell alignment="end">
+                        <IndexTable.Cell>
                           <Text variant="bodySm" as="p">
                             {item.costPerUnit
                               ? `$${item.costPerUnit.toLocaleString(undefined, {
@@ -181,7 +168,7 @@ export default function Reports() {
                               : "—"}
                           </Text>
                         </IndexTable.Cell>
-                        <IndexTable.Cell alignment="end">
+                        <IndexTable.Cell>
                           <Text variant="bodySm" as="p" fontWeight="semibold">
                             ${item.totalValue.toLocaleString(undefined, {
                               minimumFractionDigits: 2,
@@ -222,7 +209,7 @@ export default function Reports() {
                   </Text>
                 </div>
                 <div className="p-4 bg-blue-50 rounded-lg">
-                  <Text variant="headingSm" as="h3" tone="info">
+                  <Text variant="headingSm" as="h3" tone="base">
                     Outbound
                   </Text>
                   <Text variant="headingLg" as="p">
@@ -233,7 +220,7 @@ export default function Reports() {
                   </Text>
                 </div>
                 <div className="p-4 bg-amber-50 rounded-lg">
-                  <Text variant="headingSm" as="h3" tone="warning">
+                  <Text variant="headingSm" as="h3" tone="caution">
                     Adjustments
                   </Text>
                   <Text variant="headingLg" as="p">

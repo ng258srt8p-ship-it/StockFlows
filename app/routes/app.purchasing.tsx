@@ -135,7 +135,7 @@ export default function PurchasingList() {
 
   if (isLoading) {
     return (
-      <SkeletonPage title="Purchase Orders" subtitle="Manage vendor orders and receiving">
+      <SkeletonPage title="Purchase Orders">
         <Layout>
           <Layout.Section>
             <Card>

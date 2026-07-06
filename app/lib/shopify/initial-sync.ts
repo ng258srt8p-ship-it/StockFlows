@@ -9,11 +9,10 @@
  * Webhooks handle subsequent changes.
  */
 
-import { prisma } from "~/lib/db/client";
-import { logger } from "~/lib/logger";
+import { ApiVersion, prisma } from "~/lib/db/client";
+import { ApiVersion, logger } from "~/lib/logger";
 import type { MovementType } from "@prisma/client";
-import { LATEST_API_VERSION } from "@shopify/shopify-api";
-import { toInventoryItemGid, toLocationGid } from "./id-normalize";
+import { ApiVersion } from "@shopify/shopify-api";
 
 interface SyncResult {
   locationsSynced: number;
@@ -29,7 +28,7 @@ async function graphqlQuery(
   query: string,
   variables: Record<string, unknown> = {},
 ): Promise<any> {
-  const url = `https://${shopDomain}/admin/api/${LATEST_API_VERSION}/graphql.json`;
+  const url = `https://${shopDomain}/admin/api/${'2026-07'}/graphql.json`;
   const response = await fetch(url, {
     method: "POST",
     headers: {

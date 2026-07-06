@@ -28,11 +28,15 @@ export const links: LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Instrument+Serif:ital@0;1&display=swap",
   },
+  {
+    rel: "stylesheet",
+    href: "https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Playfair+Display:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap",
+  },
 ];
 
 export const meta: MetaFunction = () => [
-  { title: "StockFlows - Inventory Management" },
-  { name: "description", content: "Smart inventory management for Shopify" },
+  { title: "StockFlows — Inventory Management for Shopify" },
+  { name: "description", content: "Replace Stocky with StockFlows. Multi-warehouse inventory management, demand forecasting, and purchase order tracking for Shopify merchants." },
   { charSet: "utf-8" },
   { name: "viewport", content: "width=device-width, initial-scale=1" },
 ];
@@ -113,7 +117,7 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body className="antialiased" style={{ fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", backgroundColor: "#fafafa" }}>
+      <body className="antialiased" style={{ fontFamily: "'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif", backgroundColor: "#fafafa" }}>
         <AppProvider i18n={i18n}>
           {isLoading && (
             <div className="fixed top-0 left-0 right-0 h-1 bg-blue-600 animate-pulse z-50" />

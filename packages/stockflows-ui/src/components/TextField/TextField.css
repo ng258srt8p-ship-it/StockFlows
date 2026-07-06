@@ -1,0 +1,7 @@
+.sf-text-field {
+  width: 100%;
+}
+
+.sf-text-field :global(.Polaris-TextField) {
+  width: 100%;
+}

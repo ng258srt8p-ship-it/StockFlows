@@ -17,6 +17,7 @@ export default defineConfig({
 
   use: {
     // Connect to existing Chrome via CDP instead of launching new browser
+    // @ts-expect-error cdpEndpoint is supported at runtime but missing from Playwright types
     cdpEndpoint: "http://localhost:9222",
     trace: "on-first-retry",
     screenshot: "only-on-failure",

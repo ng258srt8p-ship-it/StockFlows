@@ -1,0 +1,56 @@
+{
+  "name": "@stockflows/ui",
+  "version": "1.0.0",
+  "description": "Shared UI component library for StockFlows demo and production apps",
+  "type": "module",
+  "main": "./dist/index.cjs.js",
+  "module": "./dist/index.es.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.es.js",
+      "require": "./dist/index.cjs.js"
+    },
+    "./styles.css": "./dist/styles.css",
+    "./styles/variables.css": "./dist/variables.css",
+    "./styles/polaris-overrides.css": "./dist/polaris-overrides.css"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite build --watch --mode development",
+    "build": "tsc && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint src --ext ts,tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@shopify/polaris": "^12.27.0",
+    "@shopify/polaris-icons": "^9.3.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "dependencies": {
+    "recharts": "^3.8.1",
+    "shepherd.js": "^11.2.0",
+    "zod": "^4.4.3",
+    "zustand": "^5.0.14"
+  },
+  "devDependencies": {
+    "@shopify/polaris": "^12.27.0",
+    "@shopify/polaris-icons": "^9.3.1",
+    "@shopify/polaris-tokens": "^8.10.0",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.7.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.9.3",
+    "vite": "^6.4.3",
+    "vitest": "^4.1.9"
+  }
+}

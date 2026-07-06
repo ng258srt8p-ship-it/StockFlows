@@ -1,0 +1,29 @@
+.sf-index-table {
+  width: 100%;
+}
+
+.sf-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: var(--p-space-50) var(--p-space-100);
+  border-radius: var(--p-border-radius-100);
+  font-size: var(--p-font-size-200);
+  font-weight: 600;
+  font-family: var(--sf-sans);
+  text-transform: capitalize;
+}
+
+.sf-status-badge--in_stock {
+  background-color: var(--p-color-bg-success-subdued);
+  color: var(--p-color-text-success);
+}
+
+.sf-status-badge--low_stock {
+  background-color: var(--p-color-bg-warning-subdued);
+  color: var(--p-color-text-warning);
+}
+
+.sf-status-badge--out_of_stock {
+  background-color: var(--p-color-bg-critical-subdued);
+  color: var(--p-color-text-critical);
+}

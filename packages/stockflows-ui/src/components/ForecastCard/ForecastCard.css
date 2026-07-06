@@ -1,0 +1,94 @@
+.sf-forecast-card {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sf-forecast-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: var(--p-space-400);
+  gap: var(--p-space-300);
+}
+
+.sf-forecast-card__title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.sf-forecast-card__title {
+  margin: 0 0 var(--p-space-50);
+  font-size: var(--p-font-size-400);
+  font-weight: 600;
+  font-family: var(--sf-serif);
+  color: var(--p-color-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sf-forecast-card__sku {
+  margin: 0;
+  font-size: var(--p-font-size-200);
+  color: var(--p-color-text-subdued);
+  font-family: var(--sf-mono);
+}
+
+.sf-forecast-card__metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--p-space-300);
+  margin-bottom: var(--p-space-400);
+  padding: var(--p-space-300);
+  background-color: var(--p-color-bg-subdued);
+  border-radius: var(--p-border-radius-200);
+}
+
+.sf-forecast-card__metric {
+  display: flex;
+  flex-direction: column;
+  gap: var(--p-space-50);
+}
+
+.sf-forecast-card__metric-label {
+  font-size: var(--p-font-size-200);
+  font-weight: 500;
+  color: var(--p-color-text-subdued);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.sf-forecast-card__metric-value {
+  font-size: var(--p-font-size-300);
+  font-weight: 600;
+  font-family: var(--sf-serif);
+  color: var(--p-color-text);
+}
+
+.sf-forecast-card__actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--p-space-300);
+  margin-bottom: var(--p-space-400);
+}
+
+.sf-forecast-card__details-btn {
+  width: 100%;
+  padding: var(--p-space-200) var(--p-space-300);
+  background-color: transparent;
+  border: 1px solid var(--p-color-border);
+  border-radius: var(--p-border-radius-100);
+  font-size: var(--p-font-size-300);
+  font-weight: 500;
+  font-family: var(--sf-sans);
+  color: var(--p-color-text-primary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.sf-forecast-card__details-btn:hover {
+  background-color: var(--p-color-bg-primary-subdued);
+  border-color: var(--p-color-border-primary);
+}

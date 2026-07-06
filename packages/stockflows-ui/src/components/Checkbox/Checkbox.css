@@ -1,0 +1,7 @@
+.sf-checkbox {
+  width: 100%;
+}
+
+.sf-checkbox :global(.Polaris-Choice) {
+  width: 100%;
+}

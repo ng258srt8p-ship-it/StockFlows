@@ -1,0 +1,7 @@
+.sf-select {
+  width: 100%;
+}
+
+.sf-select :global(.Polaris-Select) {
+  width: 100%;
+}

@@ -12,7 +12,7 @@
 import "@shopify/shopify-api/adapters/web-api";
 
 import {
-  LATEST_API_VERSION,
+  ApiVersion,
   shopifyApp,
   DeliveryMethod,
 } from "@shopify/shopify-app-remix/server";
@@ -115,7 +115,7 @@ const shopify = shopifyApp({
   sessionStorage: new PrismaSessionStorage(),
   useOnlineTokens: true,
   isEmbeddedApp: true,
-  apiVersion: LATEST_API_VERSION,
+  apiVersion: '2026-07',
   authPathPrefix: "/auth",
 
   webhooks: {

@@ -1,0 +1,24 @@
+{
+  "summary": {
+    "totalInventoryValue": 2101.72,
+    "totalItems": 10,
+    "totalMovements": 310,
+    "movements": {
+      "inbound": { "units": 0, "label": "Received & Returns", "color": "#16a34a", "bgColor": "#f0fdf4", "borderColor": "#bbf7d0" },
+      "outbound": { "units": 1465, "label": "Sales & Shipments", "color": "#2563eb", "bgColor": "#eff6ff", "borderColor": "#bfdbfe" },
+      "adjustments": { "units": 0, "label": "Manual & System Adjustments", "color": "#d97706", "bgColor": "#fffbeb", "borderColor": "#fde68a" }
+    }
+  },
+  "inventoryValuation": [
+    { "product": "Widget Pro", "sku": "WDG-001", "quantity": 150, "unitCost": 5.99, "totalValue": 898.50 },
+    { "product": "Widget Basic", "sku": "WDG-002", "quantity": 8, "unitCost": 2.49, "totalValue": 19.92 },
+    { "product": "Gadget XL", "sku": "GAD-001", "quantity": 0, "unitCost": 12.99, "totalValue": 0.00 },
+    { "product": "Gadget Mini", "sku": "GAD-002", "quantity": 45, "unitCost": 7.50, "totalValue": 337.50 },
+    { "product": "Accessory Pack A", "sku": "ACC-001", "quantity": 200, "unitCost": 1.25, "totalValue": 250.00 },
+    { "product": "Accessory Pack B", "sku": "ACC-002", "quantity": 3, "unitCost": 3.75, "totalValue": 11.25 },
+    { "product": "USB-C Cable 2m", "sku": "CBL-001", "quantity": 320, "unitCost": 0.89, "totalValue": 284.80 },
+    { "product": "HDMI Cable 3m", "sku": "CBL-002", "quantity": 0, "unitCost": 1.45, "totalValue": 0.00 },
+    { "product": "Shipping Box Medium", "sku": "PKG-001", "quantity": 500, "unitCost": 0.35, "totalValue": 175.00 },
+    { "product": "Bubble Wrap Roll", "sku": "PKG-002", "quantity": 25, "unitCost": 4.99, "totalValue": 124.75 }
+  ]
+}

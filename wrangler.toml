@@ -1,2 +1,2 @@
 name = "stockflows"
-pages_build_output_dir = "./public"
+pages_build_output_dir = "./pages-dist"

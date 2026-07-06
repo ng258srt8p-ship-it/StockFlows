@@ -1,0 +1,41 @@
+.sf-settings-card {
+  width: 100%;
+}
+
+.sf-settings-card__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--p-space-400);
+  margin-bottom: var(--p-space-400);
+  padding-bottom: var(--p-space-300);
+  border-bottom: 1px solid var(--p-color-border-subdued);
+}
+
+.sf-settings-card__title-section {
+  flex: 1;
+  min-width: 0;
+}
+
+.sf-settings-card__title {
+  margin: 0 0 var(--p-space-100);
+  font-size: var(--p-font-size-400);
+  font-weight: 600;
+  font-family: var(--sf-serif);
+  color: var(--p-color-text);
+}
+
+.sf-settings-card__description {
+  margin: 0;
+  font-size: var(--p-font-size-300);
+  color: var(--p-color-text-subdued);
+  line-height: 1.5;
+}
+
+.sf-settings-card__action {
+  flex-shrink: 0;
+}
+
+.sf-settings-card__content {
+  width: 100%;
+}

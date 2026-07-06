@@ -1,0 +1,22 @@
+{
+  "notifications": {
+    "emailAlerts": true,
+    "slackEnabled": false,
+    "smsEnabled": false
+  },
+  "alertThresholds": {
+    "lowStockThreshold": 10,
+    "criticalStockThreshold": 3,
+    "safetyStockMultiplier": 1.5
+  },
+  "forecasting": {
+    "forecastHorizonDays": 30
+  },
+  "aiFeatures": {
+    "enableAiInsights": false,
+    "enableForecastExplanations": false
+  },
+  "general": {
+    "currency": "USD"
+  }
+}

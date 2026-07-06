@@ -1,0 +1,360 @@
+/* ═══════════════════════════════════════════════════
+   StockFlows Design Tokens — CSS Custom Properties
+   ═══════════════════════════════════════════════════ */
+
+:root {
+  /* ── Color Tokens ── */
+  --sf-bg: #FAFBFC;
+  --sf-surface: #FFFFFF;
+  --sf-surface-raised: #f9fafb;
+  --sf-border: #E2E8F0;
+
+  --sf-text: #0F172A;
+  --sf-text-secondary: #475569;
+  --sf-text-muted: #94A3B8;
+  --sf-text-dim: var(--sf-text-secondary);
+
+  --sf-brand: #0F172A;
+  --sf-accent: #3B82F6;
+  --sf-accent-light: #DBEAFE;
+  --sf-brand-accent: var(--sf-accent);
+
+  --sf-critical: #DC2626;
+  --sf-warning: #D97706;
+  --sf-success: #16A34A;
+
+  /* Legacy aliases (keep for backwards compat) */
+  --sf-bg-dark: #111827;
+  --sf-text-dimmer: var(--sf-text-muted);
+
+  /* ── Typography Tokens ── */
+  --sf-font: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --sf-serif: 'Instrument Serif', Georgia, serif;
+  --sf-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* ── Spacing Tokens (4px grid) ── */
+  --sf-space-1: 4px;
+  --sf-space-2: 8px;
+  --sf-space-3: 12px;
+  --sf-space-4: 16px;
+  --sf-space-5: 20px;
+  --sf-space-6: 24px;
+  --sf-space-8: 32px;
+  --sf-space-12: 48px;
+  --sf-space-16: 64px;
+
+  /* ── Radius Tokens ── */
+  --sf-radius: 12px;
+  --sf-radius-sm: 8px;
+  --sf-radius-lg: 16px;
+
+  /* ── Component Tokens ── */
+  --sf-sidebar: 240px;
+  --sf-btn-radius: 8px;
+  --sf-btn-padding: 12px 20px;
+  --sf-card-radius: 12px;
+  --sf-card-padding: 24px;
+  --sf-card-border: 1px;
+  --sf-row-height: 48px;
+
+  /* ── Polaris Color Overrides ── */
+  --p-color-bg: var(--sf-bg);
+  --p-color-bg-surface: var(--sf-surface);
+  --p-color-bg-surface-hover: #f5f5f5;
+  --p-color-text: var(--sf-text);
+  --p-color-text-subdued: var(--sf-text-dim);
+  --p-color-border: var(--sf-border);
+  --p-color-border-subdued: var(--sf-border);
+  --p-color-bg-critical-subdued: #fef2f2;
+  --p-color-text-critical: var(--sf-critical);
+  --p-color-border-critical: var(--sf-critical);
+  --p-color-bg-warning-subdued: #fffbeb;
+  --p-color-text-warning: var(--sf-warning);
+  --p-color-border-warning: var(--sf-warning);
+  --p-color-bg-success-subdued: #f0fdf4;
+  --p-color-text-success: var(--sf-success);
+  --p-color-border-success: var(--sf-success);
+  --p-font-family: var(--sf-font);
+  --p-font-weight-semibold: 600;
+}
+
+/* Dark mode support (future) */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --sf-bg: #0f1117;
+    --sf-surface: #1a1d27;
+    --sf-surface-raised: #22262f;
+    --sf-border: #374151;
+
+    --sf-text: #f9fafb;
+    --sf-text-secondary: #94A3B8;
+    --sf-text-muted: #6b7280;
+    --sf-text-dim: var(--sf-text-secondary);
+
+    --sf-brand: #f9fafb;
+    --sf-accent: #60a5fa;
+    --sf-accent-light: #1e3a5f;
+    --sf-brand-accent: var(--sf-accent);
+
+    --sf-bg-dark: #fafafa;
+
+    --p-color-bg: var(--sf-bg);
+    --p-color-bg-surface: var(--sf-surface);
+    --p-color-bg-surface-hover: #262a33;
+    --p-color-text: var(--sf-text);
+    --p-color-text-subdued: var(--sf-text-dim);
+    --p-color-border: var(--sf-border);
+    --p-color-border-subdued: var(--sf-border);
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   Base Styles
+   ═══════════════════════════════════════════════════ */
+
+/* Heading Font Overrides (Instrument Serif) */
+h1,
+.Polaris-Text--headingLg,
+.Polaris-Header-Title {
+  font-family: var(--sf-serif) !important;
+}
+
+h1,
+.Polaris-Header-Title {
+  font-weight: 400 !important;
+}
+
+h2,
+.Polaris-Text--headingMd {
+  font-family: var(--sf-serif) !important;
+  font-weight: 650 !important;
+}
+
+body {
+  background-color: var(--sf-bg);
+  color: var(--sf-text);
+  font-family: var(--sf-font);
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ═══════════════════════════════════════════════════
+   Primary Button Styles (match live app)
+   ═══════════════════════════════════════════════════ */
+
+.Polaris-Button--variantPrimary {
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  font-weight: 500 !important;
+  background-color: var(--sf-brand) !important;
+  color: rgb(255, 255, 255) !important;
+  font-family: var(--sf-font) !important;
+}
+
+.Polaris-Button--variantPrimary:hover {
+  background-color: var(--sf-bg-dark) !important;
+}
+
+/* Disabled button style (match live app) */
+.Polaris-Button[disabled],
+.Polaris-Button[aria-disabled="true"] {
+  color: rgb(102, 102, 102) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   Table Header Styles (match live app)
+   ═══════════════════════════════════════════════════ */
+
+.Polaris-IndexTable__TableHeading {
+  text-transform: uppercase !important;
+  font-size: 10.4px !important;
+  font-weight: 600 !important;
+  color: var(--sf-text-muted) !important;
+  letter-spacing: 0.5px !important;
+}
+
+.Polaris-IndexTable__TableHeading .Polaris-Text--headingSm {
+  font-size: 10.4px !important;
+  font-weight: 600 !important;
+  color: var(--sf-text-muted) !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   Badge Styles (match live app outlined style)
+   ═══════════════════════════════════════════════════ */
+
+.Polaris-Badge {
+  padding: 2px 8px !important;
+  border-radius: var(--sf-radius-sm) !important;
+}
+
+.Polaris-Badge--toneSuccess {
+  color: var(--sf-success) !important;
+  border: 1px solid var(--sf-success) !important;
+  background: transparent !important;
+}
+
+.Polaris-Badge--toneWarning {
+  color: var(--sf-warning) !important;
+  border: 1px solid var(--sf-warning) !important;
+  background: transparent !important;
+}
+
+.Polaris-Badge--toneCritical {
+  color: var(--sf-critical) !important;
+  border: 1px solid var(--sf-critical) !important;
+  background: transparent !important;
+}
+
+.Polaris-Badge--toneInfo {
+  color: var(--sf-text) !important;
+  border: 1px solid var(--sf-text) !important;
+  background: transparent !important;
+}
+
+.Polaris-Badge--toneAttention {
+  color: rgb(138, 87, 23) !important;
+  border: 1px solid rgb(138, 87, 23) !important;
+  background: transparent !important;
+}
+
+/* ═══════════════════════════════════════════════════
+   Navigation Styles
+   ═══════════════════════════════════════════════════ */
+
+.Polaris-Navigation__Item {
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  color: var(--sf-text);
+  border-radius: var(--sf-radius-sm);
+  padding: 0px 4px 0px 8px;
+}
+
+.Polaris-Navigation__Item--selected {
+  font-weight: 700;
+}
+
+.Polaris-Navigation__PrimaryNavigation {
+  padding: 16px 0px 0px;
+}
+
+/* ═══════════════════════════════════════════════════
+   Page Switching (demo)
+   ═══════════════════════════════════════════════════ */
+
+.demo-page {
+  display: none;
+}
+
+.demo-page.active {
+  display: block;
+}
+
+#page-dashboard {
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════
+   Focus Visible Styles (accessibility)
+   ═══════════════════════════════════════════════════ */
+
+*:focus-visible {
+  outline: 2px solid var(--sf-brand-accent);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════
+   Reduced Motion
+   ═══════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════
+   Tour Styles (Shepherd.js overrides)
+   ═══════════════════════════════════════════════════ */
+
+.shepherd-theme-stockflows .shepherd-element {
+  background: var(--p-color-bg-surface);
+  border: 1px solid var(--p-color-border);
+  border-radius: var(--p-border-radius-300);
+  box-shadow: var(--p-shadow-200);
+  max-width: 360px;
+  padding: 0;
+}
+
+.shepherd-theme-stockflows .shepherd-header {
+  padding: var(--p-space-300);
+  border-bottom: 1px solid var(--p-color-border);
+}
+
+.shepherd-theme-stockflows .shepherd-title {
+  font-family: var(--sf-serif) !important;
+  font-weight: 400 !important;
+  color: var(--p-color-text);
+  margin: 0;
+}
+
+.shepherd-theme-stockflows .shepherd-text {
+  padding: var(--p-space-300);
+  color: var(--p-color-text);
+  line-height: 1.5;
+}
+
+.shepherd-theme-stockflows .shepherd-buttons {
+  padding: var(--p-space-200) var(--p-space-300);
+  display: flex;
+  gap: var(--p-space-200);
+  justify-content: flex-end;
+}
+
+.shepherd-theme-stockflows .shepherd-button {
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  font-weight: 500 !important;
+  font-family: var(--sf-font) !important;
+  border-radius: var(--sf-radius-sm) !important;
+}
+
+.shepherd-theme-stockflows .shepherd-button.secondary {
+  background: transparent;
+  color: var(--p-color-text);
+  border: 1px solid var(--p-color-border);
+}
+
+.shepherd-theme-stockflows .shepherd-button.secondary:hover {
+  background: var(--p-color-bg-surface-hover);
+}
+
+.shepherd-theme-stockflows .shepherd-button:not(.secondary) {
+  background: var(--sf-brand);
+  color: white;
+  border: none;
+}
+
+.shepherd-theme-stockflows .shepherd-button:not(.secondary):hover {
+  background: var(--sf-bg-dark);
+}
+
+.shepherd-theme-stockflows .shepherd-cancel-icon {
+  color: var(--p-color-text-subdued);
+  padding: var(--p-space-200);
+}
+
+.shepherd-theme-stockflows .shepherd-cancel-icon:hover {
+  color: var(--p-color-text);
+}

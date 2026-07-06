@@ -12,6 +12,8 @@ screenshots
 *.md
 *.txt
 *.yaml
+!pnpm-workspace.yaml
+!pnpm-lock.yaml
 *.yml
 *.png
 *.jpg
