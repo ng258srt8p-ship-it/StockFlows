@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import '@stockflows/ui/styles/tokens-v7.css';
 
+@source "../node_modules/@stockflows/ui/src";
+
 body {
   margin: 0;
   padding: 0;
