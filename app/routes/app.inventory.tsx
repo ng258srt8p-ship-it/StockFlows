@@ -62,8 +62,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       costPerUnit: item.costPerUnit ? Number(item.costPerUnit) : null,
       category: (item as any).category ?? (item.sku?.startsWith("PSB") ? "Footwear" : item.sku?.startsWith("PSG") ? "Accessories" : item.sku?.startsWith("HSG") ? "Apparel" : "General"),
       location: item.location?.name ?? "Default",
-      vendor: (item as any).vendor ?? "Default Vendor",
-      velocity: (item as any).velocity ?? "medium",
     })),
     totalStockValue,
   });
@@ -73,15 +71,6 @@ function getStockBadge(qty: number, reorderPoint: number): { label: string; colo
   if (qty === 0) return { label: "Out of Stock", color: "var(--danger)" };
   if (qty <= reorderPoint) return { label: "Low Stock", color: "var(--warning)" };
   return { label: "In Stock", color: "var(--success)" };
-}
-
-function getVelocityBadge(velocity: string): { label: string; color: string } {
-  switch (velocity) {
-    case "high": return { label: "High", color: "var(--danger)" };
-    case "medium": return { label: "Medium", color: "var(--warning)" };
-    case "low": return { label: "Low", color: "var(--success)" };
-    default: return { label: velocity, color: "var(--info)" };
-  }
 }
 
 export default function Inventory() {
@@ -198,21 +187,19 @@ export default function Inventory() {
                 <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Qty</th>
                 <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Reorder Pt</th>
                 <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Status</th>
-                <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Velocity</th>
                 <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Location</th>
               </tr>
             </thead>
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center" style={{ color: "var(--text-tertiary)" }}>
+                  <td colSpan={7} className="px-4 py-12 text-center" style={{ color: "var(--text-tertiary)" }}>
                     No items match your filters.
                   </td>
                 </tr>
               ) : (
                 filtered.map((item) => {
                   const stock = getStockBadge(item.quantity, item.reorderPoint);
-                  const velocity = getVelocityBadge(item.velocity);
                   return (
                     <tr
                       key={item.id}
@@ -247,14 +234,6 @@ export default function Inventory() {
                           style={{ backgroundColor: `${stock.color}15`, color: stock.color }}
                         >
                           {stock.label}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span
-                          className="inline-block px-2.5 py-1 rounded-md text-xs font-medium"
-                          style={{ backgroundColor: `${velocity.color}15`, color: velocity.color }}
-                        >
-                          {velocity.label}
                         </span>
                       </td>
                       <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>

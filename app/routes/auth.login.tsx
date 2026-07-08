@@ -15,6 +15,9 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       return e;
     }
     console.error("[auth.login] Error:", e);
-    throw e;
+    return new Response("Auth error — check Shopify configuration.", {
+      status: 200,
+      headers: { "Content-Type": "text/plain" },
+    });
   }
 };

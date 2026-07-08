@@ -212,7 +212,7 @@ export default function PurchasingList() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredPOs.map((po) => {
             const totalValue = po.lineItems.reduce((s, li) => s + Number(li.unitCost || 0) * li.quantity, 0)
-              + Number(po.shippingCost || 0) + Number(po.customsCost || 0) + Number(po.otherCost || 0);
+              + Number(po.shippingCost || 0) + Number(po.customsDuties || 0) + Number(po.otherCosts || 0);
 
             return (
               <div

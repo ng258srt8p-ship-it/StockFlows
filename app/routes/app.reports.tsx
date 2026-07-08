@@ -78,7 +78,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     // 2. Purchase orders by month
     const pos = await prisma.purchaseOrder.findMany({
       where: { shopId: shop.id },
-      select: { createdAt: true, totalCost: true },
+      include: { lineItems: { select: { unitCost: true, quantity: true } } },
       orderBy: { createdAt: "asc" },
     });
 
@@ -88,7 +88,8 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       if (!poMap.has(month)) poMap.set(month, { orders: 0, value: 0 });
       const m = poMap.get(month)!;
       m.orders += 1;
-      m.value += Number(po.totalCost || 0);
+      const itemTotal = po.lineItems.reduce((s, li) => s + Number(li.unitCost || 0) * li.quantity, 0);
+      m.value += itemTotal + Number(po.shippingCost || 0) + Number(po.customsDuties || 0) + Number(po.otherCosts || 0);
     });
 
     const poByMonth = Array.from(poMap.entries()).slice(-6).map(([month, data]) => ({
