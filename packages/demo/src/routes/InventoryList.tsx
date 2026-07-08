@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Badge, Card, StatCard } from '@stockflows/ui';
+import { PageHeader } from '@stockflows/ui';
 import { useDemoStore } from '../store/useStore';
 
 const InventoryList: React.FC = () => {
@@ -35,7 +36,7 @@ const InventoryList: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Inventory ({inventory.length} SKUs)</h1>
+      <PageHeader title="Inventory" subtitle={`${inventory.length} SKUs tracked`} actions={[{ label: 'Add SKU', onClick: () => {} }]} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <StatCard label="Total SKUs" value={String(inventory.length)} trend="neutral" icon="inventory_2" />

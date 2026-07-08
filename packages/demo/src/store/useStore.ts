@@ -88,6 +88,62 @@ export interface ActivityItem {
   user: string;
 }
 
+export interface NotificationSettings {
+  emailAlerts: boolean;
+  pushNotifications: boolean;
+  smsAlerts: boolean;
+  alertFrequency: 'realtime' | 'hourly' | 'daily';
+  lowStockThreshold: number;
+  outOfStockAlerts: boolean;
+  supplierDelayAlerts: boolean;
+  forecastUpdates: boolean;
+}
+
+export interface UserPreferences {
+  language: string;
+  timezone: string;
+  currency: string;
+  theme: 'dark' | 'light' | 'system';
+  dateFormat: string;
+  timeFormat: string;
+  notifications: boolean;
+  autoSave: boolean;
+}
+
+export interface SecuritySettings {
+  twoFactorAuth: boolean;
+  lastPasswordChange: string;
+  activeSessions: number;
+  apiKeys: Array<{ id: string; name: string; created: string; lastUsed: string }>;
+}
+
+export interface TeamMember {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'editor' | 'viewer';
+  status: 'active' | 'invited' | 'disabled';
+}
+
+export interface Integration {
+  id: string;
+  name: string;
+  connected: boolean;
+  lastSync: string;
+}
+
+export interface BillingInfo {
+  plan: string;
+  billingCycle: string;
+  nextBilling: string;
+  amount: number;
+  paymentMethod: string;
+  skusUsed: number;
+  skusLimit: number;
+  ordersThisPeriod: number;
+  apiCalls: number;
+}
+
 // ---- State Interface ----
 
 interface DemoState {
@@ -128,6 +184,21 @@ interface DemoState {
   nextTourStep: () => void;
   prevTourStep: () => void;
   endTour: () => void;
+
+  // Settings
+  notificationSettings: NotificationSettings;
+  userPreferences: UserPreferences;
+  securitySettings: SecuritySettings;
+  teamMembers: TeamMember[];
+  integrations: Integration[];
+  billingInfo: BillingInfo;
+  updateNotificationSettings: (settings: Partial<NotificationSettings>) => void;
+  updateUserPreferences: (prefs: Partial<UserPreferences>) => void;
+  updateSecuritySettings: (settings: Partial<SecuritySettings>) => void;
+  addTeamMember: (member: Omit<TeamMember, 'id'>) => void;
+  removeTeamMember: (id: string) => void;
+  updateTeamMemberRole: (id: string, role: TeamMember['role']) => void;
+  toggleIntegration: (id: string) => void;
 
   // Computed helpers
   totalStockValue: () => number;
@@ -197,6 +268,92 @@ export const useDemoStore = create<DemoState>((set, get) => ({
     localStorage.setItem('sf-tour-completed', 'true');
     set({ tourActive: false, tourStep: 0, tourCompleted: true });
   },
+
+  // Settings
+  notificationSettings: {
+    emailAlerts: true,
+    pushNotifications: true,
+    smsAlerts: false,
+    alertFrequency: 'realtime',
+    lowStockThreshold: 10,
+    outOfStockAlerts: true,
+    supplierDelayAlerts: true,
+    forecastUpdates: true,
+  },
+  userPreferences: {
+    language: 'en',
+    timezone: 'America/New_York',
+    currency: 'USD',
+    theme: 'dark',
+    dateFormat: 'MM/DD/YYYY',
+    timeFormat: '12h',
+    notifications: true,
+    autoSave: true,
+  },
+  securitySettings: {
+    twoFactorAuth: true,
+    lastPasswordChange: '2026-06-15',
+    activeSessions: 2,
+    apiKeys: [
+      { id: 'key-1', name: 'Production API Key', created: '2026-03-01', lastUsed: '2026-07-08' },
+      { id: 'key-2', name: 'Development API Key', created: '2026-05-15', lastUsed: '2026-07-07' },
+    ],
+  },
+  teamMembers: [
+    { id: 'tm-1', name: 'Alex Johnson', email: 'alex@stockflows.app', role: 'admin', status: 'active' },
+    { id: 'tm-2', name: 'Sarah Chen', email: 'sarah@stockflows.app', role: 'editor', status: 'active' },
+    { id: 'tm-3', name: 'Marcus Williams', email: 'marcus@stockflows.app', role: 'editor', status: 'active' },
+    { id: 'tm-4', name: 'Priya Patel', email: 'priya@stockflows.app', role: 'viewer', status: 'active' },
+  ],
+  integrations: [
+    { id: 'int-1', name: 'Shopify', connected: true, lastSync: '2026-07-08 01:00' },
+    { id: 'int-2', name: 'ShipStation', connected: true, lastSync: '2026-07-07 18:30' },
+    { id: 'int-3', name: 'QuickBooks', connected: false, lastSync: 'Never' },
+    { id: 'int-4', name: 'WooCommerce', connected: false, lastSync: 'Never' },
+  ],
+  billingInfo: {
+    plan: 'Starter',
+    billingCycle: 'Monthly',
+    nextBilling: '2026-08-01',
+    amount: 29,
+    paymentMethod: 'Visa ending in 4242',
+    skusUsed: 156,
+    skusLimit: 500,
+    ordersThisPeriod: 23,
+    apiCalls: 4521,
+  },
+  updateNotificationSettings: (settings) =>
+    set((state) => ({
+      notificationSettings: { ...state.notificationSettings, ...settings },
+    })),
+  updateUserPreferences: (prefs) =>
+    set((state) => ({
+      userPreferences: { ...state.userPreferences, ...prefs },
+    })),
+  updateSecuritySettings: (settings) =>
+    set((state) => ({
+      securitySettings: { ...state.securitySettings, ...settings },
+    })),
+  addTeamMember: (member) =>
+    set((state) => ({
+      teamMembers: [...state.teamMembers, { ...member, id: `tm-${Date.now()}` }],
+    })),
+  removeTeamMember: (id) =>
+    set((state) => ({
+      teamMembers: state.teamMembers.filter((m) => m.id !== id),
+    })),
+  updateTeamMemberRole: (id, role) =>
+    set((state) => ({
+      teamMembers: state.teamMembers.map((m) => (m.id === id ? { ...m, role } : m)),
+    })),
+  toggleIntegration: (id) =>
+    set((state) => ({
+      integrations: state.integrations.map((i) =>
+        i.id === id
+          ? { ...i, connected: !i.connected, lastSync: !i.connected ? new Date().toISOString().slice(0, 16).replace('T', ' ') : i.lastSync }
+          : i
+      ),
+    })),
 
   // ---- Computed helpers ----
   totalStockValue: () =>

@@ -75,6 +75,15 @@ else
   log "flyctl not found, skipping Fly.io deploy"
 fi
 
+# Step 4b: Deploy to Shopify
+log "Step 4b: Deploying to Shopify..."
+if command -v shopify &> /dev/null; then
+  cd "$PROJECT_DIR"
+  shopify app deploy --allow-updates 2>&1 | tee -a "$LOG_FILE" || log "Shopify deploy failed"
+else
+  log "shopify CLI not found, skipping Shopify deploy"
+fi
+
 # Step 5: Run live e2e tests
 log "Step 5: Running live e2e tests..."
 cd "$PROJECT_DIR"

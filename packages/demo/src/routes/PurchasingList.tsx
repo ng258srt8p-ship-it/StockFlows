@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Badge, Card } from '@stockflows/ui';
+import { PageHeader } from '@stockflows/ui';
 import { useDemoStore } from '../store/useStore';
 
 const PurchasingList: React.FC = () => {
@@ -23,12 +24,11 @@ const PurchasingList: React.FC = () => {
 
   return (
     <div className="p-6">
-      <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold text-[var(--text-primary)]">Purchase Orders ({purchaseOrders.length})</h1>
-        <button className="bg-[var(--accent)] text-[var(--bg-primary)] px-4 py-2 rounded-lg font-medium">
-          New PO
-        </button>
-      </div>
+      <PageHeader
+        title="Purchase Orders"
+        subtitle={`${purchaseOrders.length} active orders`}
+        actions={[{ label: 'New PO', onClick: () => {} }]}
+      />
 
       {/* Status Filter */}
       <div className="flex gap-3 mb-6">

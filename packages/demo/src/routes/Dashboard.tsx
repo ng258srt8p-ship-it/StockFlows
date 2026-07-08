@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StatCard, Badge, Card } from '@stockflows/ui';
+import { PageHeader } from '@stockflows/ui';
 import { useDemoStore } from '../store/useStore';
 
 /* ── Skeleton helpers ───────────────────────────────────────────── */
@@ -96,7 +97,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>Dashboard</h1>
+      <PageHeader title="Dashboard" subtitle="Real-time inventory overview" />
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

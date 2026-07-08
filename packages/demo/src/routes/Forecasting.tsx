@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, Badge } from '@stockflows/ui';
+import { PageHeader } from '@stockflows/ui';
 import { useDemoStore } from '../store/useStore';
 
 const Forecasting: React.FC = () => {
@@ -11,7 +12,7 @@ const Forecasting: React.FC = () => {
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-8">Forecasting</h1>
+      <PageHeader title="Forecasting" subtitle="AI-powered demand predictions" />
 
       {/* Forecast Summary */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">

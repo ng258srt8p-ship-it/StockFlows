@@ -1,73 +1,81 @@
 import React from 'react';
-import { Card, Badge } from '@stockflows/ui';
+import { Card } from '@stockflows/ui';
+import { useDemoStore } from '../../store/useStore';
 
-const userPreferences = {
-  language: 'English',
-  timezone: 'America/New_York',
-  currency: 'USD',
-  theme: 'dark',
-  dateFormat: 'MM/DD/YYYY',
-  timeFormat: '12h',
-  notifications: true,
-  autoSave: true,
-};
-
-const PreferencesPage: React.FC = () => (
-  <div className="p-6">
-    <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-8">User Preferences</h1>
-
-    <div className="grid md:grid-cols-2 gap-6">
-      <Card>
-        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">Display Settings</h2>
-        <div className="space-y-3 text-[var(--text-secondary)]">
-          <div className="flex justify-between">
-            <span>Language:</span>
-            <span className="text-[var(--text-primary)]">{userPreferences.language}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Timezone:</span>
-            <span className="text-[var(--text-primary)]">{userPreferences.timezone}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Currency:</span>
-            <Badge status="info">{userPreferences.currency}</Badge>
-          </div>
-          <div className="flex justify-between">
-            <span>Theme:</span>
-            <Badge status={userPreferences.theme === 'dark' ? 'success' : 'info'}>
-              {userPreferences.theme}
-            </Badge>
-          </div>
-          <div className="flex justify-between">
-            <span>Date Format:</span>
-            <span className="text-[var(--text-primary)]">{userPreferences.dateFormat}</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Time Format:</span>
-            <span className="text-[var(--text-primary)]">{userPreferences.timeFormat}</span>
-          </div>
-        </div>
-      </Card>
-
-      <Card>
-        <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">System Preferences</h2>
-        <div className="space-y-3 text-[var(--text-secondary)]">
-          <div className="flex justify-between">
-            <span>Notifications:</span>
-            <Badge status={userPreferences.notifications ? 'success' : 'error'}>
-              {userPreferences.notifications ? 'Enabled' : 'Disabled'}
-            </Badge>
-          </div>
-          <div className="flex justify-between">
-            <span>Auto-Save:</span>
-            <Badge status={userPreferences.autoSave ? 'success' : 'error'}>
-              {userPreferences.autoSave ? 'Enabled' : 'Disabled'}
-            </Badge>
-          </div>
-        </div>
-      </Card>
-    </div>
-  </div>
+const Toggle: React.FC<{ enabled: boolean; onToggle: () => void }> = ({ enabled, onToggle }) => (
+  <button
+    onClick={onToggle}
+    className="relative inline-flex h-6 w-11 items-center rounded-full transition-colors"
+    style={{ backgroundColor: enabled ? 'var(--accent)' : 'var(--border-default)' }}
+  >
+    <span
+      className="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
+      style={{ transform: enabled ? 'translateX(22px)' : 'translateX(2px)' }}
+    />
+  </button>
 );
 
-export default PreferencesPage;
+export default function PreferencesPage() {
+  const { userPreferences, updateUserPreferences } = useDemoStore();
+
+  return (
+    <div className="p-6">
+      <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-8">User Preferences</h1>
+
+      <div className="grid md:grid-cols-2 gap-6">
+        <Card>
+          <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">Display Settings</h2>
+          <div className="space-y-4">
+            {[
+              { key: 'language' as const, label: 'Language', options: ['English', 'Spanish', 'French', 'German'] },
+              { key: 'timezone' as const, label: 'Timezone', options: ['America/New_York', 'America/Chicago', 'America/Denver', 'America/Los_Angeles', 'UTC'] },
+              { key: 'currency' as const, label: 'Currency', options: ['USD', 'EUR', 'GBP', 'CAD', 'AUD'] },
+              { key: 'theme' as const, label: 'Theme', options: ['dark', 'light', 'system'] },
+              { key: 'dateFormat' as const, label: 'Date Format', options: ['MM/DD/YYYY', 'DD/MM/YYYY', 'YYYY-MM-DD'] },
+              { key: 'timeFormat' as const, label: 'Time Format', options: ['12h', '24h'] },
+            ].map(({ key, label, options }) => (
+              <div key={key} className="flex items-center justify-between">
+                <span className="text-[var(--text-secondary)]">{label}:</span>
+                <select
+                  value={userPreferences[key]}
+                  onChange={(e) => updateUserPreferences({ [key]: e.target.value })}
+                  className="rounded-lg border px-3 py-1.5 text-sm text-[var(--text-primary)] bg-[var(--bg-primary)] border-[var(--border)]"
+                >
+                  {options.map((opt) => (
+                    <option key={opt} value={opt}>{opt}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className="text-xl font-bold text-[var(--text-primary)] mb-4">System Preferences</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <span className="text-[var(--text-secondary)]">Notifications:</span>
+              <Toggle
+                enabled={userPreferences.notifications}
+                onToggle={() => updateUserPreferences({ notifications: !userPreferences.notifications })}
+              />
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-[var(--text-secondary)]">Auto-Save:</span>
+              <Toggle
+                enabled={userPreferences.autoSave}
+                onToggle={() => updateUserPreferences({ autoSave: !userPreferences.autoSave })}
+              />
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <div className="mt-6 flex justify-end">
+        <button className="px-6 py-2 rounded-lg font-medium text-sm bg-[var(--accent)] text-[var(--bg-primary)]">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  );
+}

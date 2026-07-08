@@ -9,7 +9,7 @@ const settings = {
 
 const SettingsPage: React.FC = () => (
   <div className="p-6">
-    <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-8">Settings (Read-Only — Demo Mode)</h1>
+    <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-8">Settings</h1>
 
     <div className="grid md:grid-cols-2 gap-6">
       <Card>
