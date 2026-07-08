@@ -1,0 +1,250 @@
+import type { LoaderFunctionArgs } from "@remix-run/node";
+import { json } from "@remix-run/node";
+import { useLoaderData, useNavigate, useSearchParams, useNavigation } from "@remix-run/react";
+import { authenticate } from "~/lib/shopify/server";
+import { prisma } from "~/lib/db/client";
+import { requirePermission } from "~/lib/auth/middleware";
+import {
+  Page,
+  Layout,
+  Card,
+  IndexTable,
+  TextField,
+  Select,
+  Badge,
+  Button,
+  Filters,
+  SkeletonBodyText,
+  SkeletonDisplayText,
+  SkeletonPage,
+} from "@shopify/polaris";
+import { useState, useCallback } from "react";
+import type { InventoryItem, Location } from "@prisma/client";
+
+type InventoryWithLocation = InventoryItem & { location: Location };
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+  const isEmbeddedRequest = url.searchParams.has("shop") && url.searchParams.has("embedded");
+
+  // Try Shopify authentication, fall back gracefully if no session
+  let session: any;
+  try {
+    const auth = await authenticate.admin(request);
+    session = auth.session;
+  } catch (error) {
+    session = null;
+  }
+
+  // Resolve the shop record
+  let shop;
+  if (session) {
+    shop = await prisma.shop.findUnique({
+      where: { shopifyDomain: session.shop },
+    });
+  } else {
+    // Fallback: prefer stockflows2.myshopify.com if it exists, otherwise first shop
+    shop = await prisma.shop.findUnique({
+      where: { shopifyDomain: "stockflows2.myshopify.com" },
+    }) ?? await prisma.shop.findFirst();
+  }
+
+  if (!shop) return json({ items: [], locations: [] });
+
+  const locationId = url.searchParams.get("location");
+  const search = url.searchParams.get("search") || "";
+  const status = url.searchParams.get("status") || "";
+
+  const where: any = { shopId: shop.id };
+  if (locationId) where.locationId = locationId;
+  if (search) {
+    where.OR = [
+      { title: { contains: search, mode: "insensitive" } },
+      { sku: { contains: search, mode: "insensitive" } },
+      { barcode: { contains: search, mode: "insensitive" } },
+    ];
+  }
+  if (status === "low") where.quantity = { lte: prisma.inventoryItem.fields.reorderPoint };
+  if (status === "out") where.quantity = 0;
+
+  const [allItems, locations] = await Promise.all([
+    prisma.inventoryItem.findMany({
+      where,
+      include: { location: true },
+      orderBy: { updatedAt: "desc" },
+      take: 100,
+    }),
+    prisma.location.findMany({
+      where: { shopId: shop.id, isActive: true },
+      orderBy: { name: "asc" },
+    }),
+  ]);
+
+  // Filter out Shopify Gift Card test data
+  const items = allItems.filter((item) => item.title !== "Gift Card");
+
+  return json({ items, locations });
+};
+
+export default function InventoryList() {
+  const { items, locations } = useLoaderData<typeof loader>();
+  const navigate = useNavigate();
+  const navigation = useNavigation();
+  const isLoading = navigation.state === "loading";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [search, setSearch] = useState(searchParams.get("search") || "");
+
+  const handleSearch = useCallback(
+    (value: string) => {
+      setSearch(value);
+      const params = new URLSearchParams(searchParams);
+      if (value) params.set("search", value);
+      else params.delete("search");
+      setSearchParams(params);
+    },
+    [searchParams, setSearchParams]
+  );
+
+  const handleLocationFilter = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(searchParams);
+      if (value) params.set("location", value);
+      else params.delete("location");
+      setSearchParams(params);
+    },
+    [searchParams, setSearchParams]
+  );
+
+  const getStatus = (item: any) => {
+    if (item.quantity === 0) return { label: "Out of Stock", status: "critical" as const };
+    if (item.quantity <= item.reorderPoint) return { label: "Low Stock", status: "warning" as const };
+    return { label: "In Stock", status: "success" as const };
+  };
+
+  if (isLoading) {
+    return (
+      <SkeletonPage title="Inventory">
+        <Layout>
+          <Layout.Section>
+            <Card>
+              <div className="p-4">
+                <div className="flex gap-4 mb-4">
+                  <div className="flex-1">
+                    <SkeletonDisplayText size="small" />
+                  </div>
+                  <div className="w-48">
+                    <SkeletonDisplayText size="small" />
+                  </div>
+                </div>
+                <div className="space-y-4">
+                  {[1, 2, 3, 4, 5].map((i) => (
+                    <div key={i} className="flex gap-4 items-center">
+                      <div className="w-24"><SkeletonBodyText /></div>
+                      <div className="flex-1"><SkeletonBodyText /></div>
+                      <div className="w-24"><SkeletonBodyText /></div>
+                      <div className="w-16 text-right"><SkeletonBodyText /></div>
+                      <div className="w-16 text-right"><SkeletonBodyText /></div>
+                      <div className="w-24"><SkeletonBodyText /></div>
+                      <div className="w-16 text-right"><SkeletonBodyText /></div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Card>
+          </Layout.Section>
+        </Layout>
+      </SkeletonPage>
+    );
+  }
+
+  return (
+    <Page
+      title="Inventory"
+      subtitle={`${items.length} items`}
+      primaryAction={{
+        content: "Add Item",
+        onAction: () => navigate("/app/inventory/new"),
+      }}
+    >
+      <Layout>
+        <Layout.Section>
+          <Card>
+            <div className="p-4">
+              <div className="flex gap-4 mb-4">
+                <div className="flex-1">
+                  <TextField
+                    label="Search inventory"
+                    labelHidden
+                    placeholder="Search by SKU, product, or barcode..."
+                    value={search}
+                    onChange={handleSearch}
+                    autoComplete="off"
+                    clearButton
+                    onClearButtonClick={() => handleSearch("")}
+                  />
+                </div>
+                <div className="w-48">
+                  <Select
+                    options={[
+                      { label: "All locations", value: "" },
+                      ...locations.map((l) => ({ label: l.name, value: l.id })),
+                    ]}
+                    value={searchParams.get("location") || ""}
+                    onChange={handleLocationFilter}
+                  />
+                </div>
+              </div>
+
+              <IndexTable
+                resourceName={{ singular: "item", plural: "items" }}
+                itemCount={items.length}
+                headings={[
+                  { title: "SKU" },
+                  { title: "Product" },
+                  { title: "Location" },
+                  { title: "Qty", alignment: "end" },
+                  { title: "Reorder Pt", alignment: "end" },
+                  { title: "Status" },
+                  { title: "Cost", alignment: "end" },
+                ]}
+                selectable={false}
+                onRowClick={(_, row) => navigate(`/app/inventory/${row.id}`)}
+              >
+                {items.map((item, index) => {
+                  const status = getStatus(item);
+                  return (
+                    <IndexTable.Row key={item.id} id={item.id} position={index}>
+                      <IndexTable.Cell>
+                        <span className="font-mono text-sm">{item.sku || "—"}</span>
+                      </IndexTable.Cell>
+                      <IndexTable.Cell>
+                        <span className="font-medium">{item.title}</span>
+                      </IndexTable.Cell>
+                      <IndexTable.Cell>{item.location.name}</IndexTable.Cell>
+                      <IndexTable.Cell>
+                        <span className="text-right font-semibold">{item.quantity}</span>
+                      </IndexTable.Cell>
+                      <IndexTable.Cell>
+                        <span className="text-right">{item.reorderPoint}</span>
+                      </IndexTable.Cell>
+                      <IndexTable.Cell>
+                        <Badge tone={status.status}>{status.label}</Badge>
+                      </IndexTable.Cell>
+                      <IndexTable.Cell>
+                        <span className="text-right">
+                          {item.costPerUnit
+                            ? `$${Number(item.costPerUnit).toFixed(2)}`
+                            : "—"}
+                        </span>
+                      </IndexTable.Cell>
+                    </IndexTable.Row>
+                  );
+                })}
+              </IndexTable>
+            </div>
+          </Card>
+        </Layout.Section>
+      </Layout>
+    </Page>
+  );
+}

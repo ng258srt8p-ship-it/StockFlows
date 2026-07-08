@@ -1,0 +1,57 @@
+# StockFlows v7 — Fly.io Configuration
+# Deploy with: flyctl deploy
+
+app = "stockflows"
+primary_region = "iad"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+  NODE_ENV = "production"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ["app"]
+
+[http_service.concurrency]
+  type = "connections"
+  hard_limit = 250
+  soft_limit = 200
+
+[[vm]]
+  cpu_kind = "shared"
+  cpus = 1
+  memory_mb = 512
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 250
+    soft_limit = 200
+
+[[services.ports]]
+  handlers = ["http"]
+  port = 80
+  force_https = true
+
+[[services.ports]]
+  handlers = ["tls", "http"]
+  port = 443
+
+[checks]
+  [checks.health]
+    port = 8080
+    type = "http"
+    interval = "15s"
+    timeout = "5s"
+    method = "GET"
+    path = "/health"

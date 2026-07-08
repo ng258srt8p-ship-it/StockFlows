@@ -1,0 +1,9 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "@stockflows/ui#build": { "dependsOn": ["^build"] },
+    "@stockflows/app#build": { "dependsOn": ["@stockflows/ui#build"] },
+    "@stockflows/website#build": { "dependsOn": ["@stockflows/ui#build"] },
+    "@stockflows/demo#build": { "dependsOn": ["@stockflows/ui#build"] }
+  }
+}

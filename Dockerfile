@@ -1,6 +1,9 @@
 FROM node:22-bookworm-slim AS base
 WORKDIR /app
 
+# Install OpenSSL for Prisma
+RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
+
 # Enable pnpm via corepack
 RUN corepack enable && corepack prepare pnpm@9.15.0 --activate
 

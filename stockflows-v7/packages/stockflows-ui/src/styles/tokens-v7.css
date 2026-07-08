@@ -1,0 +1,108 @@
+/* StockFlows v7 Design Tokens — Wiz.io Inspired */
+:root {
+  /* Core Colors */
+  --bg-primary: #0A0B0E;
+  --bg-secondary: #14161B;
+  --bg-tertiary: #1C1E24;
+  --bg-quaternary: #252830;
+  
+  /* Accent — Neon Green */
+  --accent: #C7FB33;
+  --accent-primary: #C7FB33;
+  --accent-hover: #D4FF5C;
+  --accent-muted: rgba(199, 251, 51, 0.15);
+  
+  /* Text */
+  --text-primary: #FFFFFF;
+  --text-secondary: #A0A3AB;
+  --text-tertiary: #6B6F78;
+  
+  /* Borders */
+  --border: #2A2D35;
+  --border-default: #2A2D35;
+  --border-hover: #3A3D45;
+  
+  /* Semantic */
+  --success: #34D399;
+  --warning: #FBBF24;
+  --danger: #F87171;
+  --info: #60A5FA;
+  
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 20px rgba(199, 251, 51, 0.2);
+  
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  
+  /* Border Radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+  
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'San Francisco', system-ui, sans-serif;
+  --font-mono: 'Fira Code', 'SF Mono', monospace;
+  
+  /* Z-index */
+  --z-dropdown: 1000;
+  --z-modal: 1100;
+  --z-popover: 1200;
+  /* Skeleton */
+  --skeleton-bg: #1E2129;
+  --skeleton-shimmer: #2A2D35;
+
+  /* Focus ring */
+  --focus-ring: #C7FB33;
+  --focus-ring-offset: 2px;
+
+  /* Overlay */
+  --overlay: rgba(0, 0, 0, 0.5);
+
+  /* Tooltip */
+  --tooltip-bg: #252830;
+  --tooltip-text: #E5E7EB;
+
+  /* Toast */
+  --toast-bg: #14161B;
+  --toast-border: var(--border);
+}
+
+/* Animations */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, var(--skeleton-bg) 25%, var(--skeleton-shimmer) 50%, var(--skeleton-bg) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.focus-ring:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}

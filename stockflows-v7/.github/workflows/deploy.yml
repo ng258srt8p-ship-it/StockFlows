@@ -1,0 +1,101 @@
+# StockFlows v7 — CI/CD Pipeline
+
+name: Deploy StockFlows v7
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        package: [app, @stockflows/website, @stockflows/demo]
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.15.0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Build ${{ matrix.package }}
+        run: pnpm --filter ${{ matrix.package }} build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9.15.0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      # Deploy Shopify App to Fly.io
+      - name: Deploy to Fly.io
+        uses: superfly/flyctl-actions/setup-flyctl@master
+      
+      - name: Deploy app to Fly.io
+        run: flyctl deploy --app stockflows --remote-only
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+
+      # Deploy Website to Cloudflare Pages
+      - name: Build website
+        run: pnpm --filter @stockflows/website build
+      
+      - name: Deploy website to Cloudflare Pages
+        run: npx wrangler pages deploy packages/website/dist --project-name=stockflows-website --branch=main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      # Deploy Demo to Cloudflare Pages
+      - name: Build demo
+        run: pnpm --filter @stockflows/demo build
+      
+      - name: Deploy demo to Cloudflare Pages
+        run: npx wrangler pages deploy packages/demo/dist --project-name=stockflows-tour --branch=main
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+
+      # Health checks
+      - name: Run health checks
+        run: |
+          echo "Waiting for deployments to propagate..."
+          sleep 30
+          
+          echo "Checking Shopify App..."
+          curl -f https://stockflows.fly.dev/health || exit 1
+          
+          echo "Checking Website..."
+          curl -f https://stockflows.pages.dev | head -20 || exit 1
+          
+          echo "Checking Demo..."
+          curl -f https://stockflows.pages.dev/demo | head -20 || exit 1
+          
+          echo "All health checks passed!"

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "jsx": "react-jsx",
+    "paths": { "@stockflows/ui/*": ["./packages/stockflows-ui/src/*"] }
+  },
+  "exclude": [
+    "app/**/*",
+    "e2e/**/*",
+    "node_modules",
+    "packages/*/node_modules",
+    "packages/*/dist",
+    "prisma/**/*",
+    "scripts/**/*"
+  ]
+}

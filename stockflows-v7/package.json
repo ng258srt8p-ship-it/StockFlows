@@ -1,0 +1,12 @@
+{
+  "name": "stockflows-v7",
+  "version": "7.0.0",
+  "private": true,
+  "packageManager": "pnpm@9.15.0",
+  "scripts": {
+    "build:v7": "turbo run build",
+    "dev:website": "pnpm --filter @stockflows/website dev",
+    "dev:demo": "pnpm --filter @stockflows/demo dev",
+    "test:e2e": "playwright test"
+  }
+}
