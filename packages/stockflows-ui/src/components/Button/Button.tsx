@@ -12,24 +12,24 @@ export const Button: React.FC<ButtonProps> = ({
   className = "",
   ariaLabel,
 }) => {
-  const baseClasses = "inline-flex items-center justify-center font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-[var(--bg-primary)]";
+  const baseClasses = "inline-flex items-center justify-center font-medium transition-all duration-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[var(--accent)] focus:ring-offset-2 focus:ring-offset-white";
 
   const variantClasses = {
-    primary: "bg-[var(--accent)] text-[var(--bg-primary)] hover:bg-[var(--accent-hover)] shadow-lg hover:shadow-xl",
-    secondary: "bg-[var(--bg-secondary)] text-[var(--accent)] border-2 border-[var(--accent)] hover:bg-[var(--bg-tertiary)]",
-    ghost: "bg-transparent text-[var(--accent)] hover:bg-[var(--bg-secondary)]",
+    primary: "bg-[var(--accent)] text-white hover:bg-[var(--accent-hover)] shadow-md hover:shadow-lg",
+    secondary: "bg-white text-[var(--accent)] border-2 border-[var(--accent)]/30 hover:border-[var(--accent)] hover:shadow-md",
+    ghost: "bg-transparent text-[var(--accent)] hover:bg-[var(--accent-muted)]",
   };
-  
+
   const sizeClasses = {
     sm: "px-3 py-1.5 text-sm gap-1.5",
     md: "px-4 py-2 text-base gap-2",
     lg: "px-6 py-3 text-lg gap-2.5",
   };
-  
+
   const disabledClasses = "opacity-50 cursor-not-allowed";
-  
+
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${disabled || loading ? disabledClasses : ""} ${className}`;
-  
+
   return (
     <button
       className={classes}
