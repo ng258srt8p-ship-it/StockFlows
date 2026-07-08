@@ -326,19 +326,18 @@ test.describe('Demo Audit', () => {
     }
   });
 
-  test('demo dark theme consistency', async ({ page }) => {
+  test('demo light theme', async ({ page }) => {
     await page.goto(DEMO);
 
-    // Check background color
     const bgColor = await page.evaluate(() => {
       return getComputedStyle(document.body).backgroundColor;
     });
 
-    // Should be dark (#0A0B0E or similar)
-    if (bgColor.includes('255, 255, 255') || bgColor.includes('0, 0, 0') === false) {
+    // Should be light (#FFFFFF or similar)
+    if (!bgColor.includes('255, 255, 255') && !bgColor.includes(', 255)')) {
       const rgb = bgColor.match(/\d+/g);
-      if (rgb && parseInt(rgb[0]) > 50) {
-        recordGap('high', 'Design', 'demo', `Background not dark theme: ${bgColor}`, 'Ensure dark theme is applied');
+      if (rgb && parseInt(rgb[0]) < 200) {
+        recordGap('high', 'Design', 'demo', `Background not light theme: ${bgColor}`, 'Ensure light theme is applied');
       }
     }
   });
@@ -402,16 +401,20 @@ test.describe('Shopify App Audit', () => {
     }
   });
 
-  test('app dark theme', async ({ page }) => {
+  test('app light theme', async ({ page }) => {
     await page.goto(`${APP}/app`);
 
     const bgColor = await page.evaluate(() => {
       return getComputedStyle(document.body).backgroundColor;
     });
 
-    // App should have dark theme
-    if (bgColor.includes('255, 255, 255')) {
-      recordGap('high', 'Design', 'app', 'App has light background instead of dark', 'Apply dark theme CSS variables');
+    // App should have light theme (accept any light background, not just pure white)
+    const rgb = bgColor.match(/\d+/g);
+    if (rgb) {
+      const [r, g, b] = rgb.map(Number);
+      if (r < 200 && g < 200 && b < 200) {
+        recordGap('high', 'Design', 'app', `App has dark background: ${bgColor}`, 'Apply light theme CSS variables');
+      }
     }
   });
 });

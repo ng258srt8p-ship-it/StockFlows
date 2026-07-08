@@ -54,7 +54,7 @@ test.describe('Fly.io App Deployment', () => {
     expect(response?.status()).toBe(200);
   });
 
-  test('app renders with dark theme', async ({ page }) => {
+  test('app renders with background color', async ({ page }) => {
     await page.goto(`${FLY_APP}/app`);
     const body = page.locator('body');
     const bgColor = await body.evaluate(el => getComputedStyle(el).backgroundColor);
