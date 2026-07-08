@@ -29,7 +29,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
         <p className="text-xl text-[#A0A3AB] mb-8 max-w-3xl mx-auto">
           {subcopy}
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 justify-center">
+        <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
           {ctaPrimary && (
             <a
               href={ctaPrimary.href}

@@ -228,6 +228,11 @@ const App: React.FC = () => {
             <ActiveComponent />
           </main>
         </div>
+
+        {/* Mobile FAB for tour */}
+        <button onClick={startTour} className="tour-fab" aria-label="Take a Tour">
+          <span className="material-symbols-outlined text-[24px]">tour</span>
+        </button>
       </TourOverlay>
     </ErrorBoundary>
   );

@@ -10,7 +10,7 @@ interface TourOverlayProps {
 }
 
 export const TourOverlay: React.FC<TourOverlayProps> = ({ children }) => {
-  const { tourActive, tourStep, nextTourStep, endTour, setActiveRoute } = useDemoStore();
+  const { tourActive, endTour, setActiveRoute } = useDemoStore();
   const tourRef = useRef<any>(null);
 
   useEffect(() => {
@@ -29,21 +29,27 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({ children }) => {
         scrollTo: false,
         modalOverlayOpeningPadding: 8,
       },
-      tourOptions: {
-        useModalOverlay: true,
-      },
+      useModalOverlay: true,
     });
 
     tourRef.current = tour;
 
     tourSteps.forEach((step, i) => {
-      const targetEl = document.querySelector(step.attachTo);
+      const isLast = i === tourSteps.length - 1;
 
       tour.addStep({
         id: step.id,
         title: step.title,
         text: step.text,
-        attachTo: targetEl ? { element: step.attachTo, on: 'bottom-start' } : undefined,
+        attachTo: { element: step.attachTo, on: 'bottom-start' },
+        beforeShowPromise: () => {
+          return new Promise<void>((resolve) => {
+            if (step.route) {
+              setActiveRoute(step.route);
+            }
+            setTimeout(resolve, 200);
+          });
+        },
         buttons: [
           ...(i > 0
             ? [
@@ -55,11 +61,13 @@ export const TourOverlay: React.FC<TourOverlayProps> = ({ children }) => {
               ]
             : []),
           {
-            text: i === tourSteps.length - 1 ? 'Done' : 'Next',
-            action: i === tourSteps.length - 1 ? () => { endTour(); tour.complete(); } : () => {
-              if (step.route) setActiveRoute(step.route);
-              tour.next();
-            },
+            text: isLast ? 'Done' : 'Next',
+            action: isLast
+              ? () => {
+                  endTour();
+                  tour.complete();
+                }
+              : tour.next,
             classes: 'shepherd-button-primary',
           },
         ],
