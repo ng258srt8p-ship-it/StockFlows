@@ -59,32 +59,21 @@ export default function AppLayout() {
 
   const navItems: NavItem[] = [
     // ── Core ──
-    { key: "",      label: "Dashboard",        icon: "dashboard",         section: "Core" },
-    { key: "inventory",     label: "Inventory",          icon: "inventory_2",       section: "Core" },
-    { key: "purchasing",    label: "Purchasing",         icon: "shopping_cart",     section: "Core" },
-    { key: "forecasting",   label: "Forecasting",        icon: "trending_up",       section: "Core" },
-    { key: "reports",       label: "Reports",            icon: "bar_chart",         section: "Core" },
+    { key: "",               label: "Dashboard",        icon: "dashboard",         section: "Core" },
+    { key: "inventory",      label: "Inventory",        icon: "inventory_2",       section: "Core" },
+    { key: "purchasing",     label: "Purchasing",       icon: "shopping_cart",     section: "Core" },
+    { key: "forecasting",    label: "Forecasting",      icon: "trending_up",       section: "Core" },
+    { key: "reports",        label: "Reports",           icon: "bar_chart",         section: "Core" },
 
-    // ── Inventory ──
-    { key: "inventory",              label: "Inventory Detail",   icon: "info",            section: "Inventory" },
-    { key: "inventory/transfer",     label: "Stock Transfer",     icon: "swap_horiz",      section: "Inventory" },
-    { key: "inventory",              label: "Stock Adjust",       icon: "edit",            section: "Inventory" },
+    // ── Inventory Sub-routes ──
+    { key: "inventory/transfer",  label: "Stock Transfer",   icon: "swap_horiz",      section: "Inventory" },
 
-    // ── Purchasing ──
-    { key: "purchasing/new",         label: "New PO",             icon: "add_shopping_cart", section: "Purchasing" },
-    { key: "purchasing",             label: "PO Detail",          icon: "receipt_long",      section: "Purchasing" },
-    { key: "purchasing",             label: "Receive PO",         icon: "local_shipping",    section: "Purchasing" },
-    { key: "purchasing/vendors",     label: "Vendors",            icon: "store",             section: "Purchasing" },
-    { key: "purchasing/vendors",     label: "Vendor Detail",      icon: "business",          section: "Purchasing" },
+    // ── Purchasing Sub-routes ──
+    { key: "purchasing/new",      label: "New PO",          icon: "add_shopping_cart", section: "Purchasing" },
+    { key: "purchasing/vendors",  label: "Vendors",          icon: "store",             section: "Purchasing" },
 
     // ── Settings ──
     { key: "settings",    label: "Settings",        icon: "settings",          section: "Settings" },
-    { key: "settings",    label: "Notifications",   icon: "notifications",     section: "Settings" },
-    { key: "settings",    label: "Integrations",    icon: "extension",         section: "Settings" },
-    { key: "settings",    label: "Team Members",    icon: "group",             section: "Settings" },
-    { key: "settings",    label: "Billing",         icon: "credit_card",       section: "Settings" },
-    { key: "settings",    label: "Preferences",     icon: "tune",              section: "Settings" },
-    { key: "settings",    label: "Security",        icon: "shield",            section: "Settings" },
 
     // ── System ──
     { key: "migration",   label: "Migration",       icon: "cloud_sync",        section: "System" },
@@ -109,6 +98,12 @@ export default function AppLayout() {
   const isActive = (item: NavItem): boolean => {
     if (item.href) return path === item.href;
     if (item.key === "") return path === "/app" || path === "/app/";
+    // Core items use exact match so sub-routes (e.g. inventory/transfer) don't
+    // highlight the parent Core button (e.g. Inventory).
+    const exactSections = ["Core"];
+    if (exactSections.includes(item.section)) {
+      return path === `/app/${item.key}`;
+    }
     return path === `/app/${item.key}` || path.startsWith(`/app/${item.key}/`);
   };
 

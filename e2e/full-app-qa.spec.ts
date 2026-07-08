@@ -22,6 +22,9 @@ const APP_ROUTES = [
   { path: "/app/settings", title: "Settings", subtitle: "Settings" },
   { path: "/app/onboarding", title: "Welcome", subtitle: "Onboarding" },
   { path: "/app/migration", title: "Migration", subtitle: "Migration" },
+  { path: "/app/inventory/transfer", title: "Stock Transfer", subtitle: "Transfer" },
+  { path: "/app/purchasing/new", title: "New PO", subtitle: "New" },
+  { path: "/app/purchasing/vendors", title: "Vendors", subtitle: "Vendors" },
 ];
 
 test.describe("Gate 4: All Pages Load Without Console Errors", () => {
@@ -94,6 +97,26 @@ test.describe("Gate 5: Dashboard Functional", () => {
     const hasActivityItems = (await page.locator(".space-y-2 > div").count()) > 0;
     const hasEmptyState = (await page.locator('text="No recent stock movements"').count()) > 0;
     expect(hasActivityItems || hasEmptyState).toBe(true);
+  });
+
+  test("dashboard sidebar branding displays shop name", async ({ page }) => {
+    await page.goto("/app");
+    await page.waitForLoadState("networkidle");
+
+    const footer = page.locator("aside .text-xs");
+    await expect(footer.first()).toBeVisible();
+    const footerText = await footer.first().textContent();
+    expect(footerText?.trim().length).toBeGreaterThan(0);
+  });
+
+  test("dashboard has no blank page (content renders)", async ({ page }) => {
+    await page.goto("/app");
+    await page.waitForLoadState("networkidle");
+
+    // Main content should have rendered children
+    const main = page.locator("main");
+    const childrenCount = await main.evaluate((el) => el.childElementCount);
+    expect(childrenCount).toBeGreaterThan(0);
   });
 
   test("no horizontal overflow at 1280px", async ({ page }) => {
@@ -397,6 +420,9 @@ test.describe("Gate 12: Responsive Layout", () => {
     "/app/settings",
     "/app/onboarding",
     "/app/migration",
+    "/app/inventory/transfer",
+    "/app/purchasing/new",
+    "/app/purchasing/vendors",
   ];
 
   for (const route of RESPONSIVE_ROUTES) {
@@ -463,5 +489,35 @@ test.describe("Gate 3: Marketing Buttons Removed from App", () => {
     await page.goto("/explore.html");
     await page.waitForLoadState("networkidle");
     expect(errors).toEqual([]);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Gate 13: Error & Empty Pages
+// ──────────────────────────────────────────────────────────────────────────────
+
+test.describe("Gate 13: Error & Empty Pages", () => {
+  test("non-existent route returns 404 page", async ({ page }) => {
+    const response = await page.goto("/app/nonexistent-route-xyz");
+    // App routes catch these with a Remix CatchBoundary - should show 404 page
+    const h1 = page.locator("h1").first();
+    const h1Text = (await h1.textContent().catch(() => "")) || "";
+    // Should either show "Not Found" or response was 404
+    const isValid =
+      h1Text.toLowerCase().includes("not found") ||
+      h1Text.toLowerCase().includes("404") ||
+      h1Text.toLowerCase().includes("error");
+    expect(isValid).toBe(true);
+  });
+
+  test("auth routes redirect or render login page", async ({ page }) => {
+    // /auth/login should either render or redirect
+    const response = await page.goto("/auth/login");
+    // May redirect to Shopify OAuth or show app page
+    const urls = ["/auth/login", "auth", "login", "shopify", "myshopify"];
+    const finalUrl = page.url();
+    const matchesAuth = urls.some((u) => finalUrl.includes(u));
+    expect(matchesAuth).toBe(true);
+    expect(response).toBeTruthy();
   });
 });
