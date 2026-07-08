@@ -61,11 +61,16 @@ echo "deploy-$(date +%s)" > pages-dist/deploy-timestamp.txt
 
 CLOUDFLARE_API_TOKEN="$CLOUDFLARE_TOKEN" npx wrangler pages deploy pages-dist --project-name=stockflows 2>&1 | tee -a "$LOG_FILE"
 
-# Step 4: Deploy to Fly.io (if Dockerfile changed)
+# Step 4: Deploy to Fly.io (only if Dockerfile changed since last deploy)
 log "Step 4: Checking Fly.io deployment..."
 if command -v flyctl &> /dev/null; then
   cd "$PROJECT_DIR"
-  flyctl deploy --app stockflows 2>&1 | tee -a "$LOG_FILE" || log "Fly.io deploy skipped or failed"
+  DOCKERFILE_CHANGED=$(git diff HEAD~1 --name-only 2>/dev/null | grep -c "Dockerfile" || echo "0")
+  if [ "$DOCKERFILE_CHANGED" -gt "0" ]; then
+    flyctl deploy --app stockflows 2>&1 | tee -a "$LOG_FILE" || log "Fly.io deploy failed"
+  else
+    log "No Dockerfile changes, skipping Fly.io deploy"
+  fi
 else
   log "flyctl not found, skipping Fly.io deploy"
 fi
