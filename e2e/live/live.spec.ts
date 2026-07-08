@@ -90,7 +90,7 @@ test.describe('Cloudflare Pages — Website', () => {
 
   test('homepage has features section', async ({ page }) => {
     await page.goto(`${CLOUDFLARE_SITE}/`);
-    await expect(page.locator('text=AI Forecasting')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: 'AI Forecasting' })).toBeVisible({ timeout: 10000 });
   });
 
   test('homepage has pricing section', async ({ page }) => {
