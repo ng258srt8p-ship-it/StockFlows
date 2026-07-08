@@ -11,10 +11,10 @@ interface StatCardProps {
 export function StatCard({ title, value, subtitle, trend, icon }: StatCardProps) {
   const valueColor =
     trend === "positive"
-      ? "text-green-600"
+      ? "text-[var(--success)]"
       : trend === "negative"
-        ? "text-red-600"
-        : "text-gray-900";
+        ? "text-[var(--danger)]"
+        : "text-[var(--text-primary)]";
 
   return (
     <Card>

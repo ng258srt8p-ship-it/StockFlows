@@ -16,10 +16,10 @@ const tabs: { id: DemoTab; label: string; icon: typeof Layers }[] = [
 
 export default function AppSidebar({ demoTab, onSetDemoTab }: AppSidebarProps) {
   return (
-    <aside className="w-full md:w-60 bg-[#F3F4F6] border-r border-[#D1D5DB] flex flex-col shrink-0 font-mono text-[11px]">
+    <aside className="w-full md:w-60 bg-white border-r border-[var(--border)] flex flex-col shrink-0 text-sm">
       {/* Shopify Standard Admin Links */}
-      <div className="p-4 space-y-1 border-b border-[#E5E7EB]">
-        <div className="text-[9px] text-slate-400 uppercase tracking-widest px-2 font-bold mb-2">
+      <div className="p-4 space-y-1 border-b border-[var(--border)]">
+        <div className="text-xs text-[var(--text-tertiary)] font-medium px-2 mb-2">
           Shopify Admin
         </div>
         {[
@@ -31,11 +31,11 @@ export default function AppSidebar({ demoTab, onSetDemoTab }: AppSidebarProps) {
         ].map((item, idx) => (
           <div
             key={idx}
-            className="flex items-center justify-between px-2 py-1.5 text-slate-600 hover:bg-[#E5E7EB] cursor-pointer"
+            className="flex items-center justify-between px-2 py-1.5 text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] cursor-pointer rounded-lg"
           >
-            <span className="uppercase font-bold tracking-wider">{item.name}</span>
+            <span>{item.name}</span>
             {item.badge && (
-              <span className="text-[9px] bg-indigo-100 text-indigo-700 px-1.5 py-0.2 rounded-full font-bold">
+              <span className="text-[9px] bg-[var(--accent-muted)] text-[var(--accent)] px-1.5 py-0.5 rounded-full font-bold">
                 {item.badge}
               </span>
             )}
@@ -46,9 +46,9 @@ export default function AppSidebar({ demoTab, onSetDemoTab }: AppSidebarProps) {
       {/* StockFlows App Section */}
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div className="space-y-1">
-          <div className="text-[9px] text-slate-400 uppercase tracking-widest px-2 font-bold mb-3 flex items-center justify-between">
+          <div className="text-xs text-[var(--text-tertiary)] font-medium px-2 mb-3 flex items-center justify-between">
             <span>Active Apps</span>
-            <Sparkles className="h-3.5 w-3.5 text-[#C7FB33]" />
+            <Sparkles className="h-3.5 w-3.5 text-[var(--accent)]" />
           </div>
 
           {tabs.map((tab) => {
@@ -58,13 +58,13 @@ export default function AppSidebar({ demoTab, onSetDemoTab }: AppSidebarProps) {
               <button
                 key={tab.id}
                 onClick={() => onSetDemoTab(tab.id)}
-                className={`w-full text-left px-3 py-2.5 flex items-center gap-2.5 transition-all uppercase tracking-wider font-bold ${
+                className={`w-full text-left px-3 py-2.5 flex items-center gap-2.5 transition-all font-medium rounded-lg ${
                   isActive
-                    ? "bg-slate-900 text-[#C7FB33] border-l-4 border-[#C7FB33]"
-                    : "text-slate-700 hover:bg-[#E5E7EB] hover:text-slate-900"
+                    ? "bg-[var(--accent-muted)] text-[var(--accent)] border-l-4 border-[var(--accent)]"
+                    : "text-[var(--text-secondary)] hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]"
                 }`}
               >
-                <Icon className={`h-4 w-4 ${isActive ? "text-[#C7FB33]" : "text-slate-500"}`} />
+                <Icon className={`h-4 w-4 ${isActive ? "text-[var(--accent)]" : "text-[var(--text-tertiary)]"}`} />
                 <span>{tab.label}</span>
               </button>
             );
@@ -72,9 +72,9 @@ export default function AppSidebar({ demoTab, onSetDemoTab }: AppSidebarProps) {
         </div>
 
         {/* Simulated App Version Info */}
-        <div className="bg-[#E5E7EB] p-4 space-y-2 mt-4 text-[10px] text-slate-600 border border-[#D1D5DB]">
-          <div className="flex items-center gap-1.5 font-bold text-slate-800 uppercase tracking-wider">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+        <div className="bg-[var(--bg-secondary)] p-4 space-y-2 mt-4 text-xs text-[var(--text-secondary)] border border-[var(--border)] rounded-lg">
+          <div className="flex items-center gap-1.5 font-bold text-[var(--text-primary)]">
+            <ShieldCheck className="h-4 w-4 text-[var(--success)]" />
             <span>StockFlows v1.8</span>
           </div>
           <p className="leading-relaxed">

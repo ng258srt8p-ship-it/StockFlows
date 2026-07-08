@@ -51,7 +51,7 @@ export function ForecastChart({
   return (
     <div>
       {title && (
-        <h3 className="text-sm font-medium text-gray-500 mb-2">{title}</h3>
+        <h3 className="text-sm font-medium text-[var(--text-secondary)] mb-2">{title}</h3>
       )}
       <ResponsiveContainer width="100%" height={height}>
         <AreaChart data={mergedData}>
@@ -79,7 +79,7 @@ export function ForecastChart({
             type="monotone"
             dataKey="upper"
             stroke="none"
-            fill="#0066cc11"
+            fill="rgba(79, 70, 229, 0.07)"
             name="Upper Bound"
             legendType="none"
           />
@@ -96,9 +96,9 @@ export function ForecastChart({
           <Area
             type="monotone"
             dataKey="predicted"
-            stroke="#0066cc"
+            stroke="#4F46E5"
             strokeWidth={2}
-            fill="#0066cc22"
+            fill="rgba(79, 70, 229, 0.13)"
             name="Forecast"
             dot={false}
           />
@@ -108,7 +108,7 @@ export function ForecastChart({
             <Area
               type="monotone"
               dataKey="actual"
-              stroke="#008060"
+              stroke="#10B981"
               strokeWidth={2}
               fill="none"
               name="Actual"

@@ -93,7 +93,7 @@ export function ReorderRecommendation({
         </div>
 
         <div className="mb-3">
-          <div className="flex justify-between text-xs text-gray-500 mb-1">
+          <div className="flex justify-between text-xs text-[var(--text-secondary)] mb-1">
             <span>Stock Level</span>
             <span>
               {currentQty} / {currentQty + recommendedQty}
