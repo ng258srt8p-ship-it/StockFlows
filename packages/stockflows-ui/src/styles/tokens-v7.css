@@ -87,6 +87,47 @@
   --toast-border: var(--border);
 }
 
+/* Dark theme overrides */
+.dark,
+[data-theme="dark"] {
+  --bg-primary: #0A0B0E;
+  --bg-secondary: #12131A;
+  --bg-tertiary: #1A1B24;
+  --bg-quaternary: #22232E;
+
+  --accent: #6366F1;
+  --accent-primary: #6366F1;
+  --accent-hover: #818CF8;
+  --accent-muted: rgba(99, 102, 241, 0.15);
+  --accent-light: #1E1B4B;
+
+  --accent-pink: #F472B6;
+  --accent-pink-muted: rgba(244, 114, 182, 0.15);
+
+  --text-primary: #F1F5F9;
+  --text-secondary: #94A3B8;
+  --text-tertiary: #64748B;
+
+  --border: #1E293B;
+  --border-default: #1E293B;
+  --border-hover: #334155;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 24px rgba(99, 102, 241, 0.25);
+
+  --skeleton-bg: #1A1B24;
+  --skeleton-shimmer: #22232E;
+
+  --focus-ring: #6366F1;
+
+  --overlay: rgba(0, 0, 0, 0.7);
+
+  --toast-bg: #12131A;
+  --toast-border: #1E293B;
+}
+
 /* ========= Animations ========= */
 
 /* Marquee */

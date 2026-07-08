@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Navigation, HeroSection, FeatureCards, ComparisonMatrix, Footer, FeatureShowcase } from '@stockflows/ui';
 import { Pricing } from './components/Pricing';
+import { SocialProof } from './components/SocialProof';
 
 function useSectionReveal() {
   const ref = useRef<HTMLDivElement>(null);
@@ -119,6 +120,9 @@ const App: React.FC = () => {
       <div id="comparison" />
       <SectionReveal>
         <FeatureShowcase features={showcaseFeatures} />
+      </SectionReveal>
+      <SectionReveal>
+        <SocialProof />
       </SectionReveal>
       <SectionReveal>
         <Pricing />
