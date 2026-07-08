@@ -1,6 +1,8 @@
 import React from 'react';
 import { useDemoStore } from './store/useStore';
 import ErrorBoundary from './components/ErrorBoundary';
+import { TourOverlay } from './components/Tour/TourOverlay';
+import './components/Tour/tour.css';
 import Dashboard from './routes/Dashboard';
 import InventoryList from './routes/InventoryList';
 import PurchasingList from './routes/PurchasingList';
@@ -138,6 +140,7 @@ const navItems: NavItem[] = [
 const App: React.FC = () => {
   const activeRoute = useDemoStore((s) => s.activeRoute);
   const setActiveRoute = useDemoStore((s) => s.setActiveRoute);
+  const startTour = useDemoStore((s) => s.startTour);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
 
   const ActiveComponent = routeMap[activeRoute as RouteKey] || Dashboard;
@@ -149,74 +152,83 @@ const App: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div className="flex h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
-        {/* Mobile hamburger button */}
-        <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="fixed top-4 left-4 z-50 p-2 rounded-lg md:hidden"
-          style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
-          aria-label="Toggle sidebar"
-        >
-          <span className="material-symbols-outlined">{sidebarOpen ? 'close' : 'menu'}</span>
-        </button>
+      <TourOverlay>
+        <div className="flex h-screen" style={{ backgroundColor: 'var(--bg-primary)' }}>
+          {/* Mobile hamburger button */}
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="fixed top-4 left-4 z-50 p-2 rounded-lg md:hidden"
+            style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-primary)' }}
+            aria-label="Toggle sidebar"
+          >
+            <span className="material-symbols-outlined">{sidebarOpen ? 'close' : 'menu'}</span>
+          </button>
 
-        {/* Mobile overlay */}
-        {sidebarOpen && (
-          <div
-            className="fixed inset-0 bg-black/50 z-30 md:hidden"
-            onClick={() => setSidebarOpen(false)}
-          />
-        )}
+          {/* Mobile overlay */}
+          {sidebarOpen && (
+            <div
+              className="fixed inset-0 bg-black/50 z-30 md:hidden"
+              onClick={() => setSidebarOpen(false)}
+            />
+          )}
 
-        {/* Sidebar */}
-        <aside
-          className={`
-            fixed inset-y-0 left-0 z-40 w-64 flex flex-col border-r transform transition-transform duration-200 ease-in-out
-            ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            md:relative md:translate-x-0 md:z-auto
-          `}
-          style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--bg-secondary)' }}
-        >
-          <div className="p-4 border-b" style={{ borderColor: 'var(--border-default)' }}>
-            <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
-              <span style={{ color: 'var(--accent)' }}>Stock</span>Flows <span className="text-xs font-normal" style={{ color: 'var(--text-tertiary)' }}>v7 Demo</span>
-            </h1>
-          </div>
+          {/* Sidebar */}
+          <aside
+            className={`
+              fixed inset-y-0 left-0 z-40 w-64 flex flex-col border-r transform transition-transform duration-200 ease-in-out
+              ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+              md:relative md:translate-x-0 md:z-auto
+            `}
+            style={{ borderColor: 'var(--border-default)', backgroundColor: 'var(--bg-secondary)' }}
+          >
+            <div className="p-4 border-b tour-target-logo" style={{ borderColor: 'var(--border-default)' }}>
+              <h1 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                <span style={{ color: 'var(--accent)' }}>Stock</span>Flows <span className="text-xs font-normal" style={{ color: 'var(--text-tertiary)' }}>v7 Demo</span>
+              </h1>
+            </div>
 
-          <nav className="flex-1 overflow-y-auto p-3 space-y-1">
-            {navItems.map((item, idx) => {
-              const prevItem = navItems[idx - 1];
-              const showSection = !prevItem || prevItem.section !== item.section;
+            <nav className="flex-1 overflow-y-auto p-3 space-y-1 tour-target-sidebar">
+              {navItems.map((item, idx) => {
+                const prevItem = navItems[idx - 1];
+                const showSection = !prevItem || prevItem.section !== item.section;
 
-              return (
-                <React.Fragment key={item.key}>
-                  {showSection && item.section && (
-                    <div className="pt-4 pb-1 px-3 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>
-                      {item.section}
-                    </div>
-                  )}
-                  <button
-                    onClick={() => handleNavClick(item.key)}
-                    className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
-                    style={{
-                      backgroundColor: activeRoute === item.key ? 'var(--accent)' : 'transparent',
-                      color: activeRoute === item.key ? 'var(--bg-primary)' : 'var(--text-secondary)',
-                    }}
-                  >
-                    <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
-                    {item.label}
-                  </button>
-                </React.Fragment>
-              );
-            })}
-          </nav>
-        </aside>
+                return (
+                  <React.Fragment key={item.key}>
+                    {showSection && item.section && (
+                      <div className="pt-4 pb-1 px-3 text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--text-tertiary)' }}>
+                        {item.section}
+                      </div>
+                    )}
+                    <button
+                      onClick={() => handleNavClick(item.key)}
+                      className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                      style={{
+                        backgroundColor: activeRoute === item.key ? 'var(--accent)' : 'transparent',
+                        color: activeRoute === item.key ? 'var(--bg-primary)' : 'var(--text-secondary)',
+                      }}
+                    >
+                      <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                      {item.label}
+                    </button>
+                  </React.Fragment>
+                );
+              })}
+            </nav>
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto pt-14 md:pt-0">
-          <ActiveComponent />
-        </main>
-      </div>
+            <div className="p-3 border-t" style={{ borderColor: 'var(--border-default)' }}>
+              <button onClick={startTour} className="tour-trigger">
+                <span className="material-symbols-outlined text-[16px]">info</span>
+                Take a Tour
+              </button>
+            </div>
+          </aside>
+
+          {/* Main Content */}
+          <main className="flex-1 overflow-y-auto pt-14 md:pt-0 tour-target-content">
+            <ActiveComponent />
+          </main>
+        </div>
+      </TourOverlay>
     </ErrorBoundary>
   );
 };

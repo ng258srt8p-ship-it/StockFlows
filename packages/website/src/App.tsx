@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Navigation, HeroSection, FeatureCards, ComparisonMatrix, CustomerLogos, Footer } from '@stockflows/ui';
-import { SocialProof } from './components/SocialProof';
+import { Navigation, HeroSection, FeatureCards, ComparisonMatrix, Footer, FeatureShowcase } from '@stockflows/ui';
 import { Pricing } from './components/Pricing';
 
 function useSectionReveal() {
@@ -32,21 +31,45 @@ function SectionReveal({ children }: { children: React.ReactNode }) {
   );
 }
 
+const showcaseFeatures = [
+  {
+    title: 'Dashboard',
+    description: 'Real-time inventory visibility with KPI cards, low-stock alerts, and activity feed — all at a glance.',
+    image: '/screenshots/dashboard.png',
+    alt: 'StockFlows Dashboard showing inventory metrics and alerts',
+  },
+  {
+    title: 'Inventory Management',
+    description: 'Search, filter, and manage every SKU across locations with stock status indicators and velocity tracking.',
+    image: '/screenshots/inventory.png',
+    alt: 'StockFlows Inventory list with search and filters',
+  },
+  {
+    title: 'Purchase Orders',
+    description: 'End-to-end PO workflow from draft to receiving — track status, vendors, and order history.',
+    image: '/screenshots/purchasing.png',
+    alt: 'StockFlows Purchase Orders page',
+  },
+  {
+    title: 'AI Forecasting',
+    description: 'Demand predictions powered by ETS, linear regression, and moving average models with confidence scores.',
+    image: '/screenshots/forecasting.png',
+    alt: 'StockFlows AI Forecasting with demand predictions',
+  },
+  {
+    title: 'Reports & Analytics',
+    description: 'Generate inventory summaries, PO reports, forecast accuracy, and vendor performance — exportable as CSV or PDF.',
+    image: '/screenshots/reports.png',
+    alt: 'StockFlows Reports and analytics page',
+  },
+];
+
 const comparisonData = [
   { capability: 'Dynamic Transfers', stocky: 'Sunsetting' as const, stockflows: 'Full' as const },
   { capability: 'Demand Velocity Rules', stocky: 'Limited' as const, stockflows: 'Full' as const },
   { capability: 'Instant Camera Scan', stocky: 'Sunsetting' as const, stockflows: 'Full' as const },
   { capability: 'Multi-Location Support', stocky: 'Limited' as const, stockflows: 'Full' as const },
   { capability: 'Audit Trail', stocky: 'Sunsetting' as const, stockflows: 'Full' as const },
-];
-
-const customerLogos = [
-  { name: 'Shopify', src: '/logos/shopify.svg' },
-  { name: 'Nike', src: '/logos/nike.svg' },
-  { name: 'Adidas', src: '/logos/adidas.svg' },
-  { name: 'Unilever', src: '/logos/unilever.svg' },
-  { name: 'P&G', src: '/logos/pg.svg' },
-  { name: 'Nestle', src: '/logos/nestle.svg' },
 ];
 
 const App: React.FC = () => {
@@ -95,12 +118,8 @@ const App: React.FC = () => {
       </SectionReveal>
       <div id="comparison" />
       <SectionReveal>
-        <SocialProof />
+        <FeatureShowcase features={showcaseFeatures} />
       </SectionReveal>
-      <SectionReveal>
-        <CustomerLogos logos={customerLogos} />
-      </SectionReveal>
-      <div id="customers" />
       <SectionReveal>
         <Pricing />
       </SectionReveal>

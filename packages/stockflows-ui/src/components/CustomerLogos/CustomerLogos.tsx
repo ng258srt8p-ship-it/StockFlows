@@ -3,7 +3,7 @@ import type { CustomerLogosProps } from "../../types";
 
 export const CustomerLogos: React.FC<CustomerLogosProps> = ({
   logos,
-  heading = "Trusted by more than 50% of Fortune 100 companies",
+  heading = "Built for modern Shopify merchants",
   className = "",
 }) => {
   return (

@@ -120,6 +120,15 @@ interface DemoState {
   // Activity
   activity: ActivityItem[];
 
+  // Tour
+  tourActive: boolean;
+  tourStep: number;
+  tourCompleted: boolean;
+  startTour: () => void;
+  nextTourStep: () => void;
+  prevTourStep: () => void;
+  endTour: () => void;
+
   // Computed helpers
   totalStockValue: () => number;
   outOfStockCount: () => number;
@@ -176,6 +185,18 @@ export const useDemoStore = create<DemoState>((set, get) => ({
 
   // Activity
   activity: mockActivity as ActivityItem[],
+
+  // Tour
+  tourActive: false,
+  tourStep: 0,
+  tourCompleted: localStorage.getItem('sf-tour-completed') === 'true',
+  startTour: () => set({ tourActive: true, tourStep: 0 }),
+  nextTourStep: () => set((state) => ({ tourStep: state.tourStep + 1 })),
+  prevTourStep: () => set((state) => ({ tourStep: Math.max(0, state.tourStep - 1) })),
+  endTour: () => {
+    localStorage.setItem('sf-tour-completed', 'true');
+    set({ tourActive: false, tourStep: 0, tourCompleted: true });
+  },
 
   // ---- Computed helpers ----
   totalStockValue: () =>

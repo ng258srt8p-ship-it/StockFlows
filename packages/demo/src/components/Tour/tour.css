@@ -1,0 +1,106 @@
+/* Shepherd.js dark theme overrides for StockFlows demo */
+
+.tour-dark.shepherd-element {
+  background: #14161B;
+  border: 1px solid #2A2D35;
+  border-radius: 12px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  max-width: 360px;
+}
+
+.tour-dark .shepherd-header {
+  background: transparent;
+  padding: 16px 16px 0;
+  border-bottom: none;
+}
+
+.tour-dark .shepherd-title {
+  color: #FFFFFF;
+  font-weight: 600;
+  font-size: 16px;
+  margin: 0;
+}
+
+.tour-dark .shepherd-text {
+  color: #A0A3AB;
+  font-size: 14px;
+  line-height: 1.6;
+  padding: 8px 16px 16px;
+}
+
+.tour-dark .shepherd-footer {
+  padding: 0 16px 16px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.tour-dark .shepherd-button {
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.tour-dark .shepherd-button-primary {
+  background: var(--accent, #C7FB33);
+  color: #0A0B0E;
+}
+
+.tour-dark .shepherd-button-primary:hover {
+  opacity: 0.9;
+}
+
+.tour-dark .shepherd-button-secondary {
+  background: #2A2D35;
+  color: #A0A3AB;
+}
+
+.tour-dark .shepherd-button-secondary:hover {
+  background: #353840;
+  color: #FFFFFF;
+}
+
+.tour-dark .shepherd-cancel-icon {
+  color: #A0A3AB;
+  font-size: 16px;
+}
+
+.tour-dark .shepherd-cancel-icon:hover {
+  color: #FFFFFF;
+}
+
+.tour-dark .shepherd-arrow {
+  color: #14161B;
+}
+
+.tour-target-logo,
+.tour-target-sidebar,
+.tour-target-content {
+  position: relative;
+}
+
+/* Tour trigger button */
+.tour-trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: 1px solid var(--accent, #C7FB33);
+  border-radius: 8px;
+  color: var(--accent, #C7FB33);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  margin-top: 12px;
+}
+
+.tour-trigger:hover {
+  background: rgba(199, 251, 51, 0.1);
+}

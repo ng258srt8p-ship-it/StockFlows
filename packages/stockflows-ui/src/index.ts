@@ -11,6 +11,7 @@ export { FeatureCards } from './components/FeatureCards/FeatureCards';
 export { Footer } from './components/Footer/Footer';
 export { HeroSection } from './components/website/HeroSection';
 export { Navigation } from './components/website/Navigation';
+export { FeatureShowcase } from './components/website/FeatureShowcase';
 
 // Shared Components
 export { StockBadge } from './components/StockBadge/StockBadge';
