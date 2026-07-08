@@ -1,4 +1,3 @@
-import { Card, Text } from "@shopify/polaris";
 import type { ReactNode } from "react";
 
 interface SettingsCardProps {
@@ -8,23 +7,20 @@ interface SettingsCardProps {
 }
 
 /**
- * A settings card using native Polaris Card component.
- * Matches the pattern used by Forecasting and other app pages.
+ * A settings card using CSS variables matching demo visual style.
  */
 export function SettingsCard({ title, description, children }: SettingsCardProps) {
   return (
-    <Card>
-      <div className="p-4">
-        <Text variant="headingSm" as="h3">
-          {title}
-        </Text>
-        {description && (
-          <Text variant="bodySm" as="p" tone="subdued" className="mt-1">
-            {description}
-          </Text>
-        )}
-        <div className="space-y-4 mt-4">{children}</div>
-      </div>
-    </Card>
+    <div className="rounded-lg border p-5" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+      <h3 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+        {title}
+      </h3>
+      {description && (
+        <p className="text-sm mt-1" style={{ color: "var(--text-secondary)" }}>
+          {description}
+        </p>
+      )}
+      <div className="space-y-4 mt-4">{children}</div>
+    </div>
   );
 }

@@ -63,7 +63,7 @@ test.describe('Fly.io App Deployment', () => {
 
   test('app has StockFlows branding', async ({ page }) => {
     await page.goto(`${FLY_APP}/app`);
-    await expect(page.locator('text=StockFlows')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: /StockFlows v?7?/i })).toBeVisible({ timeout: 10000 });
   });
 });
 
@@ -115,7 +115,7 @@ test.describe('Cloudflare Pages — Demo', () => {
 
   test('demo has sidebar navigation', async ({ page }) => {
     await page.goto(`${CLOUDFLARE_SITE}/demo`);
-    await expect(page.locator('text=StockFlows')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByRole('heading', { name: /StockFlows v?7?/i })).toBeVisible({ timeout: 10000 });
   });
 
   test('demo has dashboard content', async ({ page }) => {

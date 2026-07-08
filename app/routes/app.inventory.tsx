@@ -1,34 +1,16 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate, useSearchParams, useNavigation } from "@remix-run/react";
-import { authenticate } from "~/lib/shopify/server";
+import { useLoaderData, useSearchParams } from "@remix-run/react";
 import { prisma } from "~/lib/db/client";
-import { requirePermission } from "~/lib/auth/middleware";
-import {
-  Page,
-  Layout,
-  Card,
-  IndexTable,
-  TextField,
-  Select,
-  Badge,
-  SkeletonBodyText,
-  SkeletonDisplayText,
-  SkeletonPage,
-} from "@shopify/polaris";
-import { useState, useCallback } from "react";
-import type { InventoryItem, Location } from "@prisma/client";
-
-type InventoryWithLocation = InventoryItem & { location: Location };
+import { authenticate } from "~/lib/shopify/server";
+import { useState } from "react";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-
-  let session: any;
+  let session: any = null;
   try {
     const auth = await authenticate.admin(request);
     session = auth.session;
-  } catch (error) {
+  } catch (e) {
     session = null;
   }
 
@@ -36,283 +18,256 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   if (session) {
     shop = await prisma.shop.findUnique({ where: { shopifyDomain: session.shop } });
   } else {
-    shop = await prisma.shop.findUnique({ where: { shopifyDomain: "stockflows2.myshopify.com" } }) ?? await prisma.shop.findFirst();
+    shop =
+      (await prisma.shop.findUnique({ where: { shopifyDomain: "stockflows2.myshopify.com" } })) ??
+      (await prisma.shop.findFirst());
   }
 
-  if (!shop) return json({ items: [], locations: [], categories: [] });
+  if (!shop) return json({ items: [], totalStockValue: 0 });
 
-  const locationId = url.searchParams.get("location");
+  const url = new URL(request.url);
   const search = url.searchParams.get("search") || "";
-  const status = url.searchParams.get("status") || "";
-  const category = url.searchParams.get("category") || "";
+  const locationId = url.searchParams.get("location") || "";
 
-  const where: any = { shopId: shop.id };
-  if (locationId) where.locationId = locationId;
-  if (search) {
-    where.OR = [
-      { title: { contains: search, mode: "insensitive" } },
-      { sku: { contains: search, mode: "insensitive" } },
-      { barcode: { contains: search, mode: "insensitive" } },
-    ];
-  }
-  if (status === "low") where.quantity = { lte: prisma.inventoryItem.fields.reorderPoint };
-  if (status === "out") where.quantity = 0;
-  if (category) where.productType = category;
-
-  const [allItems, locations] = await Promise.all([
-    prisma.inventoryItem.findMany({
-      where,
-      include: { location: true },
-      orderBy: { updatedAt: "desc" },
-      take: 200,
-    }),
-    prisma.location.findMany({
-      where: { shopId: shop.id, isActive: true },
-      orderBy: { name: "asc" },
-    }),
-  ]);
-
-  const items = allItems.filter((item) => item.title !== "Gift Card");
-
-  // Compute velocity for each item: count SALE movements in last 30 days
-  const thirtyDaysAgo = new Date();
-  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-
-  const itemIds = items.map((i) => i.id);
-  const saleMovements = await prisma.stockMovement.groupBy({
-    by: ["inventoryItemId"],
+  const items = await prisma.inventoryItem.findMany({
     where: {
-      inventoryItemId: { in: itemIds },
-      type: "SALE",
-      createdAt: { gte: thirtyDaysAgo },
+      shopId: shop.id,
+      ...(search
+        ? {
+            OR: [
+              { title: { contains: search, mode: "insensitive" } },
+              { sku: { contains: search, mode: "insensitive" } },
+            ],
+          }
+        : {}),
     },
-    _sum: { quantityChange: true },
+    include: { location: true },
+    orderBy: { updatedAt: "desc" },
+    take: 100,
   });
 
-  const velocityMap = new Map<string, number>();
-  saleMovements.forEach((m) => {
-    velocityMap.set(m.inventoryItemId, Math.abs(m._sum.quantityChange ?? 0));
+  const totalStockValue = items.reduce(
+    (sum, item) => sum + (item.costPerUnit ? Number(item.costPerUnit) * item.quantity : 0),
+    0
+  );
+
+  return json({
+    items: items.map((item) => ({
+      id: item.id,
+      title: item.title,
+      sku: item.sku,
+      quantity: item.quantity,
+      reorderPoint: item.reorderPoint,
+      reorderQuantity: item.reorderQuantity,
+      costPerUnit: item.costPerUnit ? Number(item.costPerUnit) : null,
+      category: (item as any).category ?? (item.sku?.startsWith("PSB") ? "Footwear" : item.sku?.startsWith("PSG") ? "Accessories" : item.sku?.startsWith("HSG") ? "Apparel" : "General"),
+      location: item.location?.name ?? "Default",
+      vendor: (item as any).vendor ?? "Default Vendor",
+      velocity: (item as any).velocity ?? "medium",
+    })),
+    totalStockValue,
   });
-
-  const itemsWithVelocity = items.map((item) => {
-    const sales = velocityMap.get(item.id) || 0;
-    let velocity: string;
-    if (sales > 50) velocity = "high";
-    else if (sales > 10) velocity = "medium";
-    else velocity = "low";
-    return { ...item, velocity, salesCount: sales };
-  });
-
-  // Extract unique categories from productType field
-  const categories = [...new Set(items.map((i) => i.productType).filter(Boolean))].sort() as string[];
-
-  return json({ items: itemsWithVelocity, locations, categories });
 };
 
-export default function InventoryList() {
-  const { items, locations, categories } = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
-  const navigation = useNavigation();
-  const isLoading = navigation.state === "loading";
+function getStockBadge(qty: number, reorderPoint: number): { label: string; color: string } {
+  if (qty === 0) return { label: "Out of Stock", color: "var(--danger)" };
+  if (qty <= reorderPoint) return { label: "Low Stock", color: "var(--warning)" };
+  return { label: "In Stock", color: "var(--success)" };
+}
+
+function getVelocityBadge(velocity: string): { label: string; color: string } {
+  switch (velocity) {
+    case "high": return { label: "High", color: "var(--danger)" };
+    case "medium": return { label: "Medium", color: "var(--warning)" };
+    case "low": return { label: "Low", color: "var(--success)" };
+    default: return { label: velocity, color: "var(--info)" };
+  }
+}
+
+export default function Inventory() {
+  const data = useLoaderData<typeof loader>();
   const [searchParams, setSearchParams] = useSearchParams();
-  const [search, setSearch] = useState(searchParams.get("search") || "");
-  const activeCategory = searchParams.get("category") || "";
+  const [searchInput, setSearchInput] = useState(searchParams.get("search") || "");
 
-  const handleSearch = useCallback(
-    (value: string) => {
-      setSearch(value);
-      const params = new URLSearchParams(searchParams);
-      if (value) params.set("search", value);
-      else params.delete("search");
-      setSearchParams(params);
-    },
-    [searchParams, setSearchParams]
-  );
-
-  const handleLocationFilter = useCallback(
-    (value: string) => {
-      const params = new URLSearchParams(searchParams);
-      if (value) params.set("location", value);
-      else params.delete("location");
-      setSearchParams(params);
-    },
-    [searchParams, setSearchParams]
-  );
-
-  const handleCategoryFilter = useCallback(
-    (cat: string) => {
-      const params = new URLSearchParams(searchParams);
-      if (cat) params.set("category", cat);
-      else params.delete("category");
-      setSearchParams(params);
-    },
-    [searchParams, setSearchParams]
-  );
-
-  const getStatus = (item: any) => {
-    if (item.quantity === 0) return { label: "Out of Stock", status: "critical" as const };
-    if (item.quantity <= item.reorderPoint) return { label: "Low Stock", status: "warning" as const };
-    return { label: "In Stock", status: "success" as const };
-  };
-
-  const getVelocityBadge = (velocity: string) => {
-    switch (velocity) {
-      case "high": return <Badge tone="critical">High</Badge>;
-      case "medium": return <Badge tone="warning">Medium</Badge>;
-      default: return <Badge tone="success">Low</Badge>;
-    }
-  };
-
-  if (isLoading) {
+  if (!data.items.length) {
     return (
-      <SkeletonPage title="Inventory">
-        <Layout>
-          <Layout.Section>
-            <Card>
-              <div className="p-4">
-                <SkeletonDisplayText size="small" />
-                <div className="mt-4 space-y-2">
-                  {[1, 2, 3, 4, 5].map((i) => (
-                    <SkeletonBodyText key={i} />
-                  ))}
-                </div>
-              </div>
-            </Card>
-          </Layout.Section>
-        </Layout>
-      </SkeletonPage>
+      <div className="p-6">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>Inventory</h1>
+        <p className="mb-6" style={{ color: "var(--text-secondary)" }}>0 SKUs tracked</p>
+        <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: "var(--accent-muted)", color: "var(--accent)" }}>
+          <span className="material-symbols-outlined">inventory_2</span>
+          <p className="text-sm font-medium">No inventory items yet. Sync your Shopify products to get started.</p>
+        </div>
+      </div>
     );
   }
 
+  const { items } = data;
+  const categories = ["all", ...Array.from(new Set(items.map((i) => i.category)))];
+
+  const search = searchParams.get("search") || "";
+  const categoryFilter = searchParams.get("category") || "all";
+
+  const filtered = items.filter((i) => {
+    const matchesSearch =
+      !search ||
+      i.title.toLowerCase().includes(search.toLowerCase()) ||
+      (i.sku && i.sku.toLowerCase().includes(search.toLowerCase()));
+    const matchesCategory = categoryFilter === "all" || i.category === categoryFilter;
+    return matchesSearch && matchesCategory;
+  });
+
+  const handleSearch = (value: string) => {
+    setSearchInput(value);
+    const params = new URLSearchParams(searchParams);
+    if (value) params.set("search", value);
+    else params.delete("search");
+    setSearchParams(params);
+  };
+
+  const handleCategoryFilter = (cat: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (cat === "all") params.delete("category");
+    else params.set("category", cat);
+    setSearchParams(params);
+  };
+
   return (
-    <Page
-      title="Inventory"
-      subtitle={`${items.length} SKUs tracked`}
-      primaryAction={{
-        content: "Add Item",
-        onAction: () => navigate("/app/inventory/new"),
-      }}
-    >
-      <Layout>
-        <Layout.Section>
-          {/* Category filter buttons */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
-            <button
-              onClick={() => handleCategoryFilter("")}
-              style={{
-                padding: "6px 16px",
-                borderRadius: 8,
-                fontSize: 14,
-                fontWeight: 500,
-                border: "none",
-                cursor: "pointer",
-                backgroundColor: !activeCategory ? "var(--accent)" : "var(--bg-secondary)",
-                color: !activeCategory ? "white" : "var(--text-secondary)",
-              }}
-            >
-              All
-            </button>
-            {categories.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => handleCategoryFilter(cat)}
-                style={{
-                  padding: "6px 16px",
-                  borderRadius: 8,
-                  fontSize: 14,
-                  fontWeight: 500,
-                  border: "none",
-                  cursor: "pointer",
-                  backgroundColor: activeCategory === cat ? "var(--accent)" : "var(--bg-secondary)",
-                  color: activeCategory === cat ? "white" : "var(--text-secondary)",
-                }}
-              >
-                {cat}
-              </button>
-            ))}
-          </div>
-        </Layout.Section>
+    <div className="p-6">
+      {/* Page Header */}
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+          Inventory
+        </h1>
+        <p className="mt-2" style={{ color: "var(--text-secondary)" }}>
+          {items.length} SKUs tracked
+        </p>
+      </div>
 
-        <Layout.Section>
-          <Card>
-            <div className="p-4">
-              <div className="flex gap-4 mb-4">
-                <div className="flex-1">
-                  <TextField
-                    label="Search inventory"
-                    labelHidden
-                    placeholder="Search by SKU, product, or barcode..."
-                    value={search}
-                    onChange={handleSearch}
-                    autoComplete="off"
-                    clearButton
-                    onClearButtonClick={() => handleSearch("")}
-                  />
-                </div>
-                <div className="w-48">
-                  <Select
-                    options={[
-                      { label: "All locations", value: "" },
-                      ...locations.map((l) => ({ label: l.name, value: l.id })),
-                    ]}
-                    value={searchParams.get("location") || ""}
-                    onChange={handleLocationFilter}
-                  />
-                </div>
-              </div>
+      {/* Search & Filters */}
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+        {/* Search */}
+        <div className="relative flex-1 max-w-md">
+          <span
+            className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2"
+            style={{ color: "var(--text-tertiary)", fontSize: 18 }}
+          >
+            search
+          </span>
+          <input
+            type="text"
+            placeholder="Search by title or SKU..."
+            value={searchInput}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="w-full pl-10 pr-4 py-2 rounded-lg text-sm border outline-none focus:ring-2 transition-shadow"
+            style={{
+              backgroundColor: "var(--bg-primary)",
+              borderColor: "var(--border)",
+              color: "var(--text-primary)",
+            }}
+          />
+        </div>
+      </div>
 
-              <IndexTable
-                resourceName={{ singular: "item", plural: "items" }}
-                itemCount={items.length}
-                headings={[
-                  { title: "SKU" },
-                  { title: "Product" },
-                  { title: "Category" },
-                  { title: "Location" },
-                  { title: "Qty", alignment: "end" },
-                  { title: "Reorder Pt", alignment: "end" },
-                  { title: "Velocity" },
-                  { title: "Status" },
-                  { title: "Cost", alignment: "end" },
-                ]}
-                selectable={false}
-                onRowClick={(_, row) => navigate(`/app/inventory/${row.id}`)}
-              >
-                {items.map((item, index) => {
-                  const status = getStatus(item);
+      {/* Category Filter Tabs */}
+      <div className="flex gap-3 mb-6 flex-wrap">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            onClick={() => handleCategoryFilter(cat)}
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            style={{
+              backgroundColor: categoryFilter === cat ? "var(--accent)" : "var(--bg-secondary)",
+              color: categoryFilter === cat ? "var(--bg-primary)" : "var(--text-secondary)",
+            }}
+          >
+            {cat === "all" ? "All" : cat}
+          </button>
+        ))}
+      </div>
+
+      {/* Inventory Table */}
+      <div className="rounded-lg border overflow-hidden" style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border)" }}>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr style={{ backgroundColor: "var(--bg-tertiary)" }}>
+                <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Product</th>
+                <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>SKU</th>
+                <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Category</th>
+                <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Qty</th>
+                <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Reorder Pt</th>
+                <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Status</th>
+                <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Velocity</th>
+                <th className="text-left px-4 py-3 font-semibold" style={{ color: "var(--text-secondary)" }}>Location</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.length === 0 ? (
+                <tr>
+                  <td colSpan={8} className="px-4 py-12 text-center" style={{ color: "var(--text-tertiary)" }}>
+                    No items match your filters.
+                  </td>
+                </tr>
+              ) : (
+                filtered.map((item) => {
+                  const stock = getStockBadge(item.quantity, item.reorderPoint);
+                  const velocity = getVelocityBadge(item.velocity);
                   return (
-                    <IndexTable.Row key={item.id} id={item.id} position={index}>
-                      <IndexTable.Cell>
-                        <span className="font-mono text-sm">{item.sku || "—"}</span>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <span className="font-medium">{item.title}</span>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>{item.productType || "—"}</IndexTable.Cell>
-                      <IndexTable.Cell>{item.location.name}</IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <span className="text-right font-semibold">{item.quantity}</span>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <span className="text-right">{item.reorderPoint}</span>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>{getVelocityBadge(item.velocity)}</IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <Badge tone={status.status}>{status.label}</Badge>
-                      </IndexTable.Cell>
-                      <IndexTable.Cell>
-                        <span className="text-right">
-                          {item.costPerUnit ? `$${Number(item.costPerUnit).toFixed(2)}` : "—"}
+                    <tr
+                      key={item.id}
+                      className="border-t transition-colors hover:opacity-80"
+                      style={{ borderColor: "var(--border)" }}
+                    >
+                      <td className="px-4 py-3">
+                        <span className="font-medium" style={{ color: "var(--text-primary)" }}>
+                          {item.title}
                         </span>
-                      </IndexTable.Cell>
-                    </IndexTable.Row>
+                        {item.costPerUnit && (
+                          <span className="ml-2 text-xs" style={{ color: "var(--text-tertiary)" }}>
+                            (${item.costPerUnit.toFixed(2)}/unit)
+                          </span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>
+                        {item.sku ?? "—"}
+                      </td>
+                      <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>
+                        {item.category}
+                      </td>
+                      <td className="px-4 py-3 font-medium" style={{ color: "var(--text-primary)" }}>
+                        {item.quantity}
+                      </td>
+                      <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>
+                        {item.reorderPoint}
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className="inline-block px-2.5 py-1 rounded-md text-xs font-medium"
+                          style={{ backgroundColor: `${stock.color}15`, color: stock.color }}
+                        >
+                          {stock.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span
+                          className="inline-block px-2.5 py-1 rounded-md text-xs font-medium"
+                          style={{ backgroundColor: `${velocity.color}15`, color: velocity.color }}
+                        >
+                          {velocity.label}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3" style={{ color: "var(--text-secondary)" }}>
+                        {item.location}
+                      </td>
+                    </tr>
                   );
-                })}
-              </IndexTable>
-            </div>
-          </Card>
-        </Layout.Section>
-      </Layout>
-    </Page>
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
   );
 }

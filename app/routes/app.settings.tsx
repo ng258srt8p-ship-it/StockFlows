@@ -9,17 +9,10 @@ import { shopSettingsRateLimit, rateLimitResponse } from "~/lib/middleware/rate-
 import { SettingsFormSchema } from "~/lib/schemas/settings";
 import { useState } from "react";
 import {
-  Page,
-  Layout,
   TextField,
   Select,
-  Button,
-  Banner,
-  Text,
-  Checkbox,
 } from "@shopify/polaris";
-import { SettingsCard } from "~/components/settings";
-import { NotificationToggle } from "~/components/settings";
+import { SettingsCard, NotificationToggle } from "~/components/settings";
 
 // ---------------------------------------------------------------------------
 // Server
@@ -162,11 +155,13 @@ export default function Settings() {
   // Handle error case from loader
   if ("error" in data) {
     return (
-      <Page title="Settings">
-        <Banner tone="critical">
-          <p>{data.error}: {data.message}</p>
-        </Banner>
-      </Page>
+      <div className="p-6">
+        <h1 className="text-3xl font-bold mb-2" style={{ color: "var(--text-primary)" }}>Settings</h1>
+        <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: "var(--danger-muted, #EF444415)", color: "var(--danger)" }}>
+          <span className="material-symbols-outlined">error</span>
+          <p className="text-sm font-medium">{data.error}: {data.message}</p>
+        </div>
+      </div>
     );
   }
 
@@ -198,194 +193,208 @@ export default function Settings() {
   const [forecastExplOn, setForecastExplOn] = useState(settings?.enableForecastExplanations ?? false);
 
   return (
-    <Page title="Settings" subtitle="Manage alerts, thresholds, and preferences">
-      <Layout>
-        <Layout.Section>
-            <Form method="post">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* ── Notifications Card ─────────────────────────── */}
-                  <SettingsCard
-                    title="Notifications"
-                    description="Configure how StockFlows alerts your team about low stock levels."
-                  >
-                    <NotificationToggle
-                      label="Email Alerts"
-                      checked={emailOn}
-                      onChange={setEmailOn}
-                      name="emailAlerts"
-                    />
-                    <NotificationToggle
-                      label="Slack Alerts"
-                      checked={slackOn}
-                      onChange={setSlackOn}
-                      name="slackEnabled"
-                      additionalFields={
-                        <TextField
-                          label="Slack Webhook URL"
-                          type="url"
-                          name="slackWebhookUrl"
-                          value={slackUrl}
-                          onChange={setSlackUrl}
-                          placeholder="https://hooks.slack.com/services/..."
-                          autoComplete="off"
-                        />
-                      }
-                    />
-                    <NotificationToggle
-                      label="SMS Alerts"
-                      checked={smsOn}
-                      onChange={setSmsOn}
-                      name="smsEnabled"
-                      additionalFields={
-                        <TextField
-                          label="Phone Numbers"
-                          type="text"
-                          name="smsPhoneNumbers"
-                          value={smsPhones}
-                          onChange={setSmsPhones}
-                          placeholder="+155****5310, +155****5311"
-                          autoComplete="off"
-                        />
-                      }
-                    />
-                  </SettingsCard>
+    <div className="p-6">
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+          Settings
+        </h1>
+        <p className="mt-2" style={{ color: "var(--text-secondary)" }}>
+          Manage alerts, thresholds, and preferences
+        </p>
+      </div>
 
-                  {/* ── Alert Thresholds Card ──────────────────────── */}
-                  <SettingsCard
-                    title="Alert Thresholds"
-                    description="Set stock levels that trigger reorder alerts. Critical must be lower than Low."
-                  >
-                    <TextField
-                      label="Low Stock Threshold"
-                      type="number"
-                      name="lowStockThreshold"
-                      value={lowStock}
-                      onChange={setLowStock}
-                      suffix="units"
-                      autoComplete="off"
-                    />
-                    <TextField
-                      label="Critical Stock Threshold"
-                      type="number"
-                      name="criticalStockThreshold"
-                      value={criticalStock}
-                      onChange={setCriticalStock}
-                      suffix="units"
-                      autoComplete="off"
-                    />
-                    <TextField
-                      label="Safety Stock Multiplier"
-                      type="number"
-                      step={0.1}
-                      name="safetyStockMultiplier"
-                      value={safetyStockMultiplier}
-                      onChange={setSafetyStockMultiplier}
-                      suffix="×"
-                      autoComplete="off"
-                    />
-                  </SettingsCard>
+      <Form method="post">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* ── Notifications Card ─────────────────────────── */}
+            <SettingsCard
+              title="Notifications"
+              description="Configure how StockFlows alerts your team about low stock levels."
+            >
+              <NotificationToggle
+                label="Email Alerts"
+                checked={emailOn}
+                onChange={setEmailOn}
+                name="emailAlerts"
+              />
+              <NotificationToggle
+                label="Slack Alerts"
+                checked={slackOn}
+                onChange={setSlackOn}
+                name="slackEnabled"
+                additionalFields={
+                  <TextField
+                    label="Slack Webhook URL"
+                    type="url"
+                    name="slackWebhookUrl"
+                    value={slackUrl}
+                    onChange={setSlackUrl}
+                    placeholder="https://hooks.slack.com/services/..."
+                    autoComplete="off"
+                  />
+                }
+              />
+              <NotificationToggle
+                label="SMS Alerts"
+                checked={smsOn}
+                onChange={setSmsOn}
+                name="smsEnabled"
+                additionalFields={
+                  <TextField
+                    label="Phone Numbers"
+                    type="text"
+                    name="smsPhoneNumbers"
+                    value={smsPhones}
+                    onChange={setSmsPhones}
+                    placeholder="+155****5310, +155****5311"
+                    autoComplete="off"
+                  />
+                }
+              />
+            </SettingsCard>
 
-                  {/* ── Forecasting Card ───────────────────────────── */}
-                  <SettingsCard
-                    title="Forecasting"
-                    description="Configure how far ahead the demand forecast predicts future sales."
-                  >
-                    <TextField
-                      label="Forecast Horizon"
-                      type="number"
-                      name="forecastHorizonDays"
-                      value={forecastHorizon}
-                      onChange={setForecastHorizon}
-                      suffix="days"
-                      autoComplete="off"
-                    />
-                  </SettingsCard>
+            {/* ── Alert Thresholds Card ──────────────────────── */}
+            <SettingsCard
+              title="Alert Thresholds"
+              description="Set stock levels that trigger reorder alerts. Critical must be lower than Low."
+            >
+              <TextField
+                label="Low Stock Threshold"
+                type="number"
+                name="lowStockThreshold"
+                value={lowStock}
+                onChange={setLowStock}
+                suffix="units"
+                autoComplete="off"
+              />
+              <TextField
+                label="Critical Stock Threshold"
+                type="number"
+                name="criticalStockThreshold"
+                value={criticalStock}
+                onChange={setCriticalStock}
+                suffix="units"
+                autoComplete="off"
+              />
+              <TextField
+                label="Safety Stock Multiplier"
+                type="number"
+                step={0.1}
+                name="safetyStockMultiplier"
+                value={safetyStockMultiplier}
+                onChange={setSafetyStockMultiplier}
+                suffix="×"
+                autoComplete="off"
+              />
+            </SettingsCard>
 
-                  {/* ── AI Features Card ───────────────────────────── */}
-                  <SettingsCard
-                    title="AI Features"
-                    description="Enable AI-powered insights and natural language explanations for your inventory data."
-                  >
-                    <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
-                      <Text variant="bodyMd" as="p">
-                        AI Insights
-                      </Text>
-                      <Checkbox
-                        label="AI Insights"
-                        labelHidden
-                        checked={aiInsightsOn}
-                        onChange={setAiInsightsOn}
-                      />
-                      <input
-                        type="hidden"
-                        name="enableAiInsights"
-                        value={aiInsightsOn ? "on" : ""}
-                      />
-                    </div>
-                    <Text variant="bodySm" as="p" tone="subdued">
-                      Uses OpenCode API to analyze inventory data and generate insights.
-                      Statistical forecasting still works when AI is disabled.
-                    </Text>
+            {/* ── Forecasting Card ───────────────────────────── */}
+            <SettingsCard
+              title="Forecasting"
+              description="Configure how far ahead the demand forecast predicts future sales."
+            >
+              <TextField
+                label="Forecast Horizon"
+                type="number"
+                name="forecastHorizonDays"
+                value={forecastHorizon}
+                onChange={setForecastHorizon}
+                suffix="days"
+                autoComplete="off"
+              />
+            </SettingsCard>
 
-                    <div className="flex items-center justify-between py-2 border-b border-gray-200 last:border-0">
-                      <Text variant="bodyMd" as="p">
-                        Forecast Explanations
-                      </Text>
-                      <Checkbox
-                        label="Forecast Explanations"
-                        labelHidden
-                        checked={forecastExplOn}
-                        onChange={setForecastExplOn}
-                      />
-                      <input
-                        type="hidden"
-                        name="enableForecastExplanations"
-                        value={forecastExplOn ? "on" : ""}
-                      />
-                    </div>
-                    <Text variant="bodySm" as="p" tone="subdued">
-                      Shows AI-generated natural language explanations of forecast data.
-                    </Text>
-                  </SettingsCard>
+            {/* ── AI Features Card ───────────────────────────── */}
+            <SettingsCard
+              title="AI Features"
+              description="Enable AI-powered insights and natural language explanations for your inventory data."
+            >
+              <div className="flex items-center justify-between py-2" style={{ borderBottom: "1px solid var(--border)" }}>
+                <span className="text-sm" style={{ color: "var(--text-primary)" }}>
+                  AI Insights
+                </span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={aiInsightsOn}
+                    onChange={(e) => setAiInsightsOn(e.target.checked)}
+                  />
+                  <div className="w-9 h-5 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all" style={{ backgroundColor: aiInsightsOn ? "var(--accent)" : "var(--border)" }} />
+                  <input type="hidden" name="enableAiInsights" value={aiInsightsOn ? "on" : ""} />
+                </label>
+              </div>
+              <p className="text-xs mt-2" style={{ color: "var(--text-tertiary)" }}>
+                Uses OpenCode API to analyze inventory data and generate insights.
+                Statistical forecasting still works when AI is disabled.
+              </p>
 
-                  {/* ── General Card ───────────────────────────────── */}
-                  <SettingsCard
-                    title="General"
-                    description="Configure general settings for your StockFlows account."
-                  >
-                    <Select
-                      label="Currency"
-                      name="currency"
-                      value={settings?.currency || "USD"}
-                      options={[
-                        { label: "USD ($)", value: "USD" },
-                        { label: "EUR (€)", value: "EUR" },
-                        { label: "GBP (£)", value: "GBP" },
-                        { label: "CAD (C$)", value: "CAD" },
-                        { label: "AUD (A$)", value: "AUD" },
-                      ]}
-                    />
-                  </SettingsCard>
-                </div>
+              <div className="flex items-center justify-between py-2 mt-2" style={{ borderBottom: "1px solid var(--border)" }}>
+                <span className="text-sm" style={{ color: "var(--text-primary)" }}>
+                  Forecast Explanations
+                </span>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input
+                    type="checkbox"
+                    className="sr-only peer"
+                    checked={forecastExplOn}
+                    onChange={(e) => setForecastExplOn(e.target.checked)}
+                  />
+                  <div className="w-9 h-5 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all" style={{ backgroundColor: forecastExplOn ? "var(--accent)" : "var(--border)" }} />
+                  <input type="hidden" name="enableForecastExplanations" value={forecastExplOn ? "on" : ""} />
+                </label>
+              </div>
+              <p className="text-xs mt-2" style={{ color: "var(--text-tertiary)" }}>
+                Shows AI-generated natural language explanations of forecast data.
+              </p>
+            </SettingsCard>
 
-                {/* ── Save Button ─────────────────────────────────────── */}
-                <div className="flex justify-end pt-4 border-t border-gray-200 mt-4">
-                  <Button primary submit loading={isSubmitting}>
-                    Save Settings
-                  </Button>
-                </div>
-              </Form>
+            {/* ── General Card ───────────────────────────────── */}
+            <SettingsCard
+              title="General"
+              description="Configure general settings for your StockFlows account."
+            >
+              <Select
+                label="Currency"
+                name="currency"
+                value={settings?.currency || "USD"}
+                options={[
+                  { label: "USD ($)", value: "USD" },
+                  { label: "EUR (€)", value: "EUR" },
+                  { label: "GBP (£)", value: "GBP" },
+                  { label: "CAD (C$)", value: "CAD" },
+                  { label: "AUD (A$)", value: "AUD" },
+                ]}
+              />
+            </SettingsCard>
+          </div>
 
-              {/* ── Success Banner ──────────────────────────────────── */}
-              {actionData?.success && (
-                <div className="pt-4">
-                  <Banner tone="success">
-                    <p>Settings saved successfully.</p>
-                  </Banner>
-                </div>
-              )}
-          </Layout.Section>
-      </Layout>
-    </Page>
+          {/* ── Save Button ─────────────────────────────────────── */}
+          <div className="flex justify-end pt-4 mt-4" style={{ borderTop: "1px solid var(--border)" }}>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-6 py-2.5 rounded-lg text-sm font-medium"
+              style={{
+                backgroundColor: "var(--accent)",
+                color: "white",
+                border: "none",
+                cursor: isSubmitting ? "not-allowed" : "pointer",
+              }}
+            >
+              {isSubmitting ? "Saving..." : "Save Settings"}
+            </button>
+          </div>
+        </Form>
+
+        {/* ── Success Banner ──────────────────────────────────── */}
+        {actionData?.success && (
+          <div className="pt-4">
+            <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: "#10B98115", color: "#10B981" }}>
+              <span className="material-symbols-outlined">check_circle</span>
+              <p className="text-sm font-medium">Settings saved successfully.</p>
+            </div>
+          </div>
+        )}
+    </div>
   );
 }

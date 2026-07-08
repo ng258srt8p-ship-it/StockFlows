@@ -3,7 +3,6 @@ import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { prisma } from "~/lib/db/client";
 import { authenticate } from "~/lib/shopify/server";
-import { Page, Layout, Card, Text, Select } from "@shopify/polaris";
 import { useState } from "react";
 import {
   AreaChart, Area, BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
@@ -154,115 +153,134 @@ export default function Reports() {
     URL.revokeObjectURL(url);
   };
 
+  const hasData = stockLevels.length > 0 || poByMonth.length > 0;
+
+  if (!hasData) {
+    return (
+      <div className="p-6">
+        <div className="mb-6">
+          <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>Reports & Analytics</h1>
+          <p className="mt-2" style={{ color: "var(--text-secondary)" }}>Inventory insights and performance data</p>
+        </div>
+        <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: "var(--accent-muted)", color: "var(--accent)" }}>
+          <span className="material-symbols-outlined">bar_chart</span>
+          <p className="text-sm font-medium">No data available yet. Stock movements and purchase orders will appear here.</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <Page title="Reports & Analytics">
-      <Layout>
-        <Layout.Section>
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-            <Text variant="headingMd" as="h2">Inventory insights and performance data</Text>
-            <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-              <Select
-                options={[
-                  { label: "Last 7 days", value: "7d" },
-                  { label: "Last 30 days", value: "30d" },
-                  { label: "Last 90 days", value: "90d" },
-                ]}
-                value={dateRange}
-                onChange={setDateRange}
-              />
-              <button
-                onClick={handleExportCSV}
-                style={{
-                  padding: "6px 16px", borderRadius: 8, fontSize: 14, fontWeight: 500,
-                  backgroundColor: "var(--accent)", color: "white", border: "none", cursor: "pointer",
-                }}
-              >
-                Export CSV
-              </button>
-            </div>
+    <div className="p-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
+        <div>
+          <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>Reports & Analytics</h1>
+          <p className="mt-2" style={{ color: "var(--text-secondary)" }}>Inventory insights and performance data</p>
+        </div>
+        <div className="flex items-center gap-3">
+          <select
+            value={dateRange}
+            onChange={(e) => setDateRange(e.target.value)}
+            className="px-3 py-2 rounded-lg text-sm border outline-none"
+            style={{ backgroundColor: "var(--bg-primary)", borderColor: "var(--border)", color: "var(--text-primary)" }}
+          >
+            <option value="7d">Last 7 days</option>
+            <option value="30d">Last 30 days</option>
+            <option value="90d">Last 90 days</option>
+          </select>
+          <button
+            onClick={handleExportCSV}
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            style={{ backgroundColor: "var(--accent)", color: "white", border: "none", cursor: "pointer" }}
+          >
+            Export CSV
+          </button>
+        </div>
+      </div>
+
+      {/* Charts Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        {/* Area Chart - Stock Levels */}
+        <div className="rounded-lg border p-5" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+          <h3 className="text-base font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
+            Inventory Stock Levels
+          </h3>
+          <div style={{ height: 280 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={stockLevels}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="date" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
+                <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ color: "var(--text-secondary)", fontSize: 12 }} />
+                <Area type="monotone" dataKey="stock" stroke="#4F46E5" fill="#4F46E5" fillOpacity={0.15} name="Stock Level" />
+                <Area type="monotone" dataKey="inbound" stroke="#10B981" fill="#10B981" fillOpacity={0.15} name="Inbound" />
+                <Area type="monotone" dataKey="outbound" stroke="#EF4444" fill="#EF4444" fillOpacity={0.15} name="Outbound" />
+              </AreaChart>
+            </ResponsiveContainer>
           </div>
-        </Layout.Section>
+        </div>
 
-        <Layout.Section>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-            <Card>
-              <div style={{ padding: 16 }}>
-                <Text variant="headingSm" as="h3">Inventory Stock Levels</Text>
-                <div style={{ height: 280, marginTop: 12 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <AreaChart data={stockLevels}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="date" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
-                      <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend wrapperStyle={{ color: "var(--text-secondary)", fontSize: 12 }} />
-                      <Area type="monotone" dataKey="stock" stroke="#4F46E5" fill="#4F46E5" fillOpacity={0.15} name="Stock Level" />
-                      <Area type="monotone" dataKey="inbound" stroke="#10B981" fill="#10B981" fillOpacity={0.15} name="Inbound" />
-                      <Area type="monotone" dataKey="outbound" stroke="#EF4444" fill="#EF4444" fillOpacity={0.15} name="Outbound" />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div style={{ padding: 16 }}>
-                <Text variant="headingSm" as="h3">Purchase Orders by Month</Text>
-                <div style={{ height: 280, marginTop: 12 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={poByMonth}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="month" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
-                      <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend wrapperStyle={{ color: "var(--text-secondary)", fontSize: 12 }} />
-                      <Bar dataKey="orders" fill="#4F46E5" name="Orders" radius={[4, 4, 0, 0]} />
-                      <Bar dataKey="value" fill="#EC4899" name="Value ($)" radius={[4, 4, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div style={{ padding: 16 }}>
-                <Text variant="headingSm" as="h3">Forecast Accuracy</Text>
-                <div style={{ height: 280, marginTop: 12 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={forecastAccuracy}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                      <XAxis dataKey="sku" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
-                      <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
-                      <Tooltip content={<CustomTooltip />} />
-                      <Legend wrapperStyle={{ color: "var(--text-secondary)", fontSize: 12 }} />
-                      <Line type="monotone" dataKey="actual" stroke="#4F46E5" strokeWidth={2} name="Actual" dot={{ fill: "#4F46E5" }} />
-                      <Line type="monotone" dataKey="predicted" stroke="#EC4899" strokeWidth={2} name="Predicted" strokeDasharray="5 5" dot={{ fill: "#EC4899" }} />
-                    </LineChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </Card>
-
-            <Card>
-              <div style={{ padding: 16 }}>
-                <Text variant="headingSm" as="h3">Vendor Order Distribution</Text>
-                <div style={{ height: 280, marginTop: 12 }}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie data={vendorDistribution} cx="50%" cy="50%" outerRadius={100} dataKey="orders" nameKey="name" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
-                        {vendorDistribution.map((_: any, index: number) => (
-                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                        ))}
-                      </Pie>
-                      <Tooltip content={<CustomTooltip />} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-            </Card>
+        {/* Bar Chart - POs by Month */}
+        <div className="rounded-lg border p-5" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+          <h3 className="text-base font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
+            Purchase Orders by Month
+          </h3>
+          <div style={{ height: 280 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={poByMonth}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="month" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
+                <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ color: "var(--text-secondary)", fontSize: 12 }} />
+                <Bar dataKey="orders" fill="#4F46E5" name="Orders" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="value" fill="#EC4899" name="Value ($)" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
           </div>
-        </Layout.Section>
-      </Layout>
-    </Page>
+        </div>
+
+        {/* Line Chart - Forecast Accuracy */}
+        <div className="rounded-lg border p-5" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+          <h3 className="text-base font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
+            Forecast Accuracy
+          </h3>
+          <div style={{ height: 280 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={forecastAccuracy}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="sku" tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
+                <YAxis tick={{ fill: "var(--text-secondary)", fontSize: 12 }} />
+                <Tooltip content={<CustomTooltip />} />
+                <Legend wrapperStyle={{ color: "var(--text-secondary)", fontSize: 12 }} />
+                <Line type="monotone" dataKey="actual" stroke="#4F46E5" strokeWidth={2} name="Actual" dot={{ fill: "#4F46E5" }} />
+                <Line type="monotone" dataKey="predicted" stroke="#EC4899" strokeWidth={2} name="Predicted" strokeDasharray="5 5" dot={{ fill: "#EC4899" }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        {/* Pie Chart - Vendor Distribution */}
+        <div className="rounded-lg border p-5" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+          <h3 className="text-base font-semibold mb-4" style={{ color: "var(--text-primary)" }}>
+            Vendor Order Distribution
+          </h3>
+          <div style={{ height: 280 }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie data={vendorDistribution} cx="50%" cy="50%" outerRadius={100} dataKey="orders" nameKey="name" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                  {vendorDistribution.map((_: any, index: number) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  ))}
+                </Pie>
+                <Tooltip content={<CustomTooltip />} />
+              </PieChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

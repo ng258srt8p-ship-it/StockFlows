@@ -3,39 +3,7 @@ import { json } from "@remix-run/node";
 import { useLoaderData, useNavigate, useFetcher, useNavigation, useSearchParams } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
-import { requirePermission } from "~/lib/auth/middleware";
 import { generateAutoReorderPOs } from "~/lib/purchasing/auto-reorder";
-import {
-  Page,
-  Layout,
-  Card,
-  IndexTable,
-  Badge,
-  Button,
-  Banner,
-  Text,
-  SkeletonBodyText,
-  SkeletonDisplayText,
-  SkeletonPage,
-} from "@shopify/polaris";
-import { useCallback } from "react";
-
-const statusBadge: Record<string, "info" | "success" | "warning" | "critical"> = {
-  DRAFT: "info",
-  SENT: "warning",
-  PARTIALLY_RECEIVED: "warning",
-  RECEIVED: "success",
-  CLOSED: "success",
-  CANCELLED: "critical",
-};
-
-const STATUS_FILTERS = [
-  { label: "All", value: "all" },
-  { label: "Draft", value: "DRAFT" },
-  { label: "Waiting", value: "SENT" },
-  { label: "Ready", value: "PARTIALLY_RECEIVED" },
-  { label: "Done", value: "RECEIVED" },
-];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   let session: any;
@@ -109,6 +77,32 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return json({ success: false, message: "Unknown action" }, { status: 400 });
 };
 
+const statusDisplay: Record<string, string> = {
+  DRAFT: "Draft",
+  SENT: "Waiting",
+  PARTIALLY_RECEIVED: "Ready",
+  RECEIVED: "Done",
+  CLOSED: "Completed",
+  CANCELLED: "Cancelled",
+};
+
+const statusColor: Record<string, string> = {
+  DRAFT: "var(--warning)",
+  SENT: "var(--info)",
+  PARTIALLY_RECEIVED: "var(--success)",
+  RECEIVED: "var(--success)",
+  CLOSED: "var(--success)",
+  CANCELLED: "var(--danger)",
+};
+
+const STATUS_FILTERS = [
+  { label: "All", value: "all" },
+  { label: "Draft", value: "DRAFT" },
+  { label: "Waiting", value: "SENT" },
+  { label: "Ready", value: "PARTIALLY_RECEIVED" },
+  { label: "Done", value: "RECEIVED" },
+];
+
 export default function PurchasingList() {
   const { purchaseOrders, pendingAlertCount } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
@@ -119,153 +113,163 @@ export default function PurchasingList() {
   const [searchParams, setSearchParams] = useSearchParams();
   const activeStatus = searchParams.get("status") || "all";
 
-  const handleStatusFilter = useCallback(
-    (status: string) => {
-      const params = new URLSearchParams(searchParams);
-      if (status !== "all") params.set("status", status);
-      else params.delete("status");
-      setSearchParams(params);
-    },
-    [searchParams, setSearchParams]
-  );
-
   const filteredPOs = activeStatus === "all"
     ? purchaseOrders
     : purchaseOrders.filter((po) => po.status === activeStatus);
 
-  const totalValue = filteredPOs.reduce((sum, po) => {
-    const lineTotal = po.lineItems.reduce((s, li) => s + Number(li.unitCost || 0) * li.quantity, 0);
-    return sum + lineTotal + Number(po.shippingCost || 0) + Number(po.customsCost || 0) + Number(po.otherCost || 0);
-  }, 0);
+  const handleStatusFilter = (status: string) => {
+    const params = new URLSearchParams(searchParams);
+    if (status !== "all") params.set("status", status);
+    else params.delete("status");
+    setSearchParams(params);
+  };
 
-  if (isLoading) {
-    return (
-      <SkeletonPage title="Purchase Orders">
-        <Layout>
-          <Layout.Section>
-            <Card>
-              <div className="p-4 space-y-4">
-                {[1, 2, 3, 4, 5].map((i) => (
-                  <SkeletonBodyText key={i} />
-                ))}
-              </div>
-            </Card>
-          </Layout.Section>
-        </Layout>
-      </SkeletonPage>
-    );
-  }
+  const fetcherResult = fetcher.data as { success?: boolean; message?: string } | null;
 
   return (
-    <Page
-      title="Purchase Orders"
-      subtitle={`${purchaseOrders.length} total · $${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total value`}
-      primaryAction={{
-        content: "New PO",
-        onAction: () => navigate("/app/purchasing/new"),
-      }}
-      secondaryActions={[
-        {
-          content: "Auto-generate POs",
-          onAction: () => fetcher.submit({ intent: "auto-reorder" }, { method: "post" }),
-          loading: isGenerating,
-          disabled: isGenerating || pendingAlertCount === 0,
-        },
-      ]}
-    >
-      <Layout>
-        {fetcher.data ? (
-          <Layout.Section>
-            <Banner tone={((fetcher.data as Record<string, unknown>).success ? "success" : "warning") as "success" | "warning"}>
-              <p>{String((fetcher.data as Record<string, unknown>).message ?? "")}</p>
-            </Banner>
-          </Layout.Section>
-        ) : null}
-
-        {pendingAlertCount > 0 && !fetcher.data && (
-          <Layout.Section>
-            <Banner tone="warning">
-              <p>
-                <strong>{pendingAlertCount} items</strong> need reordering.{" "}
-                <button
-                  type="button"
-                  className="underline font-medium"
-                  onClick={() => fetcher.submit({ intent: "auto-reorder" }, { method: "post" })}
-                >
-                  Generate POs automatically
-                </button>{" "}
-                or create them manually.
-              </p>
-            </Banner>
-          </Layout.Section>
-        )}
-
-        <Layout.Section>
-          {/* Status filter tabs */}
-          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-            {STATUS_FILTERS.map((sf) => (
-              <button
-                key={sf.value}
-                onClick={() => handleStatusFilter(sf.value)}
-                style={{
-                  padding: "6px 16px",
-                  borderRadius: 8,
-                  fontSize: 14,
-                  fontWeight: 500,
-                  border: "none",
-                  cursor: "pointer",
-                  backgroundColor: activeStatus === sf.value ? "var(--accent)" : "var(--bg-secondary)",
-                  color: activeStatus === sf.value ? "white" : "var(--text-secondary)",
-                }}
-              >
-                {sf.label}
-              </button>
-            ))}
-          </div>
-
-          <Card>
-            <IndexTable
-              resourceName={{ singular: "purchase order", plural: "purchase orders" }}
-              itemCount={filteredPOs.length}
-              headings={[
-                { title: "PO #" },
-                { title: "Vendor" },
-                { title: "Location" },
-                { title: "Items", alignment: "end" },
-                { title: "Status" },
-                { title: "Expected" },
-                { title: "Created" },
-              ]}
-              selectable={false}
-              onRowClick={(_, row) => navigate(`/app/purchasing/${row.id}`)}
+    <div className="p-6">
+      {/* Page Header */}
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+            Purchase Orders
+          </h1>
+          <p className="mt-2" style={{ color: "var(--text-secondary)" }}>
+            {purchaseOrders.length} total
+          </p>
+        </div>
+        <div className="flex gap-3">
+          {pendingAlertCount > 0 && (
+            <button
+              onClick={() => fetcher.submit({ intent: "auto-reorder" }, { method: "post" })}
+              disabled={isGenerating}
+              className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              style={{
+                backgroundColor: "var(--accent-muted)",
+                color: "var(--accent)",
+                border: "none",
+                cursor: isGenerating ? "not-allowed" : "pointer",
+              }}
             >
-              {filteredPOs.map((po, index) => (
-                <IndexTable.Row key={po.id} id={po.id} position={index}>
-                  <IndexTable.Cell>
-                    <span className="font-mono">{po.poNumber}</span>
-                  </IndexTable.Cell>
-                  <IndexTable.Cell>{po.vendor.name}</IndexTable.Cell>
-                  <IndexTable.Cell>{po.location.name}</IndexTable.Cell>
-                  <IndexTable.Cell>
-                    <span className="text-right">{po.lineItems.length}</span>
-                  </IndexTable.Cell>
-                  <IndexTable.Cell>
-                    <Badge tone={statusBadge[po.status] || "info"}>
-                      {po.status.replace(/_/g, " ")}
-                    </Badge>
-                  </IndexTable.Cell>
-                  <IndexTable.Cell>
-                    {po.expectedDate ? new Date(po.expectedDate).toLocaleDateString() : "—"}
-                  </IndexTable.Cell>
-                  <IndexTable.Cell>
-                    {new Date(po.createdAt).toLocaleDateString()}
-                  </IndexTable.Cell>
-                </IndexTable.Row>
-              ))}
-            </IndexTable>
-          </Card>
-        </Layout.Section>
-      </Layout>
-    </Page>
+              {isGenerating ? "Generating..." : `Auto-reorder (${pendingAlertCount})`}
+            </button>
+          )}
+          <button
+            onClick={() => navigate("/app/purchasing/new")}
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            style={{
+              backgroundColor: "var(--accent)",
+              color: "white",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            New PO
+          </button>
+        </div>
+      </div>
+
+      {/* Banner */}
+      {fetcherResult && (
+        <div
+          className="flex items-center gap-3 p-4 rounded-lg mb-6"
+          style={{
+            backgroundColor: fetcherResult.success ? "var(--success-muted, #10B98115)" : "var(--danger-muted, #EF444415)",
+            color: fetcherResult.success ? "var(--success, #10B981)" : "var(--danger, #EF4444)",
+          }}
+        >
+          <span className="material-symbols-outlined">{fetcherResult.success ? "check_circle" : "warning"}</span>
+          <p className="text-sm">{fetcherResult.message}</p>
+        </div>
+      )}
+
+      {/* Status Filter Tabs */}
+      <div className="flex gap-3 mb-6 flex-wrap">
+        {STATUS_FILTERS.map((filter) => (
+          <button
+            key={filter.value}
+            onClick={() => handleStatusFilter(filter.value)}
+            className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+            style={{
+              backgroundColor: activeStatus === filter.value ? "var(--accent)" : "var(--bg-secondary)",
+              color: activeStatus === filter.value ? "var(--bg-primary)" : "var(--text-secondary)",
+              border: "none",
+              cursor: "pointer",
+            }}
+          >
+            {filter.label}
+          </button>
+        ))}
+      </div>
+
+      {/* PO Cards */}
+      {filteredPOs.length === 0 ? (
+        <div className="text-center py-12" style={{ color: "var(--text-tertiary)" }}>
+          <span className="material-symbols-outlined text-4xl mb-2">shopping_cart</span>
+          <p className="text-sm">No purchase orders match this filter.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredPOs.map((po) => {
+            const totalValue = po.lineItems.reduce((s, li) => s + Number(li.unitCost || 0) * li.quantity, 0)
+              + Number(po.shippingCost || 0) + Number(po.customsCost || 0) + Number(po.otherCost || 0);
+
+            return (
+              <div
+                key={po.id}
+                className="rounded-lg border p-5 hover:shadow-md transition-shadow cursor-pointer"
+                style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
+                onClick={() => navigate(`/app/purchasing/${po.id}`)}
+              >
+                {/* Header */}
+                <div className="flex items-start justify-between mb-3">
+                  <div>
+                    <h3 className="text-base font-semibold" style={{ color: "var(--text-primary)" }}>
+                      {po.vendor?.name ?? "Unknown Vendor"}
+                    </h3>
+                    <p className="text-xs mt-0.5" style={{ color: "var(--text-tertiary)" }}>
+                      {po.poNumber}
+                    </p>
+                  </div>
+                  <span
+                    className="inline-block px-2.5 py-1 rounded-md text-xs font-medium"
+                    style={{ backgroundColor: `${statusColor[po.status] ?? "var(--info)"}15`, color: statusColor[po.status] ?? "var(--info)" }}
+                  >
+                    {statusDisplay[po.status] ?? po.status}
+                  </span>
+                </div>
+
+                {/* Details */}
+                <div className="space-y-2 text-sm" style={{ color: "var(--text-secondary)" }}>
+                  <div className="flex justify-between">
+                    <span>Total</span>
+                    <span className="font-medium" style={{ color: "var(--text-primary)" }}>
+                      ${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Items</span>
+                    <span className="font-medium" style={{ color: "var(--text-primary)" }}>
+                      {po.lineItems.length}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span>Location</span>
+                    <span className="font-medium" style={{ color: "var(--text-primary)" }}>
+                      {po.location?.name ?? "Default"}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Footer */}
+                <div className="mt-3 pt-3 border-t text-xs" style={{ borderColor: "var(--border)", color: "var(--text-tertiary)" }}>
+                  Created {new Date(po.createdAt).toLocaleDateString()}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 }

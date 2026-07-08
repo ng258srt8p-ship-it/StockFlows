@@ -1,162 +1,167 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Outlet, useLoaderData, useLocation, useRouteError, isRouteErrorResponse } from "@remix-run/react";
+import { useLoaderData, useLocation, useNavigate, Outlet } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
-import {
-  Frame,
-  Navigation,
-  Page,
-  Banner,
-  Card,
-  Text,
-  Button,
-  Layout,
-} from "@shopify/polaris";
-import {
-  HomeIcon,
-  PackageIcon,
-  ClipboardIcon,
-  ChartVerticalIcon,
-  SettingsIcon,
-  CartIcon,
-} from "@shopify/polaris-icons";
+import { prisma } from "~/lib/db/client";
+import { useEffect, useState } from "react";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const isEmbeddedRequest = url.searchParams.has("shop") && url.searchParams.has("embedded");
 
-  // Try Shopify authentication, fall back gracefully if no session
-  let shopDomain: string | null = null;
+  let session: any = null;
   try {
-    const { session } = await authenticate.admin(request);
-    shopDomain = session.shop;
+    const auth = await authenticate.admin(request);
+    session = auth.session;
   } catch (error) {
-    // Never re-throw auth redirects from the app layout.
-    // Let child routes handle their own auth requirements.
-    shopDomain = null;
+    session = null;
   }
-  return json({ shopDomain });
+
+  let shop;
+  if (session) {
+    shop = await prisma.shop.findUnique({
+      where: { shopifyDomain: session.shop },
+      include: { settings: true },
+    });
+  } else {
+    shop =
+      (await prisma.shop.findUnique({
+        where: { shopifyDomain: "stockflows2.myshopify.com" },
+        include: { settings: true },
+      })) ??
+      (await prisma.shop.findFirst({
+        include: { settings: true },
+      }));
+  }
+
+  return json({
+    shopName: shop?.shopifyDomain?.replace(".myshopify.com", "") ?? "StockFlows",
+    shopDomain: session?.shop ?? null,
+    isEmbedded: isEmbeddedRequest,
+  });
 };
 
 export default function AppLayout() {
-  const { shopDomain } = useLoaderData<typeof loader>();
+  const { shopName } = useLoaderData<typeof loader>();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  // Force full page navigation for embedded app links
-  // (App Bridge intercepts <a> clicks, so we use window.location)
-  const navigate = (url: string) => {
-    window.location.href = url;
-  };
+  const path = location.pathname.replace(/^\/app\/?/, "").replace(/^\/app$/, "");
+  const activeRoute = path || "dashboard";
 
-  const navigationMarkup = (
-    <Navigation location="/app">
-      <Navigation.Section
-        items={[
-          {
-            label: "Dashboard",
-            url: "/app",
-            icon: HomeIcon,
-            selected: location.pathname === "/app",
-            onClick: () => navigate("/app"),
-          },
-          {
-            label: "Inventory",
-            url: "/app/inventory",
-            icon: PackageIcon,
-            selected: location.pathname.startsWith("/app/inventory"),
-            onClick: () => navigate("/app/inventory"),
-          },
-          {
-            label: "Purchasing",
-            url: "/app/purchasing",
-            icon: CartIcon,
-            selected: location.pathname.startsWith("/app/purchasing"),
-            onClick: () => navigate("/app/purchasing"),
-          },
-          {
-            label: "Forecasting",
-            url: "/app/forecasting",
-            icon: ClipboardIcon,
-            selected: location.pathname.startsWith("/app/forecasting"),
-            onClick: () => navigate("/app/forecasting"),
-          },
-          {
-            label: "Reports",
-            url: "/app/reports",
-            icon: ChartVerticalIcon,
-            selected: location.pathname.startsWith("/app/reports"),
-            onClick: () => navigate("/app/reports"),
-          },
-        ]}
-      />
-      <Navigation.Section
-        items={[
-          {
-            label: "Settings",
-            url: "/app/settings",
-            icon: SettingsIcon,
-            selected: location.pathname.startsWith("/app/settings"),
-            onClick: () => navigate("/app/settings"),
-          },
-        ]}
-      />
-    </Navigation>
-  );
+  useEffect(() => {
+    setSidebarOpen(false);
+  }, [location.pathname]);
 
-  return (
-    <Frame navigation={navigationMarkup}>
-      <Outlet />
-    </Frame>
-  );
-}
-
-/**
- * Error boundary for all /app/* routes. Catches loader/action errors
- * and renders a user-friendly error page instead of crashing.
- */
-export function ErrorBoundary() {
-  const error = useRouteError();
-
-  let title = "Something went wrong";
-  let message = "An unexpected error occurred. Please try again.";
-
-  if (isRouteErrorResponse(error)) {
-    title = `${error.status} ${error.statusText}`;
-    message =
-      error.status === 404
-        ? "The page you're looking for doesn't exist."
-        : error.status === 403
-          ? "You don't have permission to access this page."
-          : "Something went wrong while loading this page.";
-  } else if (error instanceof Error) {
-    message = error.message || message;
+  interface NavItem {
+    key: string;
+    label: string;
+    icon: string;
+    section: string;
   }
 
+  const navItems: NavItem[] = [
+    { key: "dashboard", label: "Dashboard", icon: "dashboard", section: "Core" },
+    { key: "inventory", label: "Inventory", icon: "inventory_2", section: "Core" },
+    { key: "purchasing", label: "Purchasing", icon: "shopping_cart", section: "Core" },
+    { key: "forecasting", label: "Forecasting", icon: "trending_up", section: "Core" },
+    { key: "reports", label: "Reports", icon: "bar_chart", section: "Core" },
+    { key: "settings", label: "Settings", icon: "settings", section: "Settings" },
+  ];
+
+  const handleNavClick = (key: string) => {
+    navigate(`/app/${key === "dashboard" ? "" : key}`);
+    setSidebarOpen(false);
+  };
+
   return (
-    <Frame>
-      <Page title="Error">
-        <Layout>
-          <Layout.Section>
-            <Card>
-              <div className="p-6">
-                <Banner tone="critical">
-                  <p>{title}</p>
-                </Banner>
-                <div className="mt-4">
-                  <Text variant="bodyMd" as="p">
-                    {message}
-                  </Text>
-                </div>
-                <div className="mt-4">
-                  <Button primary url="/app">
-                    Return to Dashboard
-                  </Button>
-                </div>
+    <div className="flex h-screen" style={{ backgroundColor: "var(--bg-primary)" }}>
+      {/* Mobile hamburger */}
+      <button
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+        className="fixed top-4 left-4 z-50 p-2 rounded-lg md:hidden"
+        style={{ backgroundColor: "var(--bg-secondary)", color: "var(--text-primary)" }}
+        aria-label="Toggle sidebar"
+      >
+        <span className="material-symbols-outlined">{sidebarOpen ? "close" : "menu"}</span>
+      </button>
+
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed inset-y-0 left-0 z-40 w-64 flex flex-col border-r transform transition-transform duration-200 ease-in-out
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          md:relative md:translate-x-0 md:z-auto
+        `}
+        style={{ borderColor: "var(--border-default)", backgroundColor: "var(--bg-secondary)" }}
+      >
+        {/* Branding */}
+        <div className="p-4 border-b" style={{ borderColor: "var(--border-default)" }}>
+          <h1 className="text-xl font-bold" style={{ color: "var(--text-primary)" }}>
+            <span style={{ color: "var(--accent)" }}>Stock</span>Flows{" "}
+            <span className="text-xs font-normal" style={{ color: "var(--text-tertiary)" }}>
+              v7
+            </span>
+          </h1>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 overflow-y-auto p-3 space-y-1">
+          {navItems.map((item, idx) => {
+            const prevItem = navItems[idx - 1];
+            const showSection = !prevItem || prevItem.section !== item.section;
+            const isActive = activeRoute === item.key;
+
+            return (
+              <div key={item.key}>
+                {showSection && item.section && (
+                  <div
+                    className="pt-4 pb-1 px-3 text-xs font-semibold uppercase tracking-wider"
+                    style={{ color: "var(--text-tertiary)" }}
+                  >
+                    {item.section}
+                  </div>
+                )}
+                <button
+                  onClick={() => handleNavClick(item.key)}
+                  className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors"
+                  style={{
+                    backgroundColor: isActive ? "var(--accent)" : "transparent",
+                    color: isActive ? "var(--bg-primary)" : "var(--text-secondary)",
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!isActive) e.currentTarget.style.backgroundColor = "var(--bg-tertiary)";
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!isActive) e.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  <span className="material-symbols-outlined text-[18px]">{item.icon}</span>
+                  {item.label}
+                </button>
               </div>
-            </Card>
-          </Layout.Section>
-        </Layout>
-      </Page>
-    </Frame>
+            );
+          })}
+        </nav>
+
+        {/* Footer */}
+        <div className="p-3 border-t" style={{ borderColor: "var(--border-default)" }}>
+          <div className="text-xs px-3" style={{ color: "var(--text-tertiary)" }}>
+            {shopName}
+          </div>
+        </div>
+      </aside>
+
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto pt-14 md:pt-0">
+        <Outlet />
+      </main>
+    </div>
   );
 }

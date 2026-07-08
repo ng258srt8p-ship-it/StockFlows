@@ -1,355 +1,264 @@
 import type { LoaderFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, Link, useNavigate, useNavigation } from "@remix-run/react";
-import { authenticate } from "~/lib/shopify/server";
+import { useLoaderData } from "@remix-run/react";
 import { prisma } from "~/lib/db/client";
-import {
-  Page,
-  Layout,
-  Card,
-  Text,
-  Badge,
-  Banner,
-  EmptyState,
-  SkeletonBodyText,
-  SkeletonDisplayText,
-  SkeletonPage,
-} from "@shopify/polaris";
-import { AlertsList } from "~/components/inventory/AlertsList";
+import { authenticate } from "~/lib/shopify/server";
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const isEmbeddedRequest = url.searchParams.has("shop") && url.searchParams.has("embedded");
-
-  // --- 1. Try Shopify authentication ---
-  let session;
+  let session: any = null;
   try {
     const auth = await authenticate.admin(request);
     session = auth.session;
-  } catch (error) {
+  } catch (e) {
     session = null;
   }
 
-  // --- 2. Resolve the shop record ---
   let shop;
-
   if (session) {
-    shop = await prisma.shop.findUnique({
-      where: { shopifyDomain: session.shop },
-      include: { settings: true },
-    });
+    shop = await prisma.shop.findUnique({ where: { shopifyDomain: session.shop } });
   } else {
-    // Playwright / dev mode: prefer stockflows2 if it exists, otherwise first shop
-    shop = await prisma.shop.findUnique({
-      where: { shopifyDomain: "stockflows2.myshopify.com" },
-      include: { settings: true },
-    }) ?? await prisma.shop.findFirst({
-      include: { settings: true },
-    });
+    shop =
+      (await prisma.shop.findUnique({ where: { shopifyDomain: "stockflows2.myshopify.com" } })) ??
+      (await prisma.shop.findFirst());
   }
 
-  if (!shop) {
-    return json({
-      stats: { totalSKUs: 0, lowStockItems: 0, outOfStockItems: 0, valueAtRisk: 0, totalInventoryValue: 0 },
-      forecastAccuracy: 0,
-      alerts: [],
-      recentActivity: [],
-    });
-  }
+  if (!shop) return json({ stats: null, alerts: [], recentMovements: [] });
 
-  // Fast: inventory summary
-  const inventoryPromise = (async () => {
-    const allItems = await prisma.inventoryItem.findMany({
-      where: { shopId: shop.id },
-      include: { location: true },
-    });
+  const [totalItems, totalLocations, totalPOs, totalVendors] = await Promise.all([
+    prisma.inventoryItem.count({ where: { shopId: shop.id } }),
+    prisma.location.count({ where: { shopId: shop.id } }),
+    prisma.purchaseOrder.count({ where: { shopId: shop.id } }),
+    prisma.vendor.count({ where: { shopId: shop.id } }),
+  ]);
 
-    // Filter out Shopify Gift Card test data
-    const items = allItems.filter((i) => i.title !== "Gift Card");
-
-    const totalSKUs = items.length;
-    const lowStockItems = items.filter((i) => i.quantity <= i.reorderPoint && i.quantity > 0).length;
-    const outOfStockItems = items.filter((i) => i.quantity === 0).length;
-    const valueAtRisk = items
-      .filter((i) => i.quantity <= i.reorderPoint)
-      .reduce((sum, i) => sum + i.quantity * Number(i.costPerUnit || 0), 0);
-    const totalInventoryValue = items.reduce(
-      (sum, i) => sum + i.quantity * Number(i.costPerUnit || 0), 0
-    );
-
-    return { totalSKUs, lowStockItems, outOfStockItems, valueAtRisk, totalInventoryValue };
-  })();
-
-  // Slow: forecast accuracy
-  const forecastPromise = (async () => {
-    const forecasts = await prisma.forecastResult.findMany({
-      where: { inventoryItem: { shopId: shop.id } },
-      orderBy: { createdAt: "desc" },
-      take: 100,
-    });
-
-    if (forecasts.length === 0) return 0;
-    const avgConfidence =
-      forecasts.reduce((sum, f) => sum + f.confidence, 0) / forecasts.length;
-    return Math.round(avgConfidence * 100);
-  })();
-
-  // Alerts
-  const alertsPromise = prisma.reorderAlert.findMany({
-    where: { shopId: shop.id, status: "PENDING" },
-    include: { inventoryItem: true, location: true },
-    orderBy: [
-      { urgency: "asc" },
-      { createdAt: "desc" },
-    ],
-    take: 10,
+  // Recent alerts
+  const alerts = await prisma.reorderAlert.findMany({
+    where: { shop: { shopifyDomain: session?.shop ?? "stockflows2.myshopify.com" }, status: "PENDING" },
+    include: { inventoryItem: { select: { title: true, sku: true } }, location: { select: { name: true } } },
+    orderBy: { createdAt: "desc" },
+    take: 5,
   });
 
-  // Recent activity (latest stock movements)
-  const recentActivityPromise = prisma.stockMovement.findMany({
+  // Recent stock movements
+  const recentMovements = await prisma.stockMovement.findMany({
     where: { inventoryItem: { shopId: shop.id } },
-    include: {
-      inventoryItem: { select: { title: true, sku: true } },
-    },
+    include: { inventoryItem: { select: { title: true, sku: true } } },
     orderBy: { createdAt: "desc" },
     take: 8,
   });
 
-  // Await everything for simple data access (avoid Jsonify relation stripping)
-  const [stats, forecastAccuracy, alertsList, recentActivity] = await Promise.all([
-    inventoryPromise,
-    forecastPromise,
-    alertsPromise,
-    recentActivityPromise,
-  ]);
+  const pendingAlerts = alerts.filter((a) => a.status === "PENDING");
 
   return json({
-    stats,
-    forecastAccuracy,
-    alerts: alertsList,
-    recentActivity: recentActivity.filter(Boolean),
-  } as const);
+    stats: {
+      totalItems,
+      totalLocations,
+      totalPOs,
+      totalVendors,
+    },
+    alerts: pendingAlerts.map((a) => ({
+      id: a.id,
+      title: a.inventoryItem.title,
+      sku: a.inventoryItem.sku,
+      urgency: a.urgency,
+      currentStock: a.currentStock,
+      reorderPoint: a.reorderPoint,
+      location: a.location.name,
+    })),
+    recentMovements: recentMovements.map((m) => ({
+      id: m.id,
+      title: m.inventoryItem.title,
+      sku: m.inventoryItem.sku,
+      type: m.type,
+      quantityChange: m.quantityChange,
+      location: "Default",
+      createdAt: m.createdAt.toISOString(),
+    })),
+  });
 };
 
-const MOVEMENT_LABELS: Record<string, string> = {
-  SALE: "Sold",
-  RETURN: "Returned",
-  ADJUSTMENT: "Adjusted",
-  TRANSFER_IN: "Transfer in",
-  TRANSFER_OUT: "Transfer out",
-  RECEIVING: "Received",
-  CYCLE_COUNT: "Cycle count",
-  DAMAGE: "Damaged",
+const urgencyLabel: Record<string, string> = {
+  CRITICAL: "Critical",
+  HIGH: "High",
+  MEDIUM: "Medium",
+  LOW: "Low",
 };
 
-const MOVEMENT_TONES: Record<string, "success" | "critical" | "attention" | "info"> = {
-  SALE: "info",
-  RETURN: "success",
-  ADJUSTMENT: "attention",
-  TRANSFER_IN: "success",
-  TRANSFER_OUT: "info",
-  RECEIVING: "success",
-  CYCLE_COUNT: "info",
-  DAMAGE: "critical",
+const urgencyColor: Record<string, string> = {
+  CRITICAL: "var(--danger)",
+  HIGH: "var(--warning)",
+  MEDIUM: "var(--info)",
+  LOW: "var(--success)",
+};
+
+const typeIcon: Record<string, string> = {
+  SALE: "shopping_cart",
+  RECEIVING: "move_down",
+  TRANSFER_IN: "move_down",
+  TRANSFER_OUT: "move_up",
+  RETURN: "undo",
+  DAMAGE: "error",
+};
+
+const typeColor: Record<string, string> = {
+  SALE: "var(--danger)",
+  RECEIVING: "var(--success)",
+  TRANSFER_IN: "var(--success)",
+  TRANSFER_OUT: "var(--warning)",
+  RETURN: "var(--info)",
+  DAMAGE: "var(--danger)",
 };
 
 export default function Dashboard() {
-  const loaderData = useLoaderData<typeof loader>();
-  const navigate = useNavigate();
-  const navigation = useNavigation();
-  const isLoading = navigation.state === "loading";
-  const stats = (loaderData as any).stats ?? { totalSKUs: 0, lowStockItems: 0, outOfStockItems: 0, valueAtRisk: 0, totalInventoryValue: 0 };
-  const alerts = (loaderData as any).alerts ?? [];
-  const recentActivity = (loaderData as any).recentActivity ?? [];
-  const forecastAccuracy = (loaderData as any).forecastAccuracy ?? 0;
+  const data = useLoaderData<typeof loader>();
 
-  if (isLoading) {
+  if (!data.stats) {
     return (
-      <SkeletonPage title="StockFlows Dashboard">
-        <Layout>
-          <Layout.Section>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {[1, 2, 3, 4].map((i) => (
-                <Card key={i}>
-                  <div className="p-4">
-                    <SkeletonDisplayText size="small" />
-                    <div className="mt-2">
-                      <SkeletonDisplayText size="medium" />
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </Layout.Section>
-          <Layout.Section>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              <Card>
-                <SkeletonDisplayText size="small" />
-                <div className="mt-4 space-y-3">
-                  <SkeletonBodyText />
-                  <SkeletonBodyText />
-                  <SkeletonBodyText />
-                </div>
-              </Card>
-              <Card>
-                <SkeletonDisplayText size="small" />
-                <div className="mt-4 space-y-3">
-                  <SkeletonBodyText />
-                  <SkeletonBodyText />
-                  <SkeletonBodyText />
-                </div>
-              </Card>
-            </div>
-          </Layout.Section>
-        </Layout>
-      </SkeletonPage>
+      <div className="p-6">
+        <div className="flex items-center gap-3 p-4 rounded-lg" style={{ backgroundColor: "var(--accent-muted)", color: "var(--accent)" }}>
+          <span className="material-symbols-outlined">info</span>
+          <p className="text-sm font-medium">No shop data available. Sync inventory to get started.</p>
+        </div>
+      </div>
     );
   }
 
+  const { stats, alerts, recentMovements } = data;
+
   return (
-    <Page title="StockFlows Dashboard" subtitle="Inventory overview">
-      <Layout>
-        {/* Stat Cards */}
-        <Layout.Section>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <StatCard title="Total SKUs" value={stats.totalSKUs ?? 0} />
-            <StatCard
-              title="Low Stock"
-              value={stats.lowStockItems ?? 0}
-              trend={stats.lowStockItems > 0 ? "negative" : "neutral"}
-            />
-            <StatCard
-              title="Out of Stock"
-              value={stats.outOfStockItems ?? 0}
-              trend={stats.outOfStockItems > 0 ? "negative" : "positive"}
-            />
-            <StatCard
-              title="Inventory Value"
-              value={`$${(stats.totalInventoryValue ?? 0).toLocaleString()}`}
-              subtext={
-                (stats.valueAtRisk ?? 0) > 0
-                  ? `$${(stats.valueAtRisk ?? 0).toLocaleString()} at risk`
-                  : undefined
-              }
-            />
+    <div className="p-6">
+      {/* Page Header */}
+      <div className="mb-8">
+        <h1 className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+          Dashboard
+        </h1>
+        <p className="mt-2" style={{ color: "var(--text-secondary)" }}>
+          Overview of your inventory operations
+        </p>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        <StatCard label="Total Items" value={String(stats.totalItems)} icon="inventory_2" />
+        <StatCard label="Locations" value={String(stats.totalLocations)} icon="store" />
+        <StatCard label="POs Created" value={String(stats.totalPOs)} icon="shopping_cart" />
+        <StatCard label="Vendors" value={String(stats.totalVendors)} icon="business" />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Alerts Card */}
+        <div className="rounded-lg border p-5" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
+              Alerts
+            </h2>
+            <span className="material-symbols-outlined" style={{ color: "var(--text-tertiary)" }}>
+              notifications
+            </span>
           </div>
-        </Layout.Section>
-
-        {/* Alerts + Recent Activity side by side */}
-        <Layout.Section>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <Card>
-              <div className="flex items-center justify-between mb-2">
-                <Text variant="headingSm" as="h3">
-                  Active Alerts
-                </Text>
-                <Badge>{String(alerts?.length ?? 0)}</Badge>
-              </div>
-              <AlertsList alerts={alerts || []} />
-            </Card>
-
-            <Card>
-              <div className="flex items-center justify-between mb-2">
-                <Text variant="headingSm" as="h3">
-                  Recent Activity
-                </Text>
-                <Link to="/app/inventory" className="text-sm text-blue-600 hover:underline">
-                  View all
-                </Link>
-              </div>
-              {recentActivity.length === 0 ? (
-                <EmptyState
-                  heading="No recent activity"
-                  action={{ content: "View inventory", onAction: () => navigate("/app/inventory") }}
-                  image="https://cdn.shopify.com/s/files/1/0262/4071/2726/files/empty-state.png"
+          {alerts.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              No alerts. All items are well-stocked.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {alerts.map((alert) => (
+                <div
+                  key={alert.id}
+                  className="flex items-center justify-between p-3 rounded-lg"
+                  style={{ backgroundColor: "var(--bg-primary)", border: "1px solid var(--border)" }}
                 >
-                  <p>Stock movements will appear here as inventory changes.</p>
-                </EmptyState>
-              ) : (
-                <div className="space-y-2">
-                  {recentActivity.map((m: any) => (
-                    <div
-                      key={m.id}
-                      className="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
-                    >
-                      <div className="flex items-center gap-2">
-                        <Badge tone={MOVEMENT_TONES[m.type] ?? "info"}>
-                          {MOVEMENT_LABELS[m.type] ?? m.type}
-                        </Badge>
-                        <div>
-                          <Text variant="bodySm" as="p" fontWeight="semibold">
-                            {m.inventoryItem.title}
-                          </Text>
-                          <Text variant="bodySm" as="p" tone="subdued">
-                            {m.inventoryItem.sku ?? "No SKU"}
-                          </Text>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <Text
-                          variant="bodySm"
-                          as="p"
-                          fontWeight="semibold"
-                          className={
-                            m.quantityChange > 0
-                              ? "text-green-600"
-                              : m.quantityChange < 0
-                                ? "text-red-600"
-                                : ""
-                          }
-                        >
-                          {m.quantityChange > 0 ? "+" : ""}
-                          {m.quantityChange}
-                        </Text>
-                        <Text variant="bodySm" as="p" tone="subdued">
-                          {new Date(m.createdAt).toLocaleDateString()}
-                        </Text>
-                      </div>
-                    </div>
-                  ))}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
+                      {alert.title}
+                    </p>
+                    <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>
+                      {alert.sku ?? "No SKU"} — {alert.location}
+                    </p>
+                  </div>
+                  <div className="text-right ml-4 flex-shrink-0">
+                    <p className="text-xs font-medium" style={{ color: urgencyColor[alert.urgency] ?? "var(--text-secondary)" }}>
+                      {urgencyLabel[alert.urgency] ?? alert.urgency}
+                    </p>
+                    <p className="text-xs" style={{ color: "var(--text-secondary)" }}>
+                      Stock: {alert.currentStock} / {alert.reorderPoint}
+                    </p>
+                  </div>
                 </div>
-              )}
-            </Card>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Recent Activity Card */}
+        <div className="rounded-lg border p-5" style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold" style={{ color: "var(--text-primary)" }}>
+              Recent Activity
+            </h2>
+            <span className="material-symbols-outlined" style={{ color: "var(--text-tertiary)" }}>
+              history
+            </span>
           </div>
-        </Layout.Section>
-      </Layout>
-    </Page>
+          {recentMovements.length === 0 ? (
+            <p className="text-sm" style={{ color: "var(--text-secondary)" }}>
+              No recent activity.
+            </p>
+          ) : (
+            <div className="space-y-2">
+              {recentMovements.map((m) => (
+                <div
+                  key={m.id}
+                  className="flex items-center gap-3 p-3 rounded-lg"
+                  style={{ backgroundColor: "var(--bg-primary)", border: "1px solid var(--border)" }}
+                >
+                  <span
+                    className="material-symbols-outlined text-lg flex-shrink-0"
+                    style={{ color: typeColor[m.type] ?? "var(--text-secondary)" }}
+                  >
+                    {typeIcon[m.type] ?? "arrow_right_alt"}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate" style={{ color: "var(--text-primary)" }}>
+                      {m.quantityChange > 0 ? "+" : ""}
+                      {m.quantityChange} — {m.title}
+                    </p>
+                    <p className="text-xs" style={{ color: "var(--text-tertiary)" }}>
+                      {m.type.replace(/_/g, " ")} — {m.location}
+                    </p>
+                  </div>
+                  <span className="text-xs flex-shrink-0" style={{ color: "var(--text-tertiary)" }}>
+                    {new Date(m.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
 
-function StatCard({
-  title,
-  value,
-  trend,
-  subtext,
-}: {
-  title: string;
-  value: string | number;
-  trend?: "positive" | "negative" | "neutral";
-  subtext?: string;
-}) {
-  const color =
-    trend === "positive"
-      ? "text-green-600"
-      : trend === "negative"
-        ? "text-red-600"
-        : "text-gray-900";
-
+function StatCard({ label, value, icon }: { label: string; value: string; icon?: string }) {
   return (
-    <Card>
-      <div className="p-4">
-        <Text variant="headingSm" as="h3">
-          {title}
-        </Text>
-        <Text variant="headingLg" as="p" className={color}>
-          {value}
-        </Text>
-        {subtext && (
-          <Text variant="bodySm" as="p" tone="subdued">
-            {subtext}
-          </Text>
+    <div
+      className="rounded-lg border p-5 hover:transition-colors"
+      style={{ backgroundColor: "var(--bg-secondary)", borderColor: "var(--border)" }}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-sm font-medium" style={{ color: "var(--text-secondary)" }}>
+          {label}
+        </span>
+        {icon && (
+          <span className="material-symbols-outlined" style={{ color: "var(--text-tertiary)", fontSize: 20 }}>
+            {icon}
+          </span>
         )}
       </div>
-    </Card>
+      <span className="text-3xl font-bold" style={{ color: "var(--text-primary)" }}>
+        {value}
+      </span>
+    </div>
   );
 }
