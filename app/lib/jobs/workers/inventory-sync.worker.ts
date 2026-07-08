@@ -50,8 +50,8 @@ if (connection) {
           // Product variant upsert (from products webhook)
           await processItemUpsert(shopDomain, {
             id: job.data.variant.id,
-            sku: job.data.variant.sku,
-            barcode: job.data.variant.barcode,
+            sku: job.data.variant.sku ?? undefined,
+            barcode: job.data.variant.barcode ?? undefined,
           }, `webhook-${job.id}`);
         } else if (job.data.inventoryItem) {
           // Direct inventory item upsert (from inventory_items webhook)

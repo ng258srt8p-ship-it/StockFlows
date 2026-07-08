@@ -99,7 +99,7 @@ describe("Webhook Handlers (Integration)", () => {
   });
 
   describe("app/uninstalled webhook", () => {
-    it("deletes shop data on uninstall", async () => {
+    it("logs uninstall but keeps shop data for reinstall", async () => {
       const { authenticate } = await import("~/lib/shopify/server");
       const { prisma } = await import("~/lib/db/client");
 
@@ -124,9 +124,8 @@ describe("Webhook Handlers (Integration)", () => {
       } as any);
 
       expect(response.status).toBe(200);
-      expect(prisma.shop.delete).toHaveBeenCalledWith({
-        where: { shopifyDomain: "test-store.myshopify.com" },
-      });
+      // Handler intentionally keeps shop data for reinstall
+      expect(prisma.shop.delete).not.toHaveBeenCalled();
     });
   });
 
