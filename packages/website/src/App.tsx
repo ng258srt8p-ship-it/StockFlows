@@ -104,7 +104,6 @@ const App: React.FC = () => {
       <SectionReveal>
         <Pricing />
       </SectionReveal>
-      <div id="pricing" />
       <Footer />
     </div>
   );
