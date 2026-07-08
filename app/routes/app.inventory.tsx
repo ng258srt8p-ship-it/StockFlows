@@ -12,8 +12,6 @@ import {
   TextField,
   Select,
   Badge,
-  Button,
-  Filters,
   SkeletonBodyText,
   SkeletonDisplayText,
   SkeletonPage,
@@ -25,9 +23,7 @@ type InventoryWithLocation = InventoryItem & { location: Location };
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
-  const isEmbeddedRequest = url.searchParams.has("shop") && url.searchParams.has("embedded");
 
-  // Try Shopify authentication, fall back gracefully if no session
   let session: any;
   try {
     const auth = await authenticate.admin(request);
@@ -36,24 +32,19 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     session = null;
   }
 
-  // Resolve the shop record
   let shop;
   if (session) {
-    shop = await prisma.shop.findUnique({
-      where: { shopifyDomain: session.shop },
-    });
+    shop = await prisma.shop.findUnique({ where: { shopifyDomain: session.shop } });
   } else {
-    // Fallback: prefer stockflows2.myshopify.com if it exists, otherwise first shop
-    shop = await prisma.shop.findUnique({
-      where: { shopifyDomain: "stockflows2.myshopify.com" },
-    }) ?? await prisma.shop.findFirst();
+    shop = await prisma.shop.findUnique({ where: { shopifyDomain: "stockflows2.myshopify.com" } }) ?? await prisma.shop.findFirst();
   }
 
-  if (!shop) return json({ items: [], locations: [] });
+  if (!shop) return json({ items: [], locations: [], categories: [] });
 
   const locationId = url.searchParams.get("location");
   const search = url.searchParams.get("search") || "";
   const status = url.searchParams.get("status") || "";
+  const category = url.searchParams.get("category") || "";
 
   const where: any = { shopId: shop.id };
   if (locationId) where.locationId = locationId;
@@ -66,13 +57,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   }
   if (status === "low") where.quantity = { lte: prisma.inventoryItem.fields.reorderPoint };
   if (status === "out") where.quantity = 0;
+  if (category) where.productType = category;
 
   const [allItems, locations] = await Promise.all([
     prisma.inventoryItem.findMany({
       where,
       include: { location: true },
       orderBy: { updatedAt: "desc" },
-      take: 100,
+      take: 200,
     }),
     prisma.location.findMany({
       where: { shopId: shop.id, isActive: true },
@@ -80,19 +72,51 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     }),
   ]);
 
-  // Filter out Shopify Gift Card test data
   const items = allItems.filter((item) => item.title !== "Gift Card");
 
-  return json({ items, locations });
+  // Compute velocity for each item: count SALE movements in last 30 days
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+  const itemIds = items.map((i) => i.id);
+  const saleMovements = await prisma.stockMovement.groupBy({
+    by: ["inventoryItemId"],
+    where: {
+      inventoryItemId: { in: itemIds },
+      type: "SALE",
+      createdAt: { gte: thirtyDaysAgo },
+    },
+    _sum: { quantityChange: true },
+  });
+
+  const velocityMap = new Map<string, number>();
+  saleMovements.forEach((m) => {
+    velocityMap.set(m.inventoryItemId, Math.abs(m._sum.quantityChange ?? 0));
+  });
+
+  const itemsWithVelocity = items.map((item) => {
+    const sales = velocityMap.get(item.id) || 0;
+    let velocity: string;
+    if (sales > 50) velocity = "high";
+    else if (sales > 10) velocity = "medium";
+    else velocity = "low";
+    return { ...item, velocity, salesCount: sales };
+  });
+
+  // Extract unique categories from productType field
+  const categories = [...new Set(items.map((i) => i.productType).filter(Boolean))].sort() as string[];
+
+  return json({ items: itemsWithVelocity, locations, categories });
 };
 
 export default function InventoryList() {
-  const { items, locations } = useLoaderData<typeof loader>();
+  const { items, locations, categories } = useLoaderData<typeof loader>();
   const navigate = useNavigate();
   const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
   const [searchParams, setSearchParams] = useSearchParams();
   const [search, setSearch] = useState(searchParams.get("search") || "");
+  const activeCategory = searchParams.get("category") || "";
 
   const handleSearch = useCallback(
     (value: string) => {
@@ -115,10 +139,28 @@ export default function InventoryList() {
     [searchParams, setSearchParams]
   );
 
+  const handleCategoryFilter = useCallback(
+    (cat: string) => {
+      const params = new URLSearchParams(searchParams);
+      if (cat) params.set("category", cat);
+      else params.delete("category");
+      setSearchParams(params);
+    },
+    [searchParams, setSearchParams]
+  );
+
   const getStatus = (item: any) => {
     if (item.quantity === 0) return { label: "Out of Stock", status: "critical" as const };
     if (item.quantity <= item.reorderPoint) return { label: "Low Stock", status: "warning" as const };
     return { label: "In Stock", status: "success" as const };
+  };
+
+  const getVelocityBadge = (velocity: string) => {
+    switch (velocity) {
+      case "high": return <Badge tone="critical">High</Badge>;
+      case "medium": return <Badge tone="warning">Medium</Badge>;
+      default: return <Badge tone="success">Low</Badge>;
+    }
   };
 
   if (isLoading) {
@@ -128,25 +170,10 @@ export default function InventoryList() {
           <Layout.Section>
             <Card>
               <div className="p-4">
-                <div className="flex gap-4 mb-4">
-                  <div className="flex-1">
-                    <SkeletonDisplayText size="small" />
-                  </div>
-                  <div className="w-48">
-                    <SkeletonDisplayText size="small" />
-                  </div>
-                </div>
-                <div className="space-y-4">
+                <SkeletonDisplayText size="small" />
+                <div className="mt-4 space-y-2">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <div key={i} className="flex gap-4 items-center">
-                      <div className="w-24"><SkeletonBodyText /></div>
-                      <div className="flex-1"><SkeletonBodyText /></div>
-                      <div className="w-24"><SkeletonBodyText /></div>
-                      <div className="w-16 text-right"><SkeletonBodyText /></div>
-                      <div className="w-16 text-right"><SkeletonBodyText /></div>
-                      <div className="w-24"><SkeletonBodyText /></div>
-                      <div className="w-16 text-right"><SkeletonBodyText /></div>
-                    </div>
+                    <SkeletonBodyText key={i} />
                   ))}
                 </div>
               </div>
@@ -160,13 +187,52 @@ export default function InventoryList() {
   return (
     <Page
       title="Inventory"
-      subtitle={`${items.length} items`}
+      subtitle={`${items.length} SKUs tracked`}
       primaryAction={{
         content: "Add Item",
         onAction: () => navigate("/app/inventory/new"),
       }}
     >
       <Layout>
+        <Layout.Section>
+          {/* Category filter buttons */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 16, flexWrap: "wrap" }}>
+            <button
+              onClick={() => handleCategoryFilter("")}
+              style={{
+                padding: "6px 16px",
+                borderRadius: 8,
+                fontSize: 14,
+                fontWeight: 500,
+                border: "none",
+                cursor: "pointer",
+                backgroundColor: !activeCategory ? "var(--accent)" : "var(--bg-secondary)",
+                color: !activeCategory ? "white" : "var(--text-secondary)",
+              }}
+            >
+              All
+            </button>
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => handleCategoryFilter(cat)}
+                style={{
+                  padding: "6px 16px",
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  border: "none",
+                  cursor: "pointer",
+                  backgroundColor: activeCategory === cat ? "var(--accent)" : "var(--bg-secondary)",
+                  color: activeCategory === cat ? "white" : "var(--text-secondary)",
+                }}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </Layout.Section>
+
         <Layout.Section>
           <Card>
             <div className="p-4">
@@ -201,9 +267,11 @@ export default function InventoryList() {
                 headings={[
                   { title: "SKU" },
                   { title: "Product" },
+                  { title: "Category" },
                   { title: "Location" },
                   { title: "Qty", alignment: "end" },
                   { title: "Reorder Pt", alignment: "end" },
+                  { title: "Velocity" },
                   { title: "Status" },
                   { title: "Cost", alignment: "end" },
                 ]}
@@ -220,6 +288,7 @@ export default function InventoryList() {
                       <IndexTable.Cell>
                         <span className="font-medium">{item.title}</span>
                       </IndexTable.Cell>
+                      <IndexTable.Cell>{item.productType || "—"}</IndexTable.Cell>
                       <IndexTable.Cell>{item.location.name}</IndexTable.Cell>
                       <IndexTable.Cell>
                         <span className="text-right font-semibold">{item.quantity}</span>
@@ -227,14 +296,13 @@ export default function InventoryList() {
                       <IndexTable.Cell>
                         <span className="text-right">{item.reorderPoint}</span>
                       </IndexTable.Cell>
+                      <IndexTable.Cell>{getVelocityBadge(item.velocity)}</IndexTable.Cell>
                       <IndexTable.Cell>
                         <Badge tone={status.status}>{status.label}</Badge>
                       </IndexTable.Cell>
                       <IndexTable.Cell>
                         <span className="text-right">
-                          {item.costPerUnit
-                            ? `$${Number(item.costPerUnit).toFixed(2)}`
-                            : "—"}
+                          {item.costPerUnit ? `$${Number(item.costPerUnit).toFixed(2)}` : "—"}
                         </span>
                       </IndexTable.Cell>
                     </IndexTable.Row>

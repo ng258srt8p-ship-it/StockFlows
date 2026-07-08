@@ -1,4 +1,5 @@
-import React from 'react';
+import React from "react";
+import { useEffect } from "react";
 import { useDemoStore } from './store/useStore';
 import ErrorBoundary from './components/ErrorBoundary';
 import { TourOverlay } from './components/Tour/TourOverlay';
@@ -142,6 +143,37 @@ const App: React.FC = () => {
   const setActiveRoute = useDemoStore((s) => s.setActiveRoute);
   const startTour = useDemoStore((s) => s.startTour);
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+
+  // URL-based routing sync
+  useEffect(() => {
+    // Read URL on mount
+    const path = window.location.pathname.replace(/^\/demo\/?/, "").replace(/^\/demo$/, "");
+    const validRoutes = ["dashboard", "inventory", "purchasing", "forecasting", "reports", "settings", "migration", "onboarding", "webhooks"];
+    if (path && validRoutes.includes(path)) {
+      setActiveRoute(path);
+    }
+  }, []);
+
+  // Push to history when route changes
+  useEffect(() => {
+    const currentPath = window.location.pathname.replace(/^\/demo\/?/, "").replace(/^\/demo$/, "");
+    if (activeRoute !== currentPath) {
+      window.history.pushState({}, "", `/demo/${activeRoute}`);
+    }
+  }, [activeRoute]);
+
+  // Handle back/forward buttons
+  useEffect(() => {
+    const handlePopState = () => {
+      const path = window.location.pathname.replace(/^\/demo\/?/, "").replace(/^\/demo$/, "");
+      const validRoutes = ["dashboard", "inventory", "purchasing", "forecasting", "reports", "settings", "migration", "onboarding", "webhooks"];
+      if (path && validRoutes.includes(path)) {
+        setActiveRoute(path);
+      }
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [setActiveRoute]);
 
   const ActiveComponent = routeMap[activeRoute as RouteKey] || Dashboard;
 

@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@stockflows/ui/styles/tokens-v7.css";
+@import "./tokens-v7.css";
 
 /* Legacy aliases — used by component overrides below */
 :root {

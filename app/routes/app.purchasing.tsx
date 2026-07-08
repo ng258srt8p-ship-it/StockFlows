@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs, ActionFunctionArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useLoaderData, useNavigate, useFetcher, useNavigation } from "@remix-run/react";
+import { useLoaderData, useNavigate, useFetcher, useNavigation, useSearchParams } from "@remix-run/react";
 import { authenticate } from "~/lib/shopify/server";
 import { prisma } from "~/lib/db/client";
 import { requirePermission } from "~/lib/auth/middleware";
@@ -18,6 +18,7 @@ import {
   SkeletonDisplayText,
   SkeletonPage,
 } from "@shopify/polaris";
+import { useCallback } from "react";
 
 const statusBadge: Record<string, "info" | "success" | "warning" | "critical"> = {
   DRAFT: "info",
@@ -28,8 +29,15 @@ const statusBadge: Record<string, "info" | "success" | "warning" | "critical"> =
   CANCELLED: "critical",
 };
 
+const STATUS_FILTERS = [
+  { label: "All", value: "all" },
+  { label: "Draft", value: "DRAFT" },
+  { label: "Waiting", value: "SENT" },
+  { label: "Ready", value: "PARTIALLY_RECEIVED" },
+  { label: "Done", value: "RECEIVED" },
+];
+
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  // Try Shopify authentication, fall back gracefully if no session
   let session: any;
   try {
     const auth = await authenticate.admin(request);
@@ -38,16 +46,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     session = null;
   }
 
-  // Resolve the shop record
   let shop;
   if (session) {
-    shop = await prisma.shop.findUnique({
-      where: { shopifyDomain: session.shop },
-    });
+    shop = await prisma.shop.findUnique({ where: { shopifyDomain: session.shop } });
   } else {
-    shop = await prisma.shop.findUnique({
-      where: { shopifyDomain: "stockflows2.myshopify.com" },
-    }) ?? await prisma.shop.findFirst();
+    shop = await prisma.shop.findUnique({ where: { shopifyDomain: "stockflows2.myshopify.com" } }) ?? await prisma.shop.findFirst();
   }
 
   if (!shop) return json({ purchaseOrders: [], pendingAlertCount: 0 });
@@ -80,8 +83,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (session) {
     shop = await prisma.shop.findUnique({ where: { shopifyDomain: session.shop } });
   } else {
-    shop = await prisma.shop.findUnique({ where: { shopifyDomain: "stockflows2.myshopify.com" } })
-      ?? await prisma.shop.findFirst();
+    shop = await prisma.shop.findUnique({ where: { shopifyDomain: "stockflows2.myshopify.com" } }) ?? await prisma.shop.findFirst();
   }
   const shopId = shop?.id;
   if (!shopId) return json({ error: "No shop found" }, { status: 404 });
@@ -91,34 +93,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (intent === "auto-reorder") {
     try {
-      // Find the user ID from the session
-      const user = await prisma.user.findFirst({
-        where: { shopId },
-      });
+      const user = await prisma.user.findFirst({ where: { shopId } });
       const userId = user?.id || "system";
-
       const results = await generateAutoReorderPOs(shopId, userId);
-
       if (results.length === 0) {
-        return json({
-          success: false,
-          message: "No POs created. Make sure vendors are assigned to your inventory items.",
-        });
+        return json({ success: false, message: "No POs created. Make sure vendors are assigned to your inventory items." });
       }
-
-      const summary = results
-        .map((r) => `${r.poNumber} (${r.vendorName}: ${r.totalUnits} units)`)
-        .join(", ");
-
-      return json({
-        success: true,
-        message: `Created ${results.length} PO: ${summary}`,
-      });
+      const summary = results.map((r) => `${r.poNumber} (${r.vendorName}: ${r.totalUnits} units)`).join(", ");
+      return json({ success: true, message: `Created ${results.length} PO: ${summary}` });
     } catch (error) {
-      return json({
-        success: false,
-        message: "Failed to generate POs. Please try again.",
-      });
+      return json({ success: false, message: "Failed to generate POs. Please try again." });
     }
   }
 
@@ -132,6 +116,27 @@ export default function PurchasingList() {
   const fetcher = useFetcher();
   const isGenerating = fetcher.state !== "idle";
   const isLoading = navigation.state === "loading";
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeStatus = searchParams.get("status") || "all";
+
+  const handleStatusFilter = useCallback(
+    (status: string) => {
+      const params = new URLSearchParams(searchParams);
+      if (status !== "all") params.set("status", status);
+      else params.delete("status");
+      setSearchParams(params);
+    },
+    [searchParams, setSearchParams]
+  );
+
+  const filteredPOs = activeStatus === "all"
+    ? purchaseOrders
+    : purchaseOrders.filter((po) => po.status === activeStatus);
+
+  const totalValue = filteredPOs.reduce((sum, po) => {
+    const lineTotal = po.lineItems.reduce((s, li) => s + Number(li.unitCost || 0) * li.quantity, 0);
+    return sum + lineTotal + Number(po.shippingCost || 0) + Number(po.customsCost || 0) + Number(po.otherCost || 0);
+  }, 0);
 
   if (isLoading) {
     return (
@@ -141,15 +146,7 @@ export default function PurchasingList() {
             <Card>
               <div className="p-4 space-y-4">
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <div key={i} className="flex gap-4 items-center">
-                    <div className="w-24"><SkeletonBodyText /></div>
-                    <div className="flex-1"><SkeletonBodyText /></div>
-                    <div className="w-24"><SkeletonBodyText /></div>
-                    <div className="w-16 text-right"><SkeletonBodyText /></div>
-                    <div className="w-24"><SkeletonBodyText /></div>
-                    <div className="w-24"><SkeletonBodyText /></div>
-                    <div className="w-24"><SkeletonBodyText /></div>
-                  </div>
+                  <SkeletonBodyText key={i} />
                 ))}
               </div>
             </Card>
@@ -162,60 +159,74 @@ export default function PurchasingList() {
   return (
     <Page
       title="Purchase Orders"
-      subtitle="Manage vendor orders and receiving"
+      subtitle={`${purchaseOrders.length} total · $${totalValue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })} total value`}
       primaryAction={{
-        content: "Create PO",
+        content: "New PO",
         onAction: () => navigate("/app/purchasing/new"),
       }}
       secondaryActions={[
         {
           content: "Auto-generate POs",
-          onAction: () =>
-            fetcher.submit({ intent: "auto-reorder" }, { method: "post" }),
+          onAction: () => fetcher.submit({ intent: "auto-reorder" }, { method: "post" }),
           loading: isGenerating,
           disabled: isGenerating || pendingAlertCount === 0,
         },
       ]}
     >
       <Layout>
-        {/* Auto-reorder result banner */}
         {fetcher.data ? (
           <Layout.Section>
-            <Banner
-              tone={((fetcher.data as Record<string, unknown>).success ? "success" : "warning") as "success" | "warning"}
-            >
+            <Banner tone={((fetcher.data as Record<string, unknown>).success ? "success" : "warning") as "success" | "warning"}>
               <p>{String((fetcher.data as Record<string, unknown>).message ?? "")}</p>
             </Banner>
           </Layout.Section>
         ) : null}
 
-        {/* Pending alerts banner */}
         {pendingAlertCount > 0 && !fetcher.data && (
           <Layout.Section>
             <Banner tone="warning">
               <p>
-                <strong>{pendingAlertCount} items</strong> need reordering.
-                {" "}
+                <strong>{pendingAlertCount} items</strong> need reordering.{" "}
                 <button
                   type="button"
                   className="underline font-medium"
-                  onClick={() =>
-                    fetcher.submit({ intent: "auto-reorder" }, { method: "post" })
-                  }
+                  onClick={() => fetcher.submit({ intent: "auto-reorder" }, { method: "post" })}
                 >
                   Generate POs automatically
-                </button>
-                {" "}or create them manually.
+                </button>{" "}
+                or create them manually.
               </p>
             </Banner>
           </Layout.Section>
         )}
 
         <Layout.Section>
+          {/* Status filter tabs */}
+          <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+            {STATUS_FILTERS.map((sf) => (
+              <button
+                key={sf.value}
+                onClick={() => handleStatusFilter(sf.value)}
+                style={{
+                  padding: "6px 16px",
+                  borderRadius: 8,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  border: "none",
+                  cursor: "pointer",
+                  backgroundColor: activeStatus === sf.value ? "var(--accent)" : "var(--bg-secondary)",
+                  color: activeStatus === sf.value ? "white" : "var(--text-secondary)",
+                }}
+              >
+                {sf.label}
+              </button>
+            ))}
+          </div>
+
           <Card>
             <IndexTable
               resourceName={{ singular: "purchase order", plural: "purchase orders" }}
-              itemCount={purchaseOrders.length}
+              itemCount={filteredPOs.length}
               headings={[
                 { title: "PO #" },
                 { title: "Vendor" },
@@ -228,7 +239,7 @@ export default function PurchasingList() {
               selectable={false}
               onRowClick={(_, row) => navigate(`/app/purchasing/${row.id}`)}
             >
-              {purchaseOrders.map((po, index) => (
+              {filteredPOs.map((po, index) => (
                 <IndexTable.Row key={po.id} id={po.id} position={index}>
                   <IndexTable.Cell>
                     <span className="font-mono">{po.poNumber}</span>
@@ -244,9 +255,7 @@ export default function PurchasingList() {
                     </Badge>
                   </IndexTable.Cell>
                   <IndexTable.Cell>
-                    {po.expectedDate
-                      ? new Date(po.expectedDate).toLocaleDateString()
-                      : "—"}
+                    {po.expectedDate ? new Date(po.expectedDate).toLocaleDateString() : "—"}
                   </IndexTable.Cell>
                   <IndexTable.Cell>
                     {new Date(po.createdAt).toLocaleDateString()}
