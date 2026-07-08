@@ -1,6 +1,7 @@
 import { Worker, Job } from "bullmq";
 import { prisma } from "~/lib/db/client";
 import { logger } from "~/lib/logger";
+import { runForecast } from "~/lib/forecasting/engine";
 import { createWorkerConnection } from "../redis-connection";
 
 const connection = createWorkerConnection();
@@ -43,7 +44,39 @@ if (connection) {
           const dailySales = aggregateDailySales(movements);
           if (dailySales.length < 7) continue;
 
-          // Placeholder: would call runForecast(dailySales, 30) here
+          const forecast = await runForecast(dailySales, 30);
+          if (forecast.modelUsed === "none") continue;
+
+          await prisma.forecastResult.upsert({
+            where: {
+              inventoryItemId_locationId_forecastDate: {
+                inventoryItemId: item.id,
+                locationId: item.locationId,
+                forecastDate: new Date(),
+              },
+            },
+            update: {
+              horizonDays: 30,
+              predictedDaily: forecast.predictions,
+              totalPredicted: forecast.totalPredicted,
+              confidence: forecast.confidence,
+              modelUsed: forecast.modelUsed,
+              modelVersion: "v1",
+              factors: { avgDailySales: forecast.avgDailySales, trendDirection: forecast.trendDirection },
+            },
+            create: {
+              inventoryItemId: item.id,
+              locationId: item.locationId,
+              forecastDate: new Date(),
+              horizonDays: 30,
+              predictedDaily: forecast.predictions,
+              totalPredicted: forecast.totalPredicted,
+              confidence: forecast.confidence,
+              modelUsed: forecast.modelUsed,
+              modelVersion: "v1",
+              factors: { avgDailySales: forecast.avgDailySales, trendDirection: forecast.trendDirection },
+            },
+          });
           completed++;
         } catch (error) {
           log.error({ err: error, itemId: item.id }, "Forecast failed for item");

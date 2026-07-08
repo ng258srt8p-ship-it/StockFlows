@@ -80,8 +80,14 @@ if (connection) {
 
       log.info("Starting staff member sync");
 
+      const shop = await prisma.shop.findUnique({ where: { id: shopId } });
+      if (!shop) {
+        log.warn("Shop not found in database — skipping staff sync");
+        return;
+      }
+
       const response = await fetch(
-        `https://admin/api/2024-01/graphql.json`,
+        `https://${shop.shopifyDomain}/admin/api/2026-07/graphql.json`,
         {
           method: "POST",
           headers: {

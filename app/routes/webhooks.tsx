@@ -274,6 +274,79 @@ const ordersCreateHandler: WebhookHandler = async (shop, payload, log) => {
   );
 };
 
+// --- Order sync ---
+
+const ordersUpdatedHandler: WebhookHandler = async (shop, payload, log) => {
+  log.info({ orderId: payload.id, financialStatus: payload.financial_status, fulfillmentStatus: payload.fulfillment_status }, "Order updated — logged for audit");
+};
+
+// --- Locations ---
+
+const locationsCreateUpdateHandler: WebhookHandler = async (shop, payload, log) => {
+  const shopRecord = await prisma.shop.findUnique({ where: { shopifyDomain: shop } });
+  if (!shopRecord) return;
+
+  await prisma.location.upsert({
+    where: { shopifyLocationId: String(payload.id) },
+    update: { name: String((payload as any).name || "") },
+    create: {
+      shopId: shopRecord.id,
+      shopifyLocationId: String(payload.id),
+      name: String((payload as any).name || ""),
+    },
+  });
+  log.debug({ locationId: payload.id }, "Location upserted");
+};
+
+const locationsDeleteHandler: WebhookHandler = async (shop, payload, log) => {
+  const existing = await prisma.location.findUnique({
+    where: { shopifyLocationId: String(payload.id) },
+  });
+  if (existing) {
+    await prisma.location.update({
+      where: { id: existing.id },
+      data: { name: `${existing.name} (deleted ${new Date().toISOString().split("T")[0]})` },
+    });
+    log.info({ locationId: payload.id, name: existing.name }, "Location soft-deleted after Shopify deletion");
+  }
+};
+
+// --- Products ---
+
+const productsCreateUpdateHandler: WebhookHandler = async (shop, payload, log) => {
+  const variants = (payload as any).variants as Array<Record<string, unknown>> | undefined;
+  if (!variants || variants.length === 0) return;
+
+  const inventorySyncQueue = await getInventorySyncQueue();
+  if (!inventorySyncQueue) {
+    log.warn("Redis not available — product webhook skipped");
+    return;
+  }
+
+  for (const variant of variants) {
+    const inventoryItemId = toInventoryItemGid(String(variant.inventory_item_id ?? variant.id));
+    await inventorySyncQueue.add(
+      "webhook-product-variant",
+      {
+        shopDomain: shop,
+        product: {
+          title: String((payload as any).title || ""),
+          productType: (payload as any).product_type || null,
+          vendor: (payload as any).vendor || null,
+        },
+        variant: {
+          id: inventoryItemId,
+          title: variant.title || null,
+          sku: variant.sku || null,
+          barcode: variant.barcode || null,
+        },
+      },
+      { jobId: `wh-product-${String(variant.id)}-${Date.now()}` },
+    );
+  }
+  log.debug({ variantCount: variants.length }, "Products webhook queued");
+};
+
 // --- App lifecycle ---
 
 const appUninstalledHandler: WebhookHandler = async (shop, _payload, log) => {
@@ -325,13 +398,13 @@ const ROUTE_TABLE: Record<string, WebhookHandler> = {
   "inventory_items/delete": passThroughHandler,
   "variants/in_stock": passThroughHandler,
   "variants/out_of_stock": variantsOutOfStockHandler,
-  "locations/create": passThroughHandler,
-  "locations/update": passThroughHandler,
-  "locations/delete": passThroughHandler,
-  "products/create": passThroughHandler,
-  "products/update": passThroughHandler,
+  "locations/create": locationsCreateUpdateHandler,
+  "locations/update": locationsCreateUpdateHandler,
+  "locations/delete": locationsDeleteHandler,
+  "products/create": productsCreateUpdateHandler,
+  "products/update": productsCreateUpdateHandler,
   "orders/create": ordersCreateHandler,
-  "orders/updated": passThroughHandler,
+  "orders/updated": ordersUpdatedHandler,
   "app/uninstalled": appUninstalledHandler,
   // GDPR / compliance topics
   "customers/data_request": customersDataRequestHandler,
